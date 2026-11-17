@@ -1,0 +1,2505 @@
+<!--
+  个人成长驾驶舱 · 单文件版
+  生成时间：2026-11-17 19:26
+  数据来源：公开版（已清空个人记录）
+  由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
+  用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个人成长驾驶舱</title>
+<style>
+/* Personal Growth Dashboard · V0.1
+   视觉方向：编辑部工作台 / 个人研究室
+   纸张、档案、手账的质感；克制、清晰、温暖 */
+
+:root {
+  --paper: #f3eee3;
+  --paper-2: #fbf7ef;
+  --paper-3: #fffdf8;
+  --ink: #26221d;
+  --ink-2: #4a443b;
+  --muted: #8a8172;
+  --muted-2: #a89e8c;
+  --line: #e2d9c8;
+  --line-2: #cfc3ad;
+  --accent: #a3492f;
+  --accent-soft: #f2e4dc;
+  --ok: #4d6b50;
+  --warn: #a3782b;
+  --bad: #94402f;
+  --shadow: 0 1px 0 rgba(38, 34, 29, 0.04), 0 8px 24px -18px rgba(38, 34, 29, 0.35);
+  --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", Georgia, serif;
+  --sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 12% 8%, rgba(255, 253, 248, 0.9), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(255, 253, 248, 0.55), transparent 46%);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: 0.01em; margin: 0; }
+
+p { margin: 0; }
+
+button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+
+button { cursor: pointer; }
+
+/* ---------- 布局 ---------- */
+
+.shell {
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  padding: 30px 20px 22px;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  background: linear-gradient(180deg, rgba(255, 253, 248, 0.5), rgba(255, 253, 248, 0));
+}
+
+.brand { display: flex; align-items: center; gap: 10px; }
+
+.brand-mark {
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border: 1px solid var(--ink);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  background: var(--ink);
+  color: var(--paper-2);
+}
+
+.brand-txt { display: flex; flex-direction: column; line-height: 1.25; }
+.brand-txt strong { font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; font-weight: 600; }
+.brand-txt i { font-style: normal; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+
+.nav-btn {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px; width: 100%;
+  padding: 9px 10px 9px 12px;
+  background: none; border: 0; border-left: 2px solid transparent;
+  text-align: left; color: var(--ink-2);
+  transition: background 0.15s, color 0.15s;
+}
+.nav-btn b { font-family: var(--serif); font-size: 15px; font-weight: 600; }
+.nav-btn i { font-style: normal; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--muted-2); text-transform: uppercase; }
+.nav-btn:hover { background: rgba(255, 253, 248, 0.7); }
+.nav-btn.is-on { border-left-color: var(--accent); background: var(--paper-3); color: var(--ink); }
+.nav-btn.is-on i { color: var(--accent); }
+
+.rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 14px; }
+
+.mode-box { display: flex; flex-direction: column; gap: 8px; }
+
+.mode-pick { display: flex; flex-direction: column; gap: 4px; }
+
+.mode-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 9px;
+  background: rgba(255, 253, 248, 0.6);
+  border: 1px solid var(--line);
+  font-size: 12px; color: var(--ink-2);
+  text-align: left;
+}
+.mode-btn .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted-2); flex: none; }
+.mode-btn[data-mode="green"] .dot { background: var(--ok); }
+.mode-btn[data-mode="yellow"] .dot { background: var(--warn); }
+.mode-btn[data-mode="red"] .dot { background: var(--bad); }
+.mode-btn.is-on { border-color: var(--ink); background: var(--paper-3); color: var(--ink); }
+.mode-btn small { margin-left: auto; font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.06em; }
+
+.rail-note { font-family: var(--serif); font-size: 12px; color: var(--muted); line-height: 1.7; }
+
+.main { padding: 34px 40px 60px; max-width: 1240px; }
+
+/* ---------- 头部 ---------- */
+
+.head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 20px; padding-bottom: 22px; margin-bottom: 24px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero { font-size: clamp(26px, 3.1vw, 38px); margin: 6px 0 8px; line-height: 1.25; }
+
+.sub { font-size: 13px; color: var(--muted); }
+
+.store-badge {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  padding: 5px 9px; border: 1px solid var(--line-2); color: var(--muted);
+  background: var(--paper-3); white-space: nowrap;
+}
+
+.banner {
+  margin-bottom: 20px; padding: 12px 14px;
+  border: 1px solid var(--line-2); border-left: 3px solid var(--warn);
+  background: var(--paper-3); font-size: 13px; color: var(--ink-2);
+}
+
+/* 「换了一天」提示 */
+.notice {
+  margin-bottom: 20px; padding: 15px 18px;
+  border: 1px solid var(--line-2); border-left: 3px solid var(--accent);
+  background: var(--paper-3); box-shadow: var(--shadow);
+}
+.notice-title { font-family: var(--serif); font-size: 15px; color: var(--ink); line-height: 1.5; }
+.notice-sub { font-size: 12px; color: var(--muted); margin-top: 5px; line-height: 1.75; }
+.notice-sub b { color: var(--ink-2); font-weight: 600; }
+.notice-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+
+/* ---------- 视图 ---------- */
+
+.view { display: none; }
+.view.is-on { display: block; animation: fade 0.18s ease-out; }
+
+/* 只做位移、不做透明度：避免动画未结束时内容读不清（截图/慢设备都会遇到） */
+@keyframes fade { from { transform: translateY(3px); } to { transform: none; } }
+
+.today-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.col { display: flex; flex-direction: column; gap: 18px; }
+.two-col { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; align-items: start; margin-bottom: 18px; }
+
+.view-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; margin-bottom: 20px; flex-wrap: wrap; }
+.view-head h2 { font-size: 24px; }
+.view-head .sub { margin-top: 4px; }
+
+/* ---------- 卡片 ---------- */
+
+.card {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 20px 22px;
+  box-shadow: var(--shadow);
+}
+
+.card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+.card-head h2 { font-size: 16px; }
+.card-head .eyebrow { flex: none; }
+
+.card-hero { background: var(--paper-3); border-color: var(--line-2); }
+
+.hero-main {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+}
+.hero-main h3 { font-size: 26px; line-height: 1.3; margin: 4px 0 10px; }
+.hero-meta { display: flex; gap: 14px; flex-wrap: wrap; font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+.hero-note { margin-top: 12px; font-size: 13px; color: var(--ink-2); border-top: 1px dashed var(--line); padding-top: 12px; }
+
+.prio-tag {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 3px 7px; border: 1px solid var(--accent); color: var(--accent);
+  background: var(--accent-soft); white-space: nowrap;
+}
+
+/* ---------- 任务 ---------- */
+
+.tasks { list-style: none; margin: 0; padding: 0; }
+
+.task {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 11px 0;
+  border-top: 1px dashed var(--line);
+}
+.task:first-child { border-top: 0; padding-top: 0; }
+
+.check {
+  flex: none; width: 18px; height: 18px; margin-top: 2px;
+  border: 1px solid var(--line-2); background: var(--paper-3);
+  display: grid; place-items: center;
+  font-size: 11px; color: transparent; line-height: 1;
+  transition: background 0.15s, border-color 0.15s;
+}
+.task:hover .check { border-color: var(--ink-2); }
+.task.is-done .check { background: var(--ink); border-color: var(--ink); color: var(--paper-2); }
+.task.is-done .task-title { color: var(--muted); text-decoration: line-through; }
+
+.task-body { min-width: 0; flex: 1; }
+.task-title { font-size: 14px; color: var(--ink); }
+.task-hint { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.task-side { flex: none; font-family: var(--mono); font-size: 10px; color: var(--muted-2); letter-spacing: 0.06em; padding-top: 3px; }
+
+.skippable {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--muted); border: 1px solid var(--line); padding: 1px 5px; margin-left: 6px;
+  text-transform: uppercase;
+}
+
+.empty {
+  padding: 14px 0; font-size: 13px; color: var(--muted);
+  font-family: var(--serif);
+}
+
+/* ---------- 进度 ---------- */
+
+.progress-num { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.progress-num b { font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1; }
+.progress-num span { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+
+.bar { height: 5px; background: var(--line); overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); transition: width 0.3s ease; }
+
+.mini-stats { display: flex; gap: 20px; margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.mini-stat { display: flex; flex-direction: column; gap: 2px; }
+.mini-stat b { font-family: var(--serif); font-size: 19px; font-weight: 600; }
+.mini-stat span { font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; }
+
+/* ---------- 表单 ---------- */
+
+textarea, input[type="text"], input[type="search"], select {
+  width: 100%;
+  padding: 9px 10px;
+  background: var(--paper-3);
+  border: 1px solid var(--line-2);
+  border-radius: 1px;
+  font-size: 13px;
+  color: var(--ink);
+  outline: none;
+}
+textarea { resize: vertical; min-height: 68px; line-height: 1.6; }
+textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
+
+.form-row { display: flex; gap: 8px; margin-top: 8px; }
+.form-row select { flex: 1; }
+
+.solid-btn, .ghost-btn {
+  padding: 8px 14px;
+  border-radius: 1px;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--ink);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.solid-btn { background: var(--ink); color: var(--paper-2); }
+.solid-btn:hover { background: var(--accent); border-color: var(--accent); }
+.ghost-btn { background: transparent; color: var(--ink-2); border-color: var(--line-2); }
+.ghost-btn:hover { border-color: var(--ink-2); background: var(--paper-3); }
+.ghost-btn.danger { color: var(--bad); border-color: #d9c2b9; }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
+.note-list { display: flex; flex-direction: column; }
+.notes-mini { list-style: none; margin: 14px 0 0; padding: 0; }
+.notes-mini li {
+  padding: 9px 0; border-top: 1px dashed var(--line);
+  font-size: 13px; color: var(--ink-2);
+  display: flex; gap: 8px; align-items: baseline;
+}
+.notes-mini li .meta { flex: none; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--muted-2); text-transform: uppercase; }
+
+/* ---------- 本周 ---------- */
+
+.week-top { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 18px; }
+.stat { background: var(--paper-2); border: 1px solid var(--line); padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; }
+.stat b { font-family: var(--serif); font-size: 18px; font-weight: 600; }
+
+.quota-list { display: flex; flex-direction: column; }
+
+.quota {
+  display: grid; grid-template-columns: minmax(0, 1fr) 150px auto;
+  gap: 14px; align-items: center;
+  padding: 12px 0; border-top: 1px dashed var(--line);
+}
+.quota:first-child { border-top: 0; padding-top: 0; }
+.quota-name { font-size: 14px; }
+.quota-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; margin-top: 2px; }
+.quota-ctrl { display: flex; gap: 6px; align-items: center; }
+.step-btn {
+  width: 26px; height: 26px; line-height: 1;
+  border: 1px solid var(--line-2); background: var(--paper-3);
+  font-size: 14px; color: var(--ink-2);
+}
+.step-btn:hover { border-color: var(--ink); }
+.quota-count { font-family: var(--mono); font-size: 12px; min-width: 42px; text-align: center; }
+.quota.is-full .bar > i { background: var(--ok); }
+
+.week-strip { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.day-chip {
+  border: 1px solid var(--line); background: var(--paper-3);
+  padding: 9px 8px; min-height: 82px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.day-chip.is-today { border-color: var(--accent); background: var(--accent-soft); }
+.day-chip .d { font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--muted); }
+.day-chip .t { font-size: 11px; line-height: 1.4; color: var(--ink-2); }
+
+.warn-item { display: flex; gap: 12px; padding: 11px 0; border-top: 1px dashed var(--line); }
+.warn-item:first-child { border-top: 0; padding-top: 0; }
+.warn-tag { flex: none; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--bad); border: 1px solid #d9c2b9; padding: 2px 6px; height: fit-content; }
+
+/* ---------- 探索 ---------- */
+
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip {
+  padding: 6px 12px; border: 1px solid var(--line-2); background: var(--paper-3);
+  font-size: 12px; color: var(--ink-2); border-radius: 1px;
+}
+.chip.is-on { background: var(--ink); border-color: var(--ink); color: var(--paper-2); }
+.chip span { font-family: var(--mono); font-size: 10px; opacity: 0.7; margin-left: 4px; }
+
+.res-list { display: flex; flex-direction: column; gap: 14px; }
+
+.res {
+  background: var(--paper-2); border: 1px solid var(--line);
+  padding: 20px 22px; box-shadow: var(--shadow);
+}
+.res-top { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.res h3 { font-size: 17px; line-height: 1.45; }
+.res h3 a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line-2); }
+.res h3 a:hover { border-bottom-color: var(--accent); color: var(--accent); }
+.res-src { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.05em; margin-top: 6px; }
+
+.res-body { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; font-size: 13px; }
+.res-line { display: flex; gap: 10px; }
+.res-line b { flex: none; width: 62px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; padding-top: 3px; }
+.res-line span { color: var(--ink-2); }
+
+.tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+.tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em; padding: 2px 7px; border: 1px solid var(--line-2); color: var(--muted); }
+.tag.ch-known { border-color: #b9c4b6; color: #4d6b50; }
+.tag.ch-adjacent { border-color: #cdbd9a; color: #8a6b26; }
+.tag.ch-random { border-color: #cbb2a8; color: var(--accent); }
+.tag.cr { border-color: var(--line); color: var(--muted-2); }
+
+.res-foot { display: flex; gap: 8px; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); flex-wrap: wrap; }
+.res-foot select { width: auto; min-width: 150px; padding: 5px 8px; font-size: 12px; }
+.res-foot .spacer { flex: 1; }
+
+/* ---------- 知识库 ---------- */
+
+.toolbar { display: flex; gap: 8px; align-items: center; margin-bottom: 16px; }
+.toolbar input { flex: 1; max-width: 360px; }
+.toolbar select { width: auto; min-width: 130px; }
+
+.note-item {
+  background: var(--paper-2); border: 1px solid var(--line);
+  padding: 14px 16px; display: flex; gap: 14px; align-items: flex-start;
+}
+.note-item + .note-item { margin-top: 10px; }
+.note-meta { flex: none; width: 130px; display: flex; flex-direction: column; gap: 3px; }
+.note-date { font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
+.note-cat { font-size: 11px; color: var(--accent); }
+.note-text { flex: 1; font-size: 14px; color: var(--ink-2); white-space: pre-wrap; }
+.note-del { flex: none; background: none; border: 0; color: var(--muted-2); font-size: 16px; line-height: 1; padding: 2px 4px; }
+.note-del:hover { color: var(--bad); }
+
+.day-group { margin-top: 16px; }
+.day-group:first-child { margin-top: 0; }
+.day-head { font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; color: var(--muted); padding-bottom: 6px; border-bottom: 1px solid var(--line); margin-bottom: 8px; text-transform: uppercase; }
+
+/* ---------- 复盘 ---------- */
+
+.q { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--ink-2); margin-bottom: 14px; }
+
+.card-data .fine { margin-bottom: 4px; }
+
+/* ---------- 其他 ---------- */
+
+.fine { font-size: 12px; color: var(--muted); line-height: 1.7; }
+.fine strong { color: var(--ink-2); font-weight: 600; }
+
+.foot {
+  display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--line);
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--muted-2);
+}
+
+.toast {
+  position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%);
+  background: var(--ink); color: var(--paper-2);
+  padding: 10px 18px; font-size: 13px;
+  box-shadow: 0 10px 30px -12px rgba(38, 34, 29, 0.6);
+  z-index: 50;
+}
+
+/* ---------- 响应式 ---------- */
+
+@media (max-width: 1080px) {
+  .today-grid, .two-col { grid-template-columns: minmax(0, 1fr); }
+  .week-top { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 880px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .rail {
+    position: sticky; top: 0; z-index: 20;
+    height: auto; flex-direction: row; align-items: center;
+    gap: 10px; padding: 10px 14px; border-right: 0; border-bottom: 1px solid var(--line);
+    overflow-x: auto; background: var(--paper);
+  }
+  .brand { flex: none; }
+  .brand-txt { display: none; }
+  .brand-mark { width: 30px; height: 30px; font-size: 10px; }
+  .nav { flex-direction: row; gap: 0; flex: 1; }
+  .nav-btn { flex-direction: column; align-items: flex-start; gap: 0; border-left: 0; border-bottom: 2px solid transparent; padding: 6px 9px; width: auto; }
+  .nav-btn b { font-size: 14px; }
+  .nav-btn i { font-size: 9px; }
+  .nav-btn.is-on { border-bottom-color: var(--accent); background: none; }
+  .rail-foot { display: none; }
+  .main { padding: 18px 14px 48px; }
+  .head { flex-direction: column; gap: 8px; margin-bottom: 16px; padding-bottom: 16px; }
+  .hero { font-size: 26px; margin: 4px 0 6px; }
+  .sub { font-size: 12px; }
+  .week-strip { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .quota { grid-template-columns: minmax(0, 1fr) auto; }
+  .quota-bar { grid-column: 1 / -1; }
+  .note-item { flex-direction: column; gap: 6px; }
+  .note-meta { width: auto; flex-direction: row; gap: 10px; }
+  .res-line { flex-direction: column; gap: 2px; }
+  .res-line b { width: auto; }
+  .stat { padding: 12px 13px; }
+}
+
+/* 手机：碎片时间用，一屏要能完成「勾 + 记」 */
+@media (max-width: 620px) {
+  :root { --tap: 26px; }
+
+  .card { padding: 15px 16px; }
+  .card-hero h3 { font-size: 22px !important; }
+  .hero-main h3 { font-size: 22px; }
+  .hero-note { font-size: 12px; }
+  .card-head { margin-bottom: 10px; }
+  .card-head h2 { font-size: 15px; }
+  .card-head .eyebrow { display: none; }
+
+  /* 触摸目标：勾选框和整行都变大 */
+  .check { width: var(--tap); height: var(--tap); font-size: 13px; border-radius: 2px; }
+  .task { padding: 13px 0; gap: 14px; }
+  .task-title { font-size: 15px; line-height: 1.5; }
+  .task-hint { font-size: 12px; }
+  .task-side { font-size: 10px; padding-top: 6px; }
+
+  .eyebrow { font-size: 9px; letter-spacing: 0.14em; }
+  .form-row { flex-direction: column; }
+  .form-row select { width: 100%; }
+  .form-row .solid-btn { width: 100%; padding: 11px; font-size: 14px; }
+  textarea { min-height: 62px; font-size: 15px; }
+  input[type="text"], input[type="search"], select { padding: 11px 10px; font-size: 14px; }
+
+  .solid-btn, .ghost-btn { padding: 11px 16px; font-size: 13px; }
+  .notice { padding: 13px 14px; }
+  .notice-title { font-size: 14px; }
+  .notice-actions { gap: 8px; }
+  .notice-actions .solid-btn, .notice-actions .ghost-btn { flex: 1 1 auto; }
+
+  .mode-pick { flex-direction: row; }
+  /* 手机上重排「今日」：主线 → 锚点 → 快速记录 → 进度 → 轮换 → 可选 → 负荷
+     做法：把两列拆开（display: contents），再用 order 控制顺序 */
+  .today-grid { display: flex; flex-direction: column; gap: 14px; }
+  .today-grid > .col { display: contents; }
+  #mainTaskCard { order: 1; }
+  #anchorsCard { order: 2; }
+  #quickCard { order: 3; }
+  #progressCard { order: 4; }
+  #rotationCard { order: 5; }
+  #optionalCard { order: 6; }
+  #lowEnergyCard { order: 7; }
+
+  .day-chip { min-height: 70px; padding: 7px 6px; }
+  .day-chip .t { font-size: 10px; }
+  .week-top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .stat b { font-size: 16px; }
+  .mini-stats { gap: 16px; }
+  .mini-stat b { font-size: 17px; }
+  .res h3 { font-size: 16px; }
+  .res-foot select { min-width: 0; flex: 1 1 140px; }
+  .toolbar { flex-wrap: wrap; }
+  .toolbar input { max-width: none; flex: 1 1 100%; }
+  .foot { flex-direction: column; gap: 6px; margin-top: 28px; }
+}
+
+/* 极窄屏（iPhone SE 一类） */
+@media (max-width: 380px) {
+  .main { padding: 14px 11px 40px; }
+  .card { padding: 13px 13px; }
+  .hero { font-size: 23px; }
+  .nav-btn { padding: 6px 7px; }
+  .nav-btn i { display: none; }
+}
+
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <aside class="rail">
+    <div class="brand">
+      <span class="brand-mark">MG</span>
+      <span class="brand-txt">
+        <strong>MY GROWTH</strong>
+        <i>个人学习系统</i>
+      </span>
+    </div>
+
+    <nav class="nav" id="nav">
+      <button type="button" class="nav-btn is-on" data-view="today"><b>今日</b><i>Today</i></button>
+      <button type="button" class="nav-btn" data-view="week"><b>本周</b><i>This week</i></button>
+      <button type="button" class="nav-btn" data-view="explore"><b>探索</b><i>Discover</i></button>
+      <button type="button" class="nav-btn" data-view="library"><b>知识库</b><i>Library</i></button>
+      <button type="button" class="nav-btn" data-view="review"><b>复盘</b><i>Review</i></button>
+    </nav>
+
+    <div class="rail-foot">
+      <div class="mode-box">
+        <span class="eyebrow">今日负荷</span>
+        <div class="mode-pick" id="modePick"></div>
+      </div>
+      <p class="rail-note">系统适应你的波动，<br>不要求你适应系统。</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="head">
+      <div class="head-left">
+        <p class="eyebrow" id="todayDate">—</p>
+        <h1 class="hero" id="greeting">今天，也向前一点。</h1>
+        <p class="sub" id="headSub">创作优先 · 均衡成长 · 自由探索</p>
+      </div>
+      <div class="head-right">
+        <span class="store-badge" id="storeBadge">本地存储</span>
+      </div>
+    </header>
+
+    <div class="notice" id="notice" hidden></div>
+    <div class="banner" id="banner" hidden></div>
+
+    <!-- 今日 -->
+    <section class="view is-on" id="view-today">
+      <div class="today-grid">
+        <div class="col">
+          <article class="card card-hero" id="mainTaskCard"></article>
+
+          <article class="card" id="anchorsCard">
+            <header class="card-head">
+              <h2>今日锚点</h2>
+              <span class="eyebrow" id="anchorMeta"></span>
+            </header>
+            <ul class="tasks" id="anchorList"></ul>
+            <p class="fine" id="anchorNote"></p>
+          </article>
+
+          <article class="card" id="rotationCard"></article>
+          <article class="card" id="optionalCard"></article>
+        </div>
+
+        <div class="col">
+          <article class="card" id="progressCard">
+            <header class="card-head">
+              <h2>今日进度</h2>
+              <span class="eyebrow">只算今天承诺的</span>
+            </header>
+            <div id="progressBox"></div>
+          </article>
+
+          <article class="card" id="quickCard">
+            <header class="card-head">
+              <h2>快速记录</h2>
+              <span class="eyebrow">写一句就行</span>
+            </header>
+            <form id="noteForm" autocomplete="off">
+              <textarea id="noteText" rows="3" placeholder="今天看到了什么？有什么地方让你觉得奇怪？或者只是一句状态。"></textarea>
+              <div class="form-row">
+                <select id="noteCat">
+                  <option value="作品观察">作品观察</option>
+                  <option value="临时灵感">临时灵感</option>
+                  <option value="阅读拾遗">阅读拾遗</option>
+                  <option value="音乐记录">音乐记录</option>
+                  <option value="科技案例">科技案例</option>
+                  <option value="状态记录">状态记录</option>
+                </select>
+                <button type="submit" class="solid-btn">记下</button>
+              </div>
+            </form>
+            <ul class="notes-mini" id="todayNotes"></ul>
+          </article>
+
+          <article class="card" id="lowEnergyCard"></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 本周 -->
+    <section class="view" id="view-week">
+      <div class="week-top">
+        <div class="stat"><span class="eyebrow">本周范围</span><b id="weekRange">—</b></div>
+        <div class="stat"><span class="eyebrow">已完成配额</span><b id="weekDone">—</b></div>
+        <div class="stat"><span class="eyebrow">学习分钟数</span><b id="weekMinutes">—</b></div>
+        <div class="stat"><span class="eyebrow">负荷分布</span><b id="weekLoad">—</b></div>
+      </div>
+
+      <article class="card">
+        <header class="card-head">
+          <h2>每周配额</h2>
+          <span class="eyebrow">初始目标，不是 KPI</span>
+        </header>
+        <div id="weekProgress" class="quota-list"></div>
+      </article>
+
+      <article class="card">
+        <header class="card-head">
+          <h2>本周轮盘</h2>
+          <span class="eyebrow">只管容易被遗忘的输入</span>
+        </header>
+        <div id="rotationPlan" class="week-strip"></div>
+        <p class="fine">吉他、画画、课程不受轮盘限制。忙到晚上十点就跳过，不顺延成第二天的债务。</p>
+      </article>
+
+      <article class="card">
+        <header class="card-head">
+          <h2>被忽略的方向</h2>
+          <span class="eyebrow">不是业绩报警</span>
+        </header>
+        <div id="neglectBox"></div>
+      </article>
+
+      <div class="two-col">
+        <article class="card" id="unknownCard"></article>
+        <article class="card" id="deepCard"></article>
+      </div>
+    </section>
+
+    <!-- 探索 -->
+    <section class="view" id="view-explore">
+      <header class="view-head">
+        <div>
+          <h2>灵感探索</h2>
+          <p class="sub" id="exploreMeta">—</p>
+        </div>
+        <div class="filter-row" id="channelFilter"></div>
+      </header>
+      <div class="res-list" id="resList"></div>
+    </section>
+
+    <!-- 知识库 -->
+    <section class="view" id="view-library">
+      <header class="view-head">
+        <div>
+          <h2>知识收纳</h2>
+          <p class="sub">低成本记录 + 定期回收，不做几千条卡片的数据库。</p>
+        </div>
+      </header>
+      <div class="toolbar">
+        <input type="search" id="libSearch" placeholder="搜关键词，比如 剪影、剪、港口">
+        <select id="libCat"></select>
+        <span class="eyebrow" id="libCount"></span>
+      </div>
+      <div id="libList" class="note-list"></div>
+    </section>
+
+    <!-- 复盘 -->
+    <section class="view" id="view-review">
+      <div class="two-col">
+        <div class="col">
+          <article class="card">
+            <header class="card-head"><h2>本周投入</h2><span class="eyebrow">事实，不评价</span></header>
+            <div id="reviewStats"></div>
+          </article>
+
+          <article class="card">
+            <header class="card-head"><h2>每周三问</h2><span class="eyebrow">每周只答这三个</span></header>
+            <form id="threeQ" autocomplete="off">
+              <label class="q">这周我第一次知道了什么？<input type="text" data-q="q1"></label>
+              <label class="q">这周什么东西改变了我原本的理解？<input type="text" data-q="q2"></label>
+              <label class="q">这周我发现了什么以前从未想过的问题？<input type="text" data-q="q3"></label>
+              <p class="fine" id="threeQState">改动会自动保存。</p>
+            </form>
+          </article>
+        </div>
+
+        <div class="col">
+          <article class="card">
+            <header class="card-head"><h2>每日回收</h2><span class="eyebrow">全部记录</span></header>
+            <div id="dailyLog" class="note-list"></div>
+          </article>
+
+          <article class="card card-data">
+            <header class="card-head"><h2>数据</h2><span class="eyebrow">导出才是备份</span></header>
+            <p class="fine">
+              网页上的操作存在浏览器本地存储里，<strong>不等于写回项目 JSON</strong>。
+              想让我（Agent）读到，请先点「导出 JSON」，再把这个文件交给我。
+            </p>
+            <div class="btn-row">
+              <button type="button" class="solid-btn" data-act="export">导出 JSON</button>
+              <button type="button" class="ghost-btn" data-act="import">导入 JSON</button>
+              <button type="button" class="ghost-btn" data-act="reload">从项目 JSON 重新载入</button>
+              <button type="button" class="ghost-btn danger" data-act="reset">重置为示例数据</button>
+            </div>
+            <input type="file" id="importFile" accept=".json,application/json" hidden>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span id="footSrc">数据源：data/*.json</span>
+      <span>V0.1 · 只验证「今天做什么 / 忽略了什么 / 有什么新东西」</span>
+    </footer>
+  </main>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<script>
+/* 离线版数据（由 build_offline.py 内联）*/
+window.__SEED__ = {
+  "today": {
+    "date": "2026-11-16",
+    "mode": "green",
+    "mode_reason": "周一，新的一周开始；精力 4/5",
+    "generated_by": "seed",
+    "generated_at": "2026-11-16T08:10:00+08:00",
+    "main_task": {
+      "id": "task_20261116_main",
+      "title": "插画创作：角色主体与上色",
+      "category": "art",
+      "date": "2026-11-16",
+      "status": "pending",
+      "priority": "primary",
+      "estimated_minutes": 240,
+      "note": "延续自 11/15，今天继续；优先保证创作质量"
+    },
+    "anchors": [
+      {
+        "id": "task_20261116_a1",
+        "title": "吉他练习 10 分钟",
+        "category": "music",
+        "date": "2026-11-16",
+        "status": "pending",
+        "priority": "anchor",
+        "estimated_minutes": 10,
+        "kind": "anchor",
+        "anchor_ref": "anchor_music",
+        "hint": "基本功或一段喜欢的旋律"
+      },
+      {
+        "id": "task_20261116_a2",
+        "title": "阅读 10 分钟",
+        "category": "read",
+        "date": "2026-11-16",
+        "status": "pending",
+        "priority": "anchor",
+        "estimated_minutes": 10,
+        "kind": "anchor",
+        "anchor_ref": "anchor_read",
+        "hint": "《观看之道》或随手一首诗"
+      },
+      {
+        "id": "task_20261116_a3",
+        "title": "睡前记录一个今天的新发现",
+        "category": "self",
+        "date": "2026-11-16",
+        "status": "pending",
+        "priority": "anchor",
+        "estimated_minutes": 3,
+        "kind": "anchor",
+        "anchor_ref": "anchor_daily",
+        "hint": "一句话就够"
+      }
+    ],
+    "rotation": {
+      "id": "task_20261116_rot",
+      "title": "视觉审美：分析一张优秀插画的设计意图",
+      "category": "art",
+      "date": "2026-11-16",
+      "status": "pending",
+      "priority": "rotation",
+      "estimated_minutes": 20,
+      "kind": "rotation",
+      "skippable": true,
+      "slot": "visual_art"
+    },
+    "optional_exploration": {
+      "id": "task_20261116_opt",
+      "title": "把上周收藏的 3 张图归入灵感库，各写一句为什么喜欢",
+      "category": "art",
+      "date": "2026-11-16",
+      "status": "pending",
+      "priority": "optional",
+      "estimated_minutes": 10,
+      "kind": "optional",
+      "skippable": true
+    },
+    "low_energy_plan": {
+      "note": "只保留吉他 + 3 分钟回收；其余不欠账",
+      "keep_task_ids": [
+        "task_20261116_a1",
+        "task_20261116_a3"
+      ]
+    },
+    "day_note": ""
+  },
+  "weekly": {
+    "week_start": "2026-11-16",
+    "week_end": "2026-11-22",
+    "generated_by": "seed",
+    "generated_at": "2026-11-16T08:00:00+08:00",
+    "progress": [
+      {
+        "target_id": "tgt_art_1",
+        "label": "审美拆解",
+        "direction": "art",
+        "done": 0,
+        "target": 2,
+        "minutes": 0,
+        "minutes_per_time": 20
+      },
+      {
+        "target_id": "tgt_art_2",
+        "label": "跨领域灵感",
+        "direction": "art",
+        "done": 0,
+        "target": 1,
+        "minutes": 0,
+        "minutes_per_time": 30
+      },
+      {
+        "target_id": "tgt_read_1",
+        "label": "阅读人文",
+        "direction": "read",
+        "done": 0,
+        "target": 3,
+        "minutes": 0,
+        "minutes_per_time": 10
+      },
+      {
+        "target_id": "tgt_music_1",
+        "label": "吉他练习",
+        "direction": "music",
+        "done": 0,
+        "target": 3,
+        "minutes": 0,
+        "minutes_per_time": 15
+      },
+      {
+        "target_id": "tgt_tech_1",
+        "label": "科技探索",
+        "direction": "tech",
+        "done": 0,
+        "target": 1,
+        "minutes": 0,
+        "minutes_per_time": 30
+      },
+      {
+        "target_id": "tgt_self_1",
+        "label": "周复盘",
+        "direction": "self",
+        "done": 0,
+        "target": 1,
+        "minutes": 0,
+        "minutes_per_time": 15
+      }
+    ],
+    "load_days": {
+      "green": 0,
+      "yellow": 0,
+      "red": 0
+    },
+    "rotation_plan": {
+      "2026-11-16": "visual_art",
+      "2026-11-17": "reading_philosophy",
+      "2026-11-18": "tech_frontier",
+      "2026-11-19": "visual_art",
+      "2026-11-20": "literature",
+      "2026-11-21": "free_exploration",
+      "2026-11-22": "review"
+    },
+    "neglected_warnings": [
+      {
+        "direction": "tech",
+        "days_since_contact": 13,
+        "suggestion": "上周没碰科技。周三的轮换本来就是它，别另外加任务"
+      }
+    ],
+    "unknown_domain_this_week": "（本周待抽：让 Agent 跑一次「我不知道自己不知道什么」）",
+    "deep_dive_this_week": "（本周待定：只选一件）",
+    "review": {
+      "q1": "",
+      "q2": "",
+      "q3": ""
+    }
+  },
+  "resources": {
+    "version": 1,
+    "demo": true,
+    "note": "以下为 V0.1 演示条目，用于验证页面结构；V0.4 起由 Discovery Curator 真实检索后写入。demo=true 表示这些不是策展结果。",
+    "items": [
+      {
+        "id": "res_20261115_01",
+        "added_at": "2026-11-15",
+        "title": "Character Art Styles Guide: Cool Ideas for Unique Designs",
+        "source": {
+          "name": "VSQUAD Studio",
+          "url": "https://vsquad.art/blog/articles/exploring-unique-character-art-styles-fresh-inspiration-for-artists/",
+          "author": "Volodymyr Liubchuk (Art Director)",
+          "published_at": "2026-03-16",
+          "type": "article"
+        },
+        "channel": "known",
+        "domains": [
+          "角色设计",
+          "风格定位"
+        ],
+        "summary": "一线美术总监拆解角色风格如何被技术管线与市场定位反向约束，并给出剪影、形体语言、风格混搭的具体做法。",
+        "why": "你在做角色设计，这篇讲的是「风格选择即生产决策」，正好补上「为什么别人这样设计」的一环。",
+        "look_for": "「把角色涂成全黑，还认得出是谁吗」这个剪影测试——用它去验一张你自己的图。",
+        "next_step": "搜 TF2 角色剪影分析，对比两人如何用形状语言区分职业。",
+        "credibility": {
+          "kind": "expert",
+          "score": 82,
+          "basis": "在职 Art Director 署名，有一手项目案例（Wayfinder / SMITE 等），属商业博客但为一线经验叙述"
+        },
+        "reading_depth": "skim",
+        "feedback": null,
+        "demo": true
+      },
+      {
+        "id": "res_20261115_02",
+        "added_at": "2026-11-15",
+        "title": "Epic 罕见公开《堡垒之夜》设计全流程，首次证实使用生成式 AI",
+        "source": {
+          "name": "17173 新闻",
+          "url": "https://news.17173.com/content/06172026/173721479.shtml",
+          "author": "",
+          "published_at": "2026-06-17",
+          "type": "article"
+        },
+        "channel": "known",
+        "domains": [
+          "游戏行业",
+          "AI 与创作流程"
+        ],
+        "summary": "Epic 公开皮肤概念设计流程，说明生成式 AI 在概念阶段的位置与边界。",
+        "why": "不是「AI 会不会取代美术」，而是「大厂把 AI 放在流程的哪一格」——这直接影响你现在该练什么。",
+        "look_for": "AI 介入的是发散阶段还是收敛阶段？人负责的是判断还是执行？",
+        "next_step": "找原始材料核对（Epic 官方博客 / GDC 演讲），新闻稿常省略条件。",
+        "credibility": {
+          "kind": "community",
+          "score": 55,
+          "basis": "二手新闻报道，未见原始官方文档；结论方向可信，细节需回溯一手来源"
+        },
+        "reading_depth": "skim",
+        "feedback": null,
+        "demo": true
+      },
+      {
+        "id": "res_20261115_03",
+        "added_at": "2026-11-15",
+        "title": "ArtStation Magazine",
+        "source": {
+          "name": "ArtStation",
+          "url": "https://magazine.artstation.com/",
+          "author": "",
+          "published_at": "",
+          "type": "work"
+        },
+        "channel": "known",
+        "domains": [
+          "概念设计",
+          "创作访谈"
+        ],
+        "summary": "ArtStation 官方编辑栏目，含艺术家访谈与项目 Breakdown。",
+        "why": "你要看的不只是成品图，而是「别人怎么走到这张图的」。Breakdown 是唯一能看到过程的地方。",
+        "look_for": "挑一篇 Breakdown，只看他的草图迭代次数和放弃的方向。",
+        "next_step": "按「角色 + breakdown」筛一篇，做 3 句观察笔记。",
+        "credibility": {
+          "kind": "curated",
+          "score": 74,
+          "basis": "平台官方策展，作者多为在职从业者；编辑内容偏展示，深度不均"
+        },
+        "reading_depth": "skim",
+        "feedback": null,
+        "demo": true
+      },
+      {
+        "id": "res_20261115_04",
+        "added_at": "2026-11-15",
+        "title": "GDC Vault — 免费演讲档案",
+        "source": {
+          "name": "GDC Vault",
+          "url": "https://www.gdcvault.com/",
+          "author": "",
+          "published_at": "",
+          "type": "video"
+        },
+        "channel": "adjacent",
+        "domains": [
+          "游戏开发",
+          "美术生产",
+          "团队协作"
+        ],
+        "summary": "GDC 历年演讲档案，含美术生产管线、风格统一、外包管理等主题。",
+        "why": "你想进游戏行业，这里能听到「制作人怎么抱怨美术」——从需求端反推你的作品该长什么样。",
+        "look_for": "找一场讲「美术风格统一」的，记录他们用什么规则约束外包。",
+        "next_step": "先看一场 30 分钟的免费演讲，不做完整笔记。",
+        "credibility": {
+          "kind": "primary",
+          "score": 88,
+          "basis": "行业会议一手演讲录像，讲者多为在职开发者；部分内容付费"
+        },
+        "reading_depth": "skim",
+        "feedback": null,
+        "demo": true
+      },
+      {
+        "id": "res_20261115_05",
+        "added_at": "2026-11-15",
+        "title": "城市声景（Soundscape）· 本周陌生领域",
+        "source": {
+          "name": "待补充：可靠入门资料",
+          "url": "",
+          "author": "",
+          "published_at": "",
+          "type": "discussion"
+        },
+        "channel": "random",
+        "domains": [
+          "声学",
+          "城市规划",
+          "环境心理学"
+        ],
+        "summary": "城市设计为什么不仅需要考虑视觉景观，还要考虑声音景观。",
+        "why": "你的场景设计目前只处理「看得见」的部分；声音是同一空间里另一半信息。",
+        "look_for": "一片街区的声音地图，和它的功能分区是否重合。",
+        "next_step": "搜 `soundscape urban design` 找一篇综述即可，不要求读完。",
+        "credibility": {
+          "kind": "community",
+          "score": 40,
+          "basis": "占位条目：尚未检索到具体入门资料，不构成推荐"
+        },
+        "reading_depth": "unused",
+        "feedback": null,
+        "demo": true
+      },
+      {
+        "id": "res_20261115_06",
+        "added_at": "2026-11-15",
+        "title": "《庄子》· 与阅读线 A 的连接",
+        "source": {
+          "name": "阅读线 A（精神阅读）",
+          "url": "",
+          "author": "庄周",
+          "published_at": "",
+          "type": "work"
+        },
+        "channel": "adjacent",
+        "domains": [
+          "哲学",
+          "创作观"
+        ],
+        "summary": "不急着给正确答案，而是不断改变你观察问题的角度。",
+        "why": "你在意「创作意图」和「被评价绑住」的问题，庄子的相对视角能提供另一套坐标。",
+        "look_for": "《逍遥游》里「有用/无用」的反复翻转。",
+        "next_step": "只读《逍遥游》一篇，读完写一句「它让我想起了什么」。",
+        "credibility": {
+          "kind": "primary",
+          "score": 95,
+          "basis": "原始典籍，无需二手解读即可读"
+        },
+        "reading_depth": "unused",
+        "feedback": null,
+        "demo": true
+      }
+    ]
+  },
+  "notes": {
+    "version": 1,
+    "items": []
+  },
+  "history": [],
+  "schedule": {
+    "version": 1,
+    "term": "2026 秋",
+    "rotation_map": {
+      "1": {
+        "slot": "visual_art",
+        "title": "视觉审美：分析一张优秀插画的设计意图",
+        "minutes": 20,
+        "direction": "art"
+      },
+      "2": {
+        "slot": "reading_philosophy",
+        "title": "阅读与哲学：读正在进行的书",
+        "minutes": 10,
+        "direction": "read"
+      },
+      "3": {
+        "slot": "tech_frontier",
+        "title": "科技前沿：一个 AI 或游戏技术新案例",
+        "minutes": 30,
+        "direction": "tech"
+      },
+      "4": {
+        "slot": "visual_art",
+        "title": "视觉审美：研究配色、构图或角色设计",
+        "minutes": 20,
+        "direction": "art"
+      },
+      "5": {
+        "slot": "literature",
+        "title": "文学与灵感：诗歌、电影、典故或创作素材",
+        "minutes": 20,
+        "direction": "read"
+      },
+      "6": {
+        "slot": "free_exploration",
+        "title": "自由探索：看电影、听音乐、逛作品集",
+        "minutes": 30,
+        "direction": "art"
+      },
+      "7": {
+        "slot": "review",
+        "title": "整理与复盘：回收本周笔记，调整下周安排",
+        "minutes": 15,
+        "direction": "self"
+      }
+    },
+    "weekly_explore_channels": [
+      "known",
+      "adjacent",
+      "random"
+    ],
+    "time_windows": {
+      "morning": {
+        "start": "06:50",
+        "end": "08:00",
+        "energy": "high",
+        "suitable": [
+          "art",
+          "read"
+        ]
+      },
+      "commute": {
+        "start": "08:00",
+        "end": "08:40",
+        "energy": "low",
+        "suitable": [
+          "read"
+        ],
+        "note": "碎片时间：诗歌、散文、小说、传记"
+      },
+      "class": {
+        "start": "08:40",
+        "end": "16:30",
+        "energy": "varies",
+        "suitable": [
+          "read"
+        ],
+        "note": "水课 20-40 分钟连续阅读；需参与时优先课堂"
+      },
+      "studio": {
+        "start": "16:30",
+        "end": "22:00",
+        "energy": "high",
+        "suitable": [
+          "art"
+        ],
+        "note": "创作主时段，学习计划不得占用"
+      },
+      "bedtime": {
+        "start": "22:00",
+        "end": "23:00",
+        "energy": "low",
+        "suitable": [
+          "music",
+          "self"
+        ]
+      }
+    },
+    "course_blocks": [],
+    "hard_rules": [
+      "创作主时段（studio）不排学习任务",
+      "轮盘任务忙到深夜就跳过，不顺延成第二天的债务",
+      "课表为空时，Morning Planner 只按精力与可支配时间安排"
+    ]
+  }
+};
+</script>
+<script>
+/* Personal Growth Dashboard · V0.1
+   纯 HTML + CSS + 原生 JS；数据先走 localStorage，导出/导入 JSON 与 Agent 衔接。
+   接口层 api.* 预留，V0.2 换成 fetch 即可，不改 UI。 */
+
+'use strict';
+
+/* ============ 0. 常量 ============ */
+
+const KEY = {
+  today: 'pgd.v1.today',
+  weekly: 'pgd.v1.weekly',
+  resources: 'pgd.v1.resources',
+  notes: 'pgd.v1.notes',
+  history: 'pgd.v1.history'
+};
+
+const DATA_URL = {
+  today: '../data/today.json',
+  weekly: '../data/weekly.json',
+  resources: '../data/resources.json',
+  notes: '../data/notes.json',
+  schedule: '../config/schedule.json'
+};
+
+const WEEK_CN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+
+const MODE_LABEL = { green: '正常', yellow: '创作繁忙', red: '低能量' };
+
+const SLOT_LABEL = {
+  visual_art: '视觉审美',
+  reading_philosophy: '阅读哲学',
+  tech_frontier: '科技前沿',
+  literature: '文学灵感',
+  free_exploration: '自由探索',
+  review: '整理复盘'
+};
+
+const CHANNEL_LABEL = { known: '已有兴趣', adjacent: '相邻领域', random: '完全陌生' };
+
+const DIRECTION_LABEL = {
+  art: '审美与创作',
+  read: '知识与智慧',
+  tech: '科技与行业',
+  music: '音乐',
+  self: '自我调节'
+};
+
+const CRED_LABEL = { primary: '原始资料', expert: '专业观点', curated: '策展评论', community: '社区/待核实' };
+
+const FEEDBACK_OPTIONS = [
+  ['', '未标记'],
+  ['interested', '感兴趣，想深入'],
+  ['curious', '有趣，暂不深入'],
+  ['not_interested', '不感兴趣'],
+  ['known', '已经了解'],
+  ['explore_more', '想继续探索相关领域']
+];
+
+const NOTE_CATS = ['作品观察', '临时灵感', '阅读拾遗', '音乐记录', '科技案例', '状态记录'];
+
+/* 周轮盘兜底：读不到 config/schedule.json 时用它（内容与 schedule.json 一致） */
+const DEFAULT_ROTATION = {
+  1: { slot: 'visual_art', title: '视觉审美：分析一张优秀插画的设计意图', minutes: 20, direction: 'art' },
+  2: { slot: 'reading_philosophy', title: '阅读与哲学：读正在进行的书', minutes: 10, direction: 'read' },
+  3: { slot: 'tech_frontier', title: '科技前沿：一个 AI 或游戏技术新案例', minutes: 30, direction: 'tech' },
+  4: { slot: 'visual_art', title: '视觉审美：研究配色、构图或角色设计', minutes: 20, direction: 'art' },
+  5: { slot: 'literature', title: '文学与灵感：诗歌、电影、典故或创作素材', minutes: 20, direction: 'read' },
+  6: { slot: 'free_exploration', title: '自由探索：看电影、听音乐、逛作品集', minutes: 30, direction: 'art' },
+  7: { slot: 'review', title: '整理与复盘：回收本周笔记，调整下周安排', minutes: 15, direction: 'self' }
+};
+
+/* 读不到 JSON（例如直接双击打开 file://）时的兜底，保证页面不空白 */
+const FALLBACK = {
+  today: {
+    date: new Date().toISOString().slice(0, 10),
+    mode: 'green',
+    mode_reason: '内置示例',
+    main_task: {
+      id: 'fallback_main', title: '插画创作', category: 'art',
+      date: new Date().toISOString().slice(0, 10), status: 'pending',
+      priority: 'primary', estimated_minutes: 240, note: '优先保证创作质量'
+    },
+    anchors: [
+      { id: 'fallback_a1', title: '吉他练习 10 分钟', category: 'music', status: 'pending', priority: 'anchor', estimated_minutes: 10, kind: 'anchor' },
+      { id: 'fallback_a2', title: '阅读 10 分钟', category: 'read', status: 'pending', priority: 'anchor', estimated_minutes: 10, kind: 'anchor' },
+      { id: 'fallback_a3', title: '记录今天的一个发现', category: 'self', status: 'pending', priority: 'anchor', estimated_minutes: 3, kind: 'anchor' }
+    ],
+    rotation: null,
+    optional_exploration: null,
+    low_energy_plan: { note: '只保留吉他 + 3 分钟回收', keep_task_ids: ['fallback_a1', 'fallback_a3'] },
+    day_note: ''
+  },
+  weekly: {
+    week_start: '', week_end: '', progress: [], load_days: { green: 0, yellow: 0, red: 0 },
+    rotation_plan: {}, neglected_warnings: [],
+    unknown_domain_this_week: '', deep_dive_this_week: '', review: { q1: '', q2: '', q3: '' }
+  },
+  resources: { version: 1, demo: true, items: [] },
+  notes: { version: 1, items: [] }
+};
+
+const state = {
+  today: null,
+  weekly: null,
+  resources: null,
+  notes: null,
+  schedule: null,
+  history: [],
+  source: '',
+  view: 'today',
+  ui: { channel: 'all', search: '', cat: 'all', noticeDismissed: false }
+};
+
+/* ============ 1. 工具 ============ */
+
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.prototype.slice.call((root || document).querySelectorAll(sel));
+
+function esc(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function num(v, fallback) {
+  var n = Number(v);
+  return isFinite(n) ? n : (fallback || 0);
+}
+
+function cnDate(iso) {
+  if (!iso) return '—';
+  var d = new Date(iso + 'T00:00:00');
+  if (isNaN(d.getTime())) return iso;
+  return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日 · ' + WEEK_CN[d.getDay()];
+}
+
+function shortDate(iso) {
+  return iso ? String(iso).slice(5).replace('-', '/') : '';
+}
+
+function weekdayOf(iso) {
+  var d = new Date(iso + 'T00:00:00');
+  return isNaN(d.getTime()) ? '' : WEEK_CN[d.getDay()];
+}
+
+/* ---- 日期工具（本地时区，避免 toISOString 的 UTC 偏移） ---- */
+
+function pad2(n) { return String(n).padStart(2, '0'); }
+
+function fmtDate(d) {
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+}
+
+function todayISO() { return fmtDate(new Date()); }
+
+function parseISO(iso) { return new Date(iso + 'T00:00:00'); }
+
+function addDays(iso, n) {
+  var d = parseISO(iso);
+  d.setDate(d.getDate() + n);
+  return fmtDate(d);
+}
+
+function weekStartOf(iso) {
+  var wd = parseISO(iso).getDay();
+  return addDays(iso, wd === 0 ? -6 : 1 - wd);
+}
+
+function weekEndOf(iso) { return addDays(weekStartOf(iso), 6); }
+
+function weekdayIndex(iso) {
+  var g = parseISO(iso).getDay();
+  return g === 0 ? 7 : g;
+}
+
+function slotDirection(slot) {
+  var map = {
+    visual_art: 'art', reading_philosophy: 'read', tech_frontier: 'tech',
+    literature: 'read', free_exploration: 'art', review: 'self'
+  };
+  return map[slot] || 'self';
+}
+
+function rotationFor(iso) {
+  var wd = String(weekdayIndex(iso));
+  var map = (state.schedule && state.schedule.rotation_map) || {};
+  var entry = map[wd] || DEFAULT_ROTATION[wd];
+  if (!entry) return null;
+  return {
+    slot: entry.slot,
+    title: entry.title,
+    minutes: num(entry.minutes, 15),
+    direction: entry.direction || slotDirection(entry.slot)
+  };
+}
+
+function greetingText() {
+  var h = new Date().getHours();
+  if (h < 5) return '夜里了';
+  if (h < 11) return '早上好';
+  if (h < 14) return '中午好';
+  if (h < 18) return '下午好';
+  return '晚上好';
+}
+
+function nowStamp() {
+  var d = new Date();
+  var p = function (n) { return String(n).padStart(2, '0'); };
+  return p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+var toastTimer = null;
+function toast(msg) {
+  var el = $('#toast');
+  el.textContent = msg;
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { el.hidden = true; }, 2600);
+}
+
+/* ============ 2. 存储 ============ */
+
+function readLocal() {
+  try {
+    var t = localStorage.getItem(KEY.today);
+    var w = localStorage.getItem(KEY.weekly);
+    var r = localStorage.getItem(KEY.resources);
+    var n = localStorage.getItem(KEY.notes);
+    if (!t || !w || !r || !n) return null;
+    return {
+      today: JSON.parse(t),
+      weekly: JSON.parse(w),
+      resources: JSON.parse(r),
+      notes: JSON.parse(n)
+    };
+  } catch (err) {
+    return null;
+  }
+}
+
+function save(key) {
+  try {
+    localStorage.setItem(KEY[key], JSON.stringify(state[key]));
+  } catch (err) {
+    toast('保存失败：浏览器存储被禁用或已满');
+  }
+}
+
+function saveAll() {
+  ['today', 'weekly', 'resources', 'notes'].forEach(save);
+}
+
+function readHistory() {
+  try {
+    var raw = localStorage.getItem(KEY.history);
+    var arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (err) {
+    return [];
+  }
+}
+
+/* 翻页前把旧的今日/本周存一份，避免历史被覆盖掉（V0.2 会展示成周报） */
+function archiveCurrent() {
+  state.history.push({
+    archived_at: new Date().toISOString(),
+    today: state.today,
+    weekly: state.weekly
+  });
+  while (state.history.length > 60) state.history.shift();
+  try {
+    localStorage.setItem(KEY.history, JSON.stringify(state.history));
+  } catch (err) { /* 存不下就算了，不阻塞翻页 */ }
+}
+
+function clearLocal() {
+  Object.keys(KEY).forEach(function (k) {
+    try { localStorage.removeItem(KEY[k]); } catch (err) { /* ignore */ }
+  });
+}
+
+function fetchJSON(url) {
+  return fetch(url, { cache: 'no-store' }).then(function (res) {
+    if (!res.ok) throw new Error(url + ' → HTTP ' + res.status);
+    return res.json();
+  });
+}
+
+function loadFromJSON() {
+  return Promise.all([
+    fetchJSON(DATA_URL.today),
+    fetchJSON(DATA_URL.weekly),
+    fetchJSON(DATA_URL.resources),
+    fetchJSON(DATA_URL.notes),
+    fetchJSON(DATA_URL.schedule).catch(function () { return null; })
+  ]).then(function (arr) {
+    return {
+      today: arr[0], weekly: arr[1], resources: arr[2], notes: arr[3], schedule: arr[4]
+    };
+  });
+}
+
+function applyData(data, source) {
+  state.today = data.today;
+  state.weekly = data.weekly;
+  state.resources = data.resources;
+  state.notes = data.notes;
+  if (data.schedule !== undefined) state.schedule = data.schedule;
+  state.source = source;
+}
+
+/* 预留给 V0.2：把下面换成 fetch('/api/...')，UI 层不用改 */
+var api = {
+  saveToday: function () { save('today'); },
+  saveWeekly: function () { save('weekly'); },
+  saveResources: function () { save('resources'); },
+  saveNotes: function () { save('notes'); }
+};
+
+/* ============ 3. 启动 ============ */
+
+function boot() {
+  state.history = readHistory();
+  var local = readLocal();
+  if (local) {
+    applyData(local, 'localStorage');
+    renderAll();
+    /* 本地已有数据时也去取一次周轮盘，失败了用内置兜底 */
+    fetchJSON(DATA_URL.schedule).then(function (s) {
+      state.schedule = s;
+      renderNotice();
+      renderToday();
+    }).catch(function () { /* ignore */ });
+    return Promise.resolve();
+  }
+
+  /* 离线单文件版：数据已经内联在页面里，不需要 fetch */
+  if (window.__SEED__) {
+    var seed = window.__SEED__ || {};
+    applyData({
+      today: seed.today || JSON.parse(JSON.stringify(FALLBACK.today)),
+      weekly: seed.weekly || JSON.parse(JSON.stringify(FALLBACK.weekly)),
+      resources: seed.resources || JSON.parse(JSON.stringify(FALLBACK.resources)),
+      notes: seed.notes || JSON.parse(JSON.stringify(FALLBACK.notes)),
+      schedule: seed.schedule || null
+    }, 'seed');
+    if (Array.isArray(seed.history) && seed.history.length) {
+      state.history = seed.history.concat(state.history).slice(-60);
+      try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
+    }
+    saveAll();
+    renderAll();
+    return Promise.resolve();
+  }
+
+  return loadFromJSON().then(function (data) {
+    applyData(data, 'json');
+    saveAll();
+    renderAll();
+  }).catch(function (err) {
+    applyData(JSON.parse(JSON.stringify(FALLBACK)), 'fallback');
+    renderAll();
+    showBanner('未能读取 data/*.json（' + err.message + '）。当前显示内置示例，网页上的修改只保存在这个浏览器里。请按 README 用本地服务打开：在项目根目录运行 python -m http.server 8000，然后访问 http://127.0.0.1:8000/dashboard/');
+  });
+}
+
+function showBanner(text) {
+  var el = $('#banner');
+  el.textContent = text;
+  el.hidden = false;
+}
+
+function renderAll() {
+  renderNotice();
+  renderToday();
+  renderWeek();
+  renderExplore();
+  renderLibrary();
+  renderReview();
+  setView(hashView() || state.view, true);
+}
+
+/* ============ 3b. 新的一天 / 新的一周 ============ */
+
+function planStale() {
+  var t = todayISO();
+  var planDate = state.today && state.today.date;
+  return !!planDate && planDate !== t;
+}
+
+function weekStale() {
+  var w = state.weekly || {};
+  var t = todayISO();
+  if (!w.week_start || !w.week_end) return true;
+  return t < w.week_start || t > w.week_end;
+}
+
+function renderNotice() {
+  var el = $('#notice');
+  if (!el) return;
+  if (state.ui.noticeDismissed || !planStale()) {
+    el.hidden = true;
+    el.innerHTML = '';
+    return;
+  }
+  var t = todayISO();
+  var pd = state.today.date;
+  var stale = weekStale();
+  var weekText = stale
+    ? '本周配额还停留在 ' + (state.weekly && state.weekly.week_start ? shortDate(state.weekly.week_start) : '更早') + ' 那一周，也会一起新建。'
+    : '';
+  el.hidden = false;
+  el.innerHTML =
+    '<div class="notice-title">页面上的计划还是 ' + esc(shortDate(pd)) + '（' + esc(weekdayOf(pd)) + '），今天是 ' + esc(shortDate(t)) + '（' + esc(weekdayOf(t)) + '）。</div>' +
+    '<div class="notice-sub">网页不会自己翻页。点一下就会按今天重排：锚点照旧、轮换换成今天该做的、昨天没做完的<b>不欠账</b>。' + esc(weekText) + '</div>' +
+    '<div class="notice-actions">' +
+      '<button type="button" class="solid-btn" data-act="rollover-day">生成今天的计划</button>' +
+      '<button type="button" class="ghost-btn" data-act="dismiss-notice">先留着昨天的</button>' +
+    '</div>';
+}
+
+function rolloverWeek(iso) {
+  var t = iso || todayISO();
+  var start = weekStartOf(t);
+  var end = weekEndOf(t);
+  var prev = state.weekly || {};
+
+  var progress = (prev.progress || []).map(function (q) {
+    return {
+      target_id: q.target_id, label: q.label, direction: q.direction,
+      done: 0, target: num(q.target), minutes: 0, minutes_per_time: num(q.minutes_per_time, 15)
+    };
+  });
+
+  var plan = {};
+  for (var i = 0; i < 7; i++) {
+    var d = addDays(start, i);
+    var r = rotationFor(d);
+    plan[d] = r ? r.slot : 'free_exploration';
+  }
+
+  state.weekly = {
+    week_start: start,
+    week_end: end,
+    generated_by: 'rollover',
+    generated_at: new Date().toISOString(),
+    progress: progress,
+    load_days: { green: 0, yellow: 0, red: 0 },
+    rotation_plan: plan,
+    neglected_warnings: [],
+    unknown_domain_this_week: '（本周待抽：让 Agent 跑一次「我不知道自己不知道什么」）',
+    deep_dive_this_week: '（本周待定：只选一件）',
+    review: { q1: '', q2: '', q3: '' }
+  };
+  save('weekly');
+}
+
+function rolloverDay() {
+  var t = todayISO();
+  var prev = state.today || {};
+
+  if (planStale()) archiveCurrent();
+  if (weekStale()) rolloverWeek(t);
+
+  var seq = 'task_' + t.replace(/-/g, '') + '_';
+  var rot = rotationFor(t);
+
+  var anchors = (prev.anchors || []).map(function (a, i) {
+    return {
+      id: seq + 'a' + (i + 1),
+      title: a.title,
+      category: a.category,
+      date: t,
+      status: 'pending',
+      priority: 'anchor',
+      estimated_minutes: num(a.estimated_minutes, 10),
+      kind: 'anchor',
+      anchor_ref: a.anchor_ref,
+      hint: a.hint
+    };
+  });
+
+  /* 主线是连续的：做完才换，没做完继续，但不罚 */
+  var pm = prev.main_task;
+  var carry = pm && pm.status !== 'done' && pm.title && pm.title.indexOf('待定') === -1;
+  var main = carry
+    ? {
+        id: seq + 'main', title: pm.title, category: pm.category || 'art', date: t,
+        status: 'pending', priority: 'primary', estimated_minutes: num(pm.estimated_minutes, 180),
+        note: '延续自 ' + shortDate(pm.date) + '，今天继续'
+      }
+    : {
+        id: seq + 'main', title: '今日创作任务（待定）', category: 'art', date: t,
+        status: 'pending', priority: 'primary', estimated_minutes: 180,
+        note: '昨天的主线已完成。今天这一件由你自己定'
+      };
+
+  var rotation = rot ? {
+    id: seq + 'rot', title: rot.title, category: rot.direction, date: t,
+    status: 'pending', priority: 'rotation', estimated_minutes: rot.minutes,
+    kind: 'rotation', skippable: true, slot: rot.slot
+  } : null;
+
+  var po = prev.optional_exploration;
+  var optional = po ? {
+    id: seq + 'opt', title: po.title, category: po.category || 'art', date: t,
+    status: 'pending', priority: 'optional', estimated_minutes: num(po.estimated_minutes, 10),
+    kind: 'optional', skippable: true
+  } : null;
+
+  state.today = {
+    date: t,
+    mode: 'green',
+    mode_reason: '新的一天（' + nowStamp() + ' 生成）',
+    generated_by: 'rollover',
+    generated_at: new Date().toISOString(),
+    main_task: main,
+    anchors: anchors,
+    rotation: rotation,
+    optional_exploration: optional,
+    low_energy_plan: {
+      note: '只保留 1 个锚点 + 3 分钟回收；其余不欠账',
+      keep_task_ids: anchors.slice(0, 2).map(function (a) { return a.id; })
+    },
+    day_note: ''
+  };
+
+  save('today');
+  state.ui.noticeDismissed = false;
+  renderAll();
+  toast('已生成 ' + shortDate(t) + '（' + weekdayOf(t) + '）的计划');
+}
+
+/* ============ 4. 今日 ============ */
+
+function todayTasks() {
+  var t = state.today || {};
+  var list = [t.main_task].concat(t.anchors || [], [t.rotation, t.optional_exploration]);
+  var paused = t.mode && t.mode !== 'green';
+  return list.filter(function (task) {
+    if (!task) return false;
+    if (paused && (task.priority === 'rotation' || task.priority === 'optional')) return false;
+    return true;
+  });
+}
+
+function findTask(id) {
+  var t = state.today || {};
+  var pool = [t.main_task].concat(t.anchors || [], [t.rotation, t.optional_exploration]);
+  for (var i = 0; i < pool.length; i++) {
+    if (pool[i] && pool[i].id === id) return pool[i];
+  }
+  return null;
+}
+
+function taskRow(task) {
+  var done = task.status === 'done';
+  return '<li class="task' + (done ? ' is-done' : '') + '">' +
+    '<button type="button" class="check" data-act="toggle" data-id="' + esc(task.id) + '" aria-label="切换完成状态">✓</button>' +
+    '<div class="task-body">' +
+    '<div class="task-title">' + esc(task.title) + (task.skippable ? '<span class="skippable">可跳过</span>' : '') + '</div>' +
+    (task.hint ? '<div class="task-hint">' + esc(task.hint) + '</div>' : '') +
+    '</div>' +
+    '<span class="task-side">' + (task.estimated_minutes ? num(task.estimated_minutes) + ' min' : '') + '</span>' +
+    '</li>';
+}
+
+function renderToday() {
+  var t = state.today || {};
+  var real = todayISO();
+  $('#todayDate').textContent = cnDate(real) +
+    (t.date && t.date !== real ? ' · 正在看 ' + shortDate(t.date) + '（' + weekdayOf(t.date) + '）的计划' : '');
+  $('#greeting').textContent = '今天，也向前一点。';
+  $('#headSub').textContent = greetingText() + ' · 今天最重要的事只有一件';
+  $('#storeBadge').textContent = state.source === 'json' ? '已从项目 JSON 载入'
+    : state.source === 'localStorage' ? '本地存储（含你的修改）'
+    : state.source === 'seed' ? '数据在本机浏览器' : '内置示例';
+
+  renderModePick();
+  renderMainTask();
+  renderAnchors();
+  renderRotation();
+  renderOptional();
+  renderProgress();
+  renderLowEnergy();
+  renderTodayNotes();
+}
+
+function renderModePick() {
+  var t = state.today || {};
+  var modes = ['green', 'yellow', 'red'];
+  $('#modePick').innerHTML = modes.map(function (m) {
+    return '<button type="button" class="mode-btn' + (t.mode === m ? ' is-on' : '') + '" data-act="mode" data-mode="' + m + '">' +
+      '<span class="dot"></span>' + MODE_LABEL[m] +
+      '<small>' + (m === 'green' ? '30-60m' : m === 'yellow' ? '10-20m' : '0m') + '</small>' +
+      '</button>';
+  }).join('');
+}
+
+function renderMainTask() {
+  var t = state.today || {};
+  var m = t.main_task;
+  var card = $('#mainTaskCard');
+  if (!m) {
+    card.innerHTML = '<span class="eyebrow">今日主线</span><p class="empty">今天还没有主线任务。让 Agent 跑一次 Morning Planner，或者先专注手头这张画。</p>';
+    return;
+  }
+  var done = m.status === 'done';
+  card.innerHTML =
+    '<div class="hero-main">' +
+      '<div style="min-width:0">' +
+        '<span class="eyebrow">今日主线 · Main Task</span>' +
+        '<h3>' + esc(m.title) + '</h3>' +
+        '<div class="hero-meta">' +
+          '<span>预计 ' + num(m.estimated_minutes) + ' 分钟</span>' +
+          '<span>' + esc(m.category || '') + '</span>' +
+          '<span>' + (done ? '已完成' : '进行中') + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<span class="prio-tag">' + (done ? 'Done' : '优先') + '</span>' +
+    '</div>' +
+    (m.note ? '<p class="hero-note">' + esc(m.note) + '</p>' : '') +
+    '<div class="btn-row">' +
+      '<button type="button" class="' + (done ? 'ghost-btn' : 'solid-btn') + '" data-act="toggle" data-id="' + esc(m.id) + '">' +
+        (done ? '取消完成' : '标记完成') +
+      '</button>' +
+    '</div>';
+}
+
+function renderAnchors() {
+  var t = state.today || {};
+  var anchors = t.anchors || [];
+  var minutes = anchors.reduce(function (a, b) { return a + num(b.estimated_minutes); }, 0);
+  $('#anchorMeta').textContent = anchors.length + ' 项 · 约 ' + minutes + ' 分钟';
+  $('#anchorList').innerHTML = anchors.length
+    ? anchors.map(taskRow).join('')
+    : '<li class="empty">没有设置锚点。</li>';
+
+  var note;
+  if (t.mode === 'red') {
+    note = '低能量模式：今天不强制学习任务。记录一句真实状态，就算完成。';
+  } else if (t.mode === 'yellow') {
+    note = '创作繁忙：只守一个锚点就够，另一个不欠账。';
+  } else {
+    note = '锚点的意义不是十分钟能学多少，而是保持持续接触的机会。';
+  }
+  $('#anchorNote').textContent = note;
+}
+
+function renderRotation() {
+  var t = state.today || {};
+  var r = t.rotation;
+  var card = $('#rotationCard');
+  if (!r) { card.hidden = true; return; }
+  card.hidden = false;
+  var paused = t.mode && t.mode !== 'green';
+  card.innerHTML =
+    '<header class="card-head"><h2>今日轮换</h2><span class="eyebrow">' +
+      (r.slot ? SLOT_LABEL[r.slot] || r.slot : '轮盘') + '</span></header>' +
+    (paused
+      ? '<p class="empty">' + MODE_LABEL[t.mode] + '模式：今天暂停轮换，不算欠账。</p>'
+      : '<ul class="tasks">' + taskRow(r) + '</ul>') +
+    '<p class="fine">轮盘只负责给「没有截止日期」的输入留位置；忙到深夜就跳过。</p>';
+}
+
+function renderOptional() {
+  var t = state.today || {};
+  var o = t.optional_exploration;
+  var card = $('#optionalCard');
+  if (!o) { card.hidden = true; return; }
+  card.hidden = false;
+  var paused = t.mode && t.mode !== 'green';
+  card.innerHTML =
+    '<header class="card-head"><h2>可选探索</h2><span class="eyebrow">今日不做也不算欠</span></header>' +
+    (paused
+      ? '<p class="empty">' + MODE_LABEL[t.mode] + '模式：已收起。</p>'
+      : '<ul class="tasks">' + taskRow(o) + '</ul>');
+}
+
+function renderProgress() {
+  var tasks = todayTasks();
+  var done = tasks.filter(function (x) { return x.status === 'done'; });
+  var pct = tasks.length ? Math.round(done.length / tasks.length * 100) : 0;
+  var artMin = 0, learnMin = 0;
+  done.forEach(function (task) {
+    if (task.category === 'art' || task.priority === 'primary') artMin += num(task.estimated_minutes);
+    else learnMin += num(task.estimated_minutes);
+  });
+  var left = tasks.length - done.length;
+  $('#progressBox').innerHTML =
+    '<div class="progress-num"><b>' + done.length + '/' + tasks.length + '</b><span>已完成</span></div>' +
+    '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="mini-stats">' +
+      '<div class="mini-stat"><b>' + artMin + 'm</b><span>创作</span></div>' +
+      '<div class="mini-stat"><b>' + learnMin + 'm</b><span>学习</span></div>' +
+      '<div class="mini-stat"><b>' + left + '</b><span>剩余</span></div>' +
+    '</div>';
+}
+
+function renderLowEnergy() {
+  var t = state.today || {};
+  var plan = t.low_energy_plan || {};
+  var keepIds = plan.keep_task_ids || [];
+  var keepTitles = keepIds.map(function (id) {
+    var task = findTask(id);
+    return task ? task.title : id;
+  });
+  var active = t.mode === 'yellow' || t.mode === 'red';
+  var modes = ['green', 'yellow', 'red'].map(function (m) {
+    return '<button type="button" class="' + (t.mode === m ? 'solid-btn' : 'ghost-btn') +
+      '" data-act="mode" data-mode="' + m + '">' + MODE_LABEL[m] + '</button>';
+  }).join('');
+
+  $('#lowEnergyCard').innerHTML =
+    '<header class="card-head"><h2>今天的负荷</h2><span class="eyebrow">' + (active ? '已降档' : '正常') + '</span></header>' +
+    '<p class="fine">' + esc(plan.note || '只保留最小锚点。') + '</p>' +
+    (keepTitles.length
+      ? '<ul class="tasks">' + keepTitles.map(function (title) {
+          return '<li class="task"><div class="task-body"><div class="task-title">' + esc(title) +
+            '<span class="skippable">保留</span></div></div></li>';
+        }).join('') + '</ul>'
+      : '') +
+    '<div class="btn-row">' + modes + '</div>' +
+    '<p class="fine" style="margin-top:10px">创作繁忙 / 低能量时，轮换与可选探索自动收起，不算欠账。</p>';
+}
+
+function renderTodayNotes() {
+  var items = (state.notes && state.notes.items) || [];
+  var date = (state.today && state.today.date) || '';
+  var mine = items.filter(function (n) { return n.date === date; }).slice(-4).reverse();
+  $('#todayNotes').innerHTML = mine.length
+    ? mine.map(function (n) {
+        return '<li><span class="meta">' + esc(n.category || '') + '</span><span>' + esc(n.text) + '</span></li>';
+      }).join('')
+    : '<li><span class="meta">—</span><span style="color:var(--muted)">今天还没有记录。一句话就够，不用写成文章。</span></li>';
+}
+
+/* ============ 5. 本周 ============ */
+
+function renderWeek() {
+  var w = state.weekly || {};
+  var items = w.progress || [];
+  var done = items.reduce(function (a, b) { return a + num(b.done); }, 0);
+  var target = items.reduce(function (a, b) { return a + num(b.target); }, 0);
+  var minutes = items.reduce(function (a, b) { return a + num(b.minutes); }, 0);
+  var ld = w.load_days || {};
+
+  $('#weekRange').textContent = w.week_start
+    ? shortDate(w.week_start) + ' → ' + shortDate(w.week_end) + '（' + (w.week_end ? weekdayOf(w.week_end) : '') + '）'
+    : '—';
+  $('#weekDone').textContent = done + ' / ' + target + ' 次';
+  $('#weekMinutes').textContent = minutes + ' 分钟';
+  $('#weekLoad').textContent = '绿 ' + num(ld.green) + ' · 黄 ' + num(ld.yellow) + ' · 红 ' + num(ld.red);
+
+  $('#weekProgress').innerHTML = items.length
+    ? items.map(quotaRow).join('')
+    : '<p class="empty">本周还没有配额。等周日复盘生成，或先手动加。</p>';
+
+  renderRotationPlan(w);
+  renderNeglect(w);
+
+  $('#unknownCard').innerHTML =
+    '<header class="card-head"><h2>本周陌生领域</h2><span class="eyebrow">不按历史兴趣抽</span></header>' +
+    '<p class="hero-note" style="border:0;padding:0;margin:0;font-size:16px">' + esc(w.unknown_domain_this_week || '未设置') + '</p>' +
+    '<p class="fine" style="margin-top:10px">只给：一个有趣的现象 · 一段背景 · 一个值得思考的问题 · 一份入门资料。不直接给答案。</p>';
+
+  $('#deepCard').innerHTML =
+    '<header class="card-head"><h2>本周值得深入</h2><span class="eyebrow">只挑 1 件</span></header>' +
+    '<p class="hero-note" style="border:0;padding:0;margin:0;font-size:16px">' + esc(w.deep_dive_this_week || '未设置') + '</p>' +
+    '<p class="fine" style="margin-top:10px">AI 可以告诉你背景，但不能替你经历第一次看它的震撼。</p>';
+}
+
+function quotaRow(q) {
+  var target = Math.max(1, num(q.target));
+  var pct = Math.min(100, Math.round(num(q.done) / target * 100));
+  var full = num(q.done) >= num(q.target);
+  return '<div class="quota' + (full ? ' is-full' : '') + '">' +
+    '<div>' +
+      '<div class="quota-name">' + esc(q.label) + '</div>' +
+      '<div class="quota-sub">' + esc(q.direction || '') + ' · 目标 ' + num(q.target) + ' 次 · 已记 ' + num(q.minutes) + ' 分钟</div>' +
+    '</div>' +
+    '<div class="quota-bar bar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="quota-ctrl">' +
+      '<button type="button" class="step-btn" data-act="q-dec" data-id="' + esc(q.target_id) + '" aria-label="减一次">−</button>' +
+      '<span class="quota-count">' + num(q.done) + '/' + num(q.target) + '</span>' +
+      '<button type="button" class="step-btn" data-act="q-inc" data-id="' + esc(q.target_id) + '" aria-label="加一次">+</button>' +
+    '</div>' +
+  '</div>';
+}
+
+function renderRotationPlan(w) {
+  var plan = w.rotation_plan || {};
+  var keys = Object.keys(plan).sort();
+  var todayIso = (state.today && state.today.date) || '';
+  if (!keys.length) {
+    $('#rotationPlan').innerHTML = '<p class="empty">本周还没有轮盘安排。</p>';
+    return;
+  }
+  $('#rotationPlan').innerHTML = keys.map(function (iso) {
+    var slot = plan[iso];
+    return '<div class="day-chip' + (iso === todayIso ? ' is-today' : '') + '">' +
+      '<span class="d">' + esc(weekdayOf(iso)) + ' ' + esc(shortDate(iso)) + '</span>' +
+      '<span class="t">' + esc(SLOT_LABEL[slot] || slot) + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function renderNeglect(w) {
+  var warnings = w.neglected_warnings || [];
+  $('#neglectBox').innerHTML = warnings.length
+    ? warnings.map(function (x) {
+        return '<div class="warn-item">' +
+          '<span class="warn-tag">' + num(x.days_since_contact) + ' 天</span>' +
+          '<div><div class="task-title">' + esc(DIRECTION_LABEL[x.direction] || x.direction) + '</div>' +
+          '<div class="task-hint">' + esc(x.suggestion) + '</div></div>' +
+        '</div>';
+      }).join('')
+    : '<p class="empty">没有方向被长期忽略。专注创作导致的空缺不算失败。</p>';
+}
+
+/* ============ 6. 探索 ============ */
+
+function renderExplore() {
+  var res = state.resources || {};
+  var items = res.items || [];
+  var counts = { known: 0, adjacent: 0, random: 0 };
+  items.forEach(function (item) { counts[item.channel] = num(counts[item.channel]) + 1; });
+
+  var mix = res.exploration_mix || { known: 0.5, adjacent: 0.3, random: 0.2 };
+  $('#exploreMeta').textContent =
+    '本期 ' + items.length + ' 条 · 已有 ' + counts.known + ' / 相邻 ' + counts.adjacent + ' / 陌生 ' + counts.random +
+    '（目标 ' + Math.round(mix.known * 10) + ' : ' + Math.round(mix.adjacent * 10) + ' : ' + Math.round(mix.random * 10) + '）' +
+    (res.demo ? ' · 演示数据，非策展结果' : '');
+
+  var filters = [['all', '全部', items.length],
+    ['known', '已有兴趣', counts.known],
+    ['adjacent', '相邻领域', counts.adjacent],
+    ['random', '完全陌生', counts.random]];
+
+  $('#channelFilter').innerHTML = filters.map(function (f) {
+    return '<button type="button" class="chip' + (state.ui.channel === f[0] ? ' is-on' : '') +
+      '" data-act="filter" data-channel="' + f[0] + '">' + f[1] + '<span>' + f[2] + '</span></button>';
+  }).join('');
+
+  var list = items.filter(function (item) {
+    return state.ui.channel === 'all' || item.channel === state.ui.channel;
+  });
+
+  $('#resList').innerHTML = list.length
+    ? list.map(resourceCard).join('')
+    : '<p class="empty">这个通道还没有内容。等 Discovery Curator 跑一次，或先收集一张你真正喜欢的图。</p>';
+}
+
+function resourceCard(item) {
+  var src = item.source || {};
+  var cred = item.credibility || {};
+  var titleHtml = src.url
+    ? '<a href="' + esc(src.url) + '" target="_blank" rel="noopener noreferrer">' + esc(item.title) + '</a>'
+    : esc(item.title);
+  var srcLine = [
+    src.name || '未标注来源',
+    src.author || '',
+    src.published_at || '',
+    src.type || ''
+  ].filter(Boolean).join(' · ');
+
+  var fav = item.favorite === true;
+
+  return '<article class="res">' +
+    '<div class="res-top">' +
+      '<div style="min-width:0"><h3>' + titleHtml + '</h3>' +
+      '<div class="res-src">' + esc(srcLine) + '</div></div>' +
+      (item.demo ? '<span class="tag">演示</span>' : '') +
+    '</div>' +
+    '<div class="res-body">' +
+      '<div class="res-line"><b>讲了什么</b><span>' + esc(item.summary || '') + '</span></div>' +
+      '<div class="res-line"><b>为什么</b><span>' + esc(item.why || '') + '</span></div>' +
+      '<div class="res-line"><b>看什么</b><span>' + esc(item.look_for || '') + '</span></div>' +
+      '<div class="res-line"><b>下一步</b><span>' + esc(item.next_step || '') + '</span></div>' +
+    '</div>' +
+    '<div class="tags">' +
+      '<span class="tag ch-' + esc(item.channel) + '">' + esc(CHANNEL_LABEL[item.channel] || item.channel || '') + '</span>' +
+      (item.domains || []).map(function (d) { return '<span class="tag">' + esc(d) + '</span>'; }).join('') +
+      (cred.kind ? '<span class="tag cr">' + esc(CRED_LABEL[cred.kind] || cred.kind) + (cred.score ? ' ' + num(cred.score) : '') + '</span>' : '') +
+    '</div>' +
+    '<div class="res-foot">' +
+      '<button type="button" class="' + (fav ? 'solid-btn' : 'ghost-btn') + '" data-act="fav" data-id="' + esc(item.id) + '">' +
+        (fav ? '已收藏' : '收藏') +
+      '</button>' +
+      '<select data-act="feedback" data-id="' + esc(item.id) + '" aria-label="反馈">' +
+        FEEDBACK_OPTIONS.map(function (o) {
+          return '<option value="' + o[0] + '"' + ((item.feedback || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
+        }).join('') +
+      '</select>' +
+    '</div>' +
+  '</article>';
+}
+
+/* ============ 7. 知识库 ============ */
+
+function noteItems() {
+  return (state.notes && state.notes.items) || [];
+}
+
+function renderLibrary() {
+  var items = noteItems();
+
+  var cats = ['all'].concat(NOTE_CATS);
+  $('#libCat').innerHTML = cats.map(function (c) {
+    return '<option value="' + esc(c) + '"' + (state.ui.cat === c ? ' selected' : '') + '>' +
+      (c === 'all' ? '全部分类' : esc(c)) + '</option>';
+  }).join('');
+
+  var q = state.ui.search.trim().toLowerCase();
+  var list = items.filter(function (n) {
+    var okCat = state.ui.cat === 'all' || n.category === state.ui.cat;
+    var okText = !q || String(n.text + ' ' + (n.category || '')).toLowerCase().indexOf(q) !== -1;
+    return okCat && okText;
+  }).sort(function (a, b) {
+    return String(b.date + b.id).localeCompare(String(a.date + a.id));
+  });
+
+  $('#libCount').textContent = list.length + ' / ' + items.length + ' 条';
+
+  $('#libList').innerHTML = list.length
+    ? list.map(noteItem).join('')
+    : '<p class="empty">' + (items.length ? '没有匹配的记录。' : '还没有任何记录。今天的一句话就可以是第一条。') + '</p>';
+}
+
+function noteItem(n) {
+  return '<article class="note-item">' +
+    '<div class="note-meta">' +
+      '<span class="note-date">' + esc(n.date || '') + '</span>' +
+      '<span class="note-cat">' + esc(n.category || '未分类') + '</span>' +
+    '</div>' +
+    '<div class="note-text">' + esc(n.text) + '</div>' +
+    '<button type="button" class="note-del" data-act="del-note" data-id="' + esc(n.id) + '" aria-label="删除">×</button>' +
+  '</article>';
+}
+
+/* ============ 8. 复盘 ============ */
+
+function renderReview() {
+  var w = state.weekly || {};
+  var items = w.progress || [];
+  var done = items.reduce(function (a, b) { return a + num(b.done); }, 0);
+  var target = items.reduce(function (a, b) { return a + num(b.target); }, 0);
+  var ld = w.load_days || {};
+  var warnings = w.neglected_warnings || [];
+
+  $('#reviewStats').innerHTML =
+    items.length ? items.map(function (q) {
+      var pct = Math.min(100, Math.round(num(q.done) / Math.max(1, num(q.target)) * 100));
+      var full = num(q.target) > 0 && num(q.done) >= num(q.target);
+      return '<div style="margin-bottom:12px">' +
+        '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">' +
+          '<span>' + esc(q.label) + '</span>' +
+          '<span style="font-family:var(--mono);font-size:11px;color:var(--muted)">' + num(q.done) + '/' + num(q.target) + ' · ' + num(q.minutes) + 'm</span>' +
+        '</div>' +
+        '<div class="bar"><i style="width:' + pct + '%;' + (full ? 'background:var(--ok)' : '') + '"></i></div>' +
+      '</div>';
+    }).join('') : '<p class="empty">本周没有可统计的内容。</p>';
+
+  $('#reviewStats').innerHTML +=
+    '<div class="mini-stats">' +
+      '<div class="mini-stat"><b>' + done + '/' + target + '</b><span>配额</span></div>' +
+      '<div class="mini-stat"><b>' + num(ld.green) + '/' + num(ld.yellow) + '/' + num(ld.red) + '</b><span>绿/黄/红</span></div>' +
+      '<div class="mini-stat"><b>' + warnings.length + '</b><span>待提醒方向</span></div>' +
+    '</div>';
+
+  var review = w.review || {};
+  $$('#threeQ input').forEach(function (input) {
+    input.value = review[input.dataset.q] || '';
+  });
+
+  renderDailyLog();
+}
+
+function renderDailyLog() {
+  var items = noteItems().slice().sort(function (a, b) {
+    return String(b.date + b.created_at).localeCompare(String(a.date + a.created_at));
+  });
+  if (!items.length) {
+    $('#dailyLog').innerHTML = '<p class="empty">还没有记录。</p>';
+    return;
+  }
+  var groups = {};
+  items.forEach(function (n) {
+    var d = n.date || '未标日期';
+    (groups[d] = groups[d] || []).push(n);
+  });
+  $('#dailyLog').innerHTML = Object.keys(groups).sort().reverse().map(function (d) {
+    return '<div class="day-group">' +
+      '<div class="day-head">' + esc(d) + ' · ' + esc(weekdayOf(d)) + '</div>' +
+      groups[d].map(function (n) {
+        return '<div class="notes-mini" style="margin:0"><li><span class="meta">' + esc(n.category || '') + '</span>' +
+          '<span>' + esc(n.text) + '</span></li></div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+/* ============ 9. 交互动作 ============ */
+
+var VIEWS = ['today', 'week', 'explore', 'library', 'review'];
+
+function hashView() {
+  var h = (location.hash || '').replace('#', '');
+  return VIEWS.indexOf(h) >= 0 ? h : '';
+}
+
+function setView(view, silent) {
+  state.view = view;
+  $$('.nav-btn').forEach(function (btn) {
+    btn.classList.toggle('is-on', btn.dataset.view === view);
+  });
+  $$('.view').forEach(function (section) {
+    section.classList.toggle('is-on', section.id === 'view-' + view);
+  });
+  if (location.hash !== '#' + view) {
+    try { history.replaceState(null, '', '#' + view); } catch (err) { /* file:// 下忽略 */ }
+  }
+  if (!silent) window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleTask(id) {
+  var task = findTask(id);
+  if (!task) return;
+  task.status = task.status === 'done' ? 'pending' : 'done';
+  api.saveToday();
+  renderToday();
+  renderWeek();
+  renderReview();
+  toast(task.status === 'done' ? '已完成：' + task.title : '已取消：' + task.title);
+}
+
+function setMode(mode) {
+  state.today.mode = mode;
+  state.today.mode_reason = '手动切换（' + nowStamp() + '）';
+  api.saveToday();
+  renderToday();
+  toast(mode === 'green' ? '回到正常版：锚点 3 个' : mode === 'yellow' ? '创作繁忙：只守一个锚点，其余不欠账' : '低能量：今天维护自己就算完成');
+}
+
+function addNote(text, category) {
+  var date = (state.today && state.today.date) || new Date().toISOString().slice(0, 10);
+  var items = noteItems();
+  var seq = items.filter(function (n) { return n.date === date; }).length + 1;
+  items.push({
+    id: 'note_' + date.replace(/-/g, '') + '_' + String(seq).padStart(2, '0'),
+    date: date,
+    category: category,
+    text: text,
+    created_at: new Date().toISOString()
+  });
+  api.saveNotes();
+  renderTodayNotes();
+  renderLibrary();
+  renderReview();
+}
+
+function deleteNote(id) {
+  var items = noteItems();
+  var idx = items.findIndex(function (n) { return n.id === id; });
+  if (idx === -1) return;
+  if (!window.confirm('删除这条记录？\n\n' + items[idx].text.slice(0, 60))) return;
+  items.splice(idx, 1);
+  api.saveNotes();
+  renderLibrary();
+  renderReview();
+  renderTodayNotes();
+  toast('已删除');
+}
+
+function toggleFav(id) {
+  var items = (state.resources && state.resources.items) || [];
+  var item = items.find(function (x) { return x.id === id; });
+  if (!item) return;
+  item.favorite = !item.favorite;
+  api.saveResources();
+  renderExplore();
+  toast(item.favorite ? '已收藏，记得周日回收' : '已取消收藏');
+}
+
+function setFeedback(id, value) {
+  var items = (state.resources && state.resources.items) || [];
+  var item = items.find(function (x) { return x.id === id; });
+  if (!item) return;
+  item.feedback = value || null;
+  api.saveResources();
+  toast('反馈已记录：' + ((FEEDBACK_OPTIONS.find(function (o) { return o[0] === value; }) || ['', '未标记'])[1]));
+}
+
+function stepQuota(targetId, delta) {
+  var items = (state.weekly && state.weekly.progress) || [];
+  var q = items.find(function (x) { return x.target_id === targetId; });
+  if (!q) return;
+  var per = num(q.minutes_per_time, 15);
+  q.done = Math.max(0, Math.min(num(q.target), num(q.done) + delta));
+  q.minutes = Math.max(0, num(q.minutes) + delta * per);
+  api.saveWeekly();
+  renderWeek();
+  renderReview();
+}
+
+function exportJSON() {
+  var payload = {
+    exported_at: new Date().toISOString(),
+    note: '本文件由 Personal Growth Dashboard V0.1 导出，可交给 Agent 读取或用于恢复。',
+    today: state.today,
+    weekly: state.weekly,
+    resources: state.resources,
+    notes: state.notes,
+    history: state.history
+  };
+  var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'growth-export-' + ((state.today && state.today.date) || 'today') + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1500);
+  toast('已导出。把这个文件交给 Agent，它就能读到你在网页上的操作。');
+}
+
+function importJSON(file) {
+  var reader = new FileReader();
+  reader.onload = function () {
+    var data;
+    try {
+      data = JSON.parse(String(reader.result));
+    } catch (err) {
+      toast('导入失败：不是合法 JSON');
+      return;
+    }
+    if (!data.today || !data.weekly) {
+      toast('导入失败：缺少 today 或 weekly 字段');
+      return;
+    }
+    if (!window.confirm('导入会覆盖当前浏览器里的今日、本周、探索和记录数据。已导出的文件不受影响。继续？')) return;
+    applyData({
+      today: data.today,
+      weekly: data.weekly,
+      resources: data.resources || { version: 1, items: [] },
+      notes: data.notes || { version: 1, items: [] }
+    }, 'localStorage');
+    saveAll();
+    renderAll();
+    toast('已导入');
+  };
+  reader.readAsText(file);
+}
+
+function reloadFromJSON() {
+  if (!window.confirm('将用项目里的 data/*.json 覆盖当前浏览器状态，未导出的修改会丢失。继续？')) return;
+  loadFromJSON().then(function (data) {
+    applyData(data, 'json');
+    saveAll();
+    renderAll();
+    toast('已从项目 JSON 重新载入');
+  }).catch(function (err) {
+    toast('载入失败：' + err.message + '（是否用本地服务打开的？）');
+  });
+}
+
+function resetDemo() {
+  if (!window.confirm('重置会把今日、本周、探索、记录恢复成项目里的示例数据，当前浏览器中的修改会丢失。\n\n建议先「导出 JSON」。确定重置？')) return;
+  clearLocal();
+  applyData(JSON.parse(JSON.stringify(FALLBACK)), 'fallback');
+  boot().then(function () { toast('已重置为示例数据'); });
+}
+
+/* ============ 10. 事件 ============ */
+
+function bindEvents() {
+  $('#nav').addEventListener('click', function (e) {
+    var btn = e.target.closest('.nav-btn');
+    if (btn) setView(btn.dataset.view);
+  });
+
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-act]');
+    if (!el) return;
+    var act = el.dataset.act;
+
+    if (act === 'toggle') { toggleTask(el.dataset.id); }
+    else if (act === 'mode') { setMode(el.dataset.mode); }
+    else if (act === 'fav') { toggleFav(el.dataset.id); }
+    else if (act === 'filter') { state.ui.channel = el.dataset.channel; renderExplore(); }
+    else if (act === 'q-inc') { stepQuota(el.dataset.id, 1); }
+    else if (act === 'q-dec') { stepQuota(el.dataset.id, -1); }
+    else if (act === 'del-note') { deleteNote(el.dataset.id); }
+    else if (act === 'export') { exportJSON(); }
+    else if (act === 'import') { $('#importFile').click(); }
+    else if (act === 'reload') { reloadFromJSON(); }
+    else if (act === 'reset') { resetDemo(); }
+    else if (act === 'rollover-day') { rolloverDay(); }
+    else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
+  });
+
+  document.addEventListener('change', function (e) {
+    var el = e.target.closest('[data-act="feedback"]');
+    if (el) setFeedback(el.dataset.id, el.value);
+  });
+
+  $('#noteForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var input = $('#noteText');
+    var text = input.value.trim();
+    if (!text) { toast('先写点什么，一句话就够'); input.focus(); return; }
+    addNote(text, $('#noteCat').value);
+    input.value = '';
+    toast('记下了。周日回收时会用到它。');
+  });
+
+  $('#threeQ').addEventListener('input', function (e) {
+    var input = e.target.closest('input[data-q]');
+    if (!input) return;
+    state.weekly.review = state.weekly.review || { q1: '', q2: '', q3: '' };
+    state.weekly.review[input.dataset.q] = input.value;
+    api.saveWeekly();
+    $('#threeQState').textContent = '已保存 ' + nowStamp();
+  });
+
+  $('#libSearch').addEventListener('input', function (e) {
+    state.ui.search = e.target.value;
+    renderLibrary();
+  });
+
+  $('#libCat').addEventListener('change', function (e) {
+    state.ui.cat = e.target.value;
+    renderLibrary();
+  });
+
+  $('#importFile').addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (file) importJSON(file);
+    e.target.value = '';
+  });
+}
+
+/* ============ 11. 启动 ============ */
+
+document.addEventListener('DOMContentLoaded', function () {
+  bindEvents();
+  boot();
+});
+
+</script>
+</body>
+</html>
