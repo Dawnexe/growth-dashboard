@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-17 20:43
+  生成时间：2026-11-17 22:44
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -429,6 +429,29 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
 
 .card-data .fine { margin-bottom: 4px; }
 
+/* ---------- 云同步 ---------- */
+
+.cloud-box {
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+.cloud-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+.cloud-name { font-family: var(--serif); font-size: 14px; font-weight: 600; }
+.cloud-state {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+  padding: 2px 7px; border: 1px solid var(--line-2); color: var(--muted);
+  text-transform: uppercase;
+}
+.cloud-state.on { border-color: #b9c4b6; color: var(--ok); }
+.cloud-state.off { border-color: var(--line-2); color: var(--muted); }
+.cloud-form { display: flex; gap: 8px; margin: 10px 0 2px; flex-wrap: wrap; }
+.cloud-form input { flex: 1 1 140px; min-width: 0; }
+.cloud-err { font-size: 12px; color: var(--bad); margin-top: 8px; line-height: 1.6; }
+.cloud-box code {
+  font-family: var(--mono); font-size: 11px;
+  background: var(--accent-soft); padding: 1px 4px; color: var(--accent);
+}
+
 /* ---------- 其他 ---------- */
 
 .fine { font-size: 12px; color: var(--muted); line-height: 1.7; }
@@ -761,6 +784,7 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
               <button type="button" class="ghost-btn danger" data-act="reset">重置为示例数据</button>
             </div>
             <input type="file" id="importFile" accept=".json,application/json" hidden>
+            <div class="cloud-box" id="cloudBox"></div>
           </article>
         </div>
       </div>
@@ -775,7 +799,7 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
 
 <div class="toast" id="toast" hidden></div>
 <script>
-/* 离线版数据（由 build_offline.py 内联）*/
+/* 内联数据（由 build_offline.py 生成）*/
 window.__SEED__ = {
   "today": {
     "date": "2026-11-16",
@@ -1192,6 +1216,10 @@ window.__SEED__ = {
     "hard_rules": []
   }
 };
+window.__CLOUD__ = {
+  "supabase_url": "https://mrgarjrwlbgzpujhipjl.supabase.co",
+  "anon_key": "sb_publishable_dhnoEyWUJ60j1MMyA2eNLQ_uzgau1EK"
+};
 </script>
 <script>
 /* Personal Growth Dashboard · V0.1
@@ -1434,12 +1462,26 @@ function readLocal() {
   }
 }
 
-function save(key) {
+/* 只写本地，不触发云同步（云同步自己内部用） */
+function saveLocal(key) {
   try {
     localStorage.setItem(KEY[key], JSON.stringify(state[key]));
   } catch (err) {
     toast('保存失败：浏览器存储被禁用或已满');
   }
+}
+
+/* 用户操作引起的保存：写本地 + 打时间戳 + 排一次云同步 */
+function save(key) {
+  saveLocal(key);
+  cloudTouch();
+  cloudSchedulePush();
+}
+
+/* 只落本地、不打时间、不推送：用于首次加载种子数据，
+   否则一台新设备会把"种子"当成"我的最新修改"，反过来覆盖云端。 */
+function saveLocalAll() {
+  ['today', 'weekly', 'resources', 'notes'].forEach(saveLocal);
 }
 
 function saveAll() {
@@ -1544,14 +1586,14 @@ function boot() {
       state.history = seed.history.concat(state.history).slice(-60);
       try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
     }
-    saveAll();
+    saveLocalAll();
     renderAll();
     return Promise.resolve();
   }
 
   return loadFromJSON().then(function (data) {
     applyData(data, 'json');
-    saveAll();
+    saveLocalAll();
     renderAll();
   }).catch(function (err) {
     applyData(JSON.parse(JSON.stringify(FALLBACK)), 'fallback');
@@ -1573,6 +1615,7 @@ function renderAll() {
   renderExplore();
   renderLibrary();
   renderReview();
+  renderCloudBox();
   setView(hashView() || state.view, true);
 }
 
@@ -2394,6 +2437,13 @@ function bindEvents() {
     else if (act === 'reset') { resetDemo(); }
     else if (act === 'rollover-day') { rolloverDay(); }
     else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
+    else if (act === 'cloud-login') { doCloudAuth('login'); }
+    else if (act === 'cloud-signup') { doCloudAuth('signup'); }
+    else if (act === 'cloud-sync') { cloudPush().then(function (ok) { if (ok) toast('已上传到云端'); }); }
+    else if (act === 'cloud-logout') {
+      CLOUD.session = null; cloudWriteSession(null); CLOUD.status = 'login'; CLOUD.lastError = '';
+      renderCloudBox(); toast('已退出云同步（本地数据保留）');
+    }
   });
 
   document.addEventListener('change', function (e) {
@@ -2437,11 +2487,286 @@ function bindEvents() {
   });
 }
 
-/* ============ 11. 启动 ============ */
+/* ============ 11. 云同步（Supabase，可选） ============
+   没配置 = 完全本地，行为与以前一模一样。
+   配置了 = 登录一次，之后打开自动拉、改完自动推，电脑手机同一份数据。
+   数据存在你自己的 Supabase 项目里，行级安全保证只有你这个账号能读。 */
+
+const SESSION_KEY = 'pgd.v1.session';
+const STAMP_KEY = 'pgd.v1.stamp';
+
+const CLOUD = {
+  cfg: null,
+  session: null,
+  status: 'off',        // off | login | ready
+  lastSync: null,
+  lastError: '',
+  timer: null,
+  busy: false,
+  suspend: false
+};
+
+function cloudConfigured() {
+  return !!(CLOUD.cfg && String(CLOUD.cfg.supabase_url || '').trim() && String(CLOUD.cfg.anon_key || '').trim());
+}
+
+function cloudBase() {
+  return String(CLOUD.cfg.supabase_url).replace(/\/+$/, '');
+}
+
+function cloudLoadConfig() {
+  if (window.__CLOUD__) return Promise.resolve(window.__CLOUD__);
+  if (location.protocol.indexOf('http') !== 0) return Promise.resolve(null);
+  return fetchJSON('../config/cloud.json').catch(function () { return null; });
+}
+
+function cloudReadSession() {
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null'); } catch (err) { return null; }
+}
+
+function cloudWriteSession(session) {
+  try {
+    if (session) localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    else localStorage.removeItem(SESSION_KEY);
+  } catch (err) { /* ignore */ }
+}
+
+function cloudSaveSession(json) {
+  var session = {
+    access_token: json.access_token,
+    refresh_token: json.refresh_token,
+    expires_at: Date.now() + (num(json.expires_in, 3600) * 1000) - 30000,
+    email: (json.user && json.user.email) || '',
+    user_id: (json.user && json.user.id) || ''
+  };
+  CLOUD.session = session;
+  cloudWriteSession(session);
+  return session;
+}
+
+function cloudHeaders(extra) {
+  var headers = Object.assign({
+    'apikey': CLOUD.cfg.anon_key,
+    'Content-Type': 'application/json'
+  }, extra || {});
+  if (CLOUD.session && CLOUD.session.access_token) {
+    headers['Authorization'] = 'Bearer ' + CLOUD.session.access_token;
+  }
+  return headers;
+}
+
+async function cloudAuthRequest(path, body) {
+  var res = await fetch(cloudBase() + path, {
+    method: 'POST',
+    headers: cloudHeaders(),
+    body: JSON.stringify(body)
+  });
+  var json = {};
+  try { json = await res.json(); } catch (err) { /* 可能为空 */ }
+  if (!res.ok) {
+    throw new Error(json.error_description || json.msg || json.message || ('HTTP ' + res.status));
+  }
+  return json;
+}
+
+function cloudSignUp(email, password) {
+  return cloudAuthRequest('/auth/v1/signup', { email: email, password: password });
+}
+
+function cloudSignIn(email, password) {
+  return cloudAuthRequest('/auth/v1/token?grant_type=password', { email: email, password: password });
+}
+
+async function cloudRefreshIfNeeded() {
+  if (!CLOUD.session) return false;
+  if (Date.now() < num(CLOUD.session.expires_at)) return true;
+  if (!CLOUD.session.refresh_token) return false;
+  var json = await cloudAuthRequest('/auth/v1/token?grant_type=refresh_token', {
+    refresh_token: CLOUD.session.refresh_token
+  });
+  cloudSaveSession(json);
+  return true;
+}
+
+function cloudStamp() {
+  try { return Number(localStorage.getItem(STAMP_KEY) || 0); } catch (err) { return 0; }
+}
+
+function cloudTouch(ts) {
+  try { localStorage.setItem(STAMP_KEY, String(ts || Date.now())); } catch (err) { /* ignore */ }
+}
+
+/* 把远端那份写进内存并落本地，不触发回推 */
+function cloudApplyPayload(payload) {
+  CLOUD.suspend = true;
+  try {
+    if (payload.today) state.today = payload.today;
+    if (payload.weekly) state.weekly = payload.weekly;
+    if (payload.resources) state.resources = payload.resources;
+    if (payload.notes) state.notes = payload.notes;
+    if (Array.isArray(payload.history)) state.history = payload.history;
+    saveLocal('today'); saveLocal('weekly'); saveLocal('resources'); saveLocal('notes');
+    try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
+  } finally {
+    CLOUD.suspend = false;
+  }
+  renderAll();
+}
+
+/* 返回 'applied' | 'stale' | 'empty' */
+async function cloudPull(force) {
+  if (!cloudConfigured() || !CLOUD.session) return 'empty';
+  await cloudRefreshIfNeeded();
+  var uid = encodeURIComponent(CLOUD.session.user_id);
+  var res = await fetch(cloudBase() + '/rest/v1/state?select=*&user_id=eq.' + uid, {
+    headers: cloudHeaders()
+  });
+  if (!res.ok) throw new Error('拉取失败 HTTP ' + res.status);
+  var rows = await res.json();
+  var row = rows && rows[0];
+  if (!row) return 'empty';
+
+  var remoteTs = Date.parse(row.updated_at || '') || 0;
+  if (!force && remoteTs <= cloudStamp()) {
+    CLOUD.lastSync = new Date();
+    return 'stale';
+  }
+  cloudApplyPayload(row.data || {});
+  cloudTouch(remoteTs);
+  CLOUD.lastSync = new Date();
+  return 'applied';
+}
+
+async function cloudPush() {
+  if (!cloudConfigured() || !CLOUD.session || CLOUD.busy || CLOUD.suspend) return false;
+  CLOUD.busy = true;
+  try {
+    await cloudRefreshIfNeeded();
+    var now = new Date().toISOString();
+    var body = [{
+      user_id: CLOUD.session.user_id,
+      data: {
+        today: state.today,
+        weekly: state.weekly,
+        resources: state.resources,
+        notes: state.notes,
+        history: state.history
+      },
+      updated_at: now
+    }];
+    var res = await fetch(cloudBase() + '/rest/v1/state?on_conflict=user_id', {
+      method: 'POST',
+      headers: cloudHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) throw new Error('上传失败 HTTP ' + res.status);
+    cloudTouch(Date.parse(now));
+    CLOUD.lastSync = new Date();
+    CLOUD.lastError = '';
+    renderCloudBox();
+    return true;
+  } catch (err) {
+    CLOUD.lastError = err.message;
+    renderCloudBox();
+    return false;
+  } finally {
+    CLOUD.busy = false;
+  }
+}
+
+function cloudSchedulePush() {
+  if (!cloudConfigured() || !CLOUD.session || CLOUD.suspend) return;
+  clearTimeout(CLOUD.timer);
+  CLOUD.timer = setTimeout(function () { cloudPush(); }, 1800);
+}
+
+function renderCloudBox() {
+  var box = $('#cloudBox');
+  if (!box) return;
+
+  if (!cloudConfigured()) {
+    box.innerHTML =
+      '<div class="cloud-row"><span class="cloud-name">云同步</span><span class="cloud-state off">未配置</span></div>' +
+      '<p class="fine">在 <code>config/cloud.json</code> 里填 Supabase 的 Project URL 和 anon key，重新打包后就能电脑手机共用一份数据。没配置时完全是本地模式，不影响使用。</p>';
+    return;
+  }
+
+  if (!CLOUD.session) {
+    box.innerHTML =
+      '<div class="cloud-row"><span class="cloud-name">云同步</span><span class="cloud-state off">未登录</span></div>' +
+      '<p class="fine">用同一个邮箱登录一次，之后打开就自动同步，不用再输。</p>' +
+      '<div class="cloud-form">' +
+        '<input id="cloudEmail" type="email" placeholder="邮箱" autocomplete="username">' +
+        '<input id="cloudPass" type="password" placeholder="密码（至少 6 位）" autocomplete="current-password">' +
+      '</div>' +
+      '<div class="btn-row">' +
+        '<button type="button" class="solid-btn" data-act="cloud-login">登录</button>' +
+        '<button type="button" class="ghost-btn" data-act="cloud-signup">注册新账号</button>' +
+      '</div>' +
+      (CLOUD.lastError ? '<p class="cloud-err">' + esc(CLOUD.lastError) + '</p>' : '');
+    return;
+  }
+
+  var when = CLOUD.lastSync
+    ? (String(CLOUD.lastSync.getHours()).padStart(2, '0') + ':' + String(CLOUD.lastSync.getMinutes()).padStart(2, '0'))
+    : '尚未';
+  box.innerHTML =
+    '<div class="cloud-row"><span class="cloud-name">云同步</span><span class="cloud-state on">已登录</span></div>' +
+    '<p class="fine">' + esc(CLOUD.session.email || '') + ' · 上次同步 ' + esc(when) + (CLOUD.busy ? ' · 同步中…' : '') + '</p>' +
+    '<div class="btn-row">' +
+      '<button type="button" class="solid-btn" data-act="cloud-sync">立即同步</button>' +
+      '<button type="button" class="ghost-btn" data-act="cloud-logout">退出登录</button>' +
+    '</div>' +
+    (CLOUD.lastError ? '<p class="cloud-err">' + esc(CLOUD.lastError) + '</p>' : '');
+}
+
+async function doCloudAuth(mode) {
+  var email = ($('#cloudEmail') || {}).value || '';
+  var pass = ($('#cloudPass') || {}).value || '';
+  if (!email || !pass) { toast('先填邮箱和密码'); return; }
+  if (pass.length < 6) { toast('密码至少 6 位'); return; }
+  CLOUD.lastError = '';
+  try {
+    var json = mode === 'signup' ? await cloudSignUp(email.trim(), pass) : await cloudSignIn(email.trim(), pass);
+    if (!json.access_token) {
+      throw new Error('注册成功，但还需要验证邮箱。到 Supabase → Authentication → Providers → Email，关掉 Confirm email 再试；或点邮件里的确认链接后登录。');
+    }
+    cloudSaveSession(json);
+    CLOUD.status = 'ready';
+    var result = await cloudPull(false);
+    if (result !== 'applied') await cloudPush();
+    renderCloudBox();
+    toast(result === 'applied' ? '已登录，云端数据已拉取' : '已登录，本地数据已上传');
+  } catch (err) {
+    CLOUD.lastError = err.message;
+    renderCloudBox();
+    toast('登录失败：' + err.message);
+  }
+}
+
+async function cloudInit() {
+  CLOUD.cfg = await cloudLoadConfig();
+  CLOUD.session = cloudReadSession();
+  if (!cloudConfigured()) { CLOUD.status = 'off'; renderCloudBox(); return; }
+  if (!CLOUD.session) { CLOUD.status = 'login'; renderCloudBox(); return; }
+
+  CLOUD.status = 'ready';
+  renderCloudBox();
+  try {
+    var result = await cloudPull(false);
+    if (result === 'empty') await cloudPush();
+  } catch (err) {
+    CLOUD.lastError = err.message;
+  }
+  renderCloudBox();
+}
+
+/* ============ 12. 启动 ============ */
 
 document.addEventListener('DOMContentLoaded', function () {
   bindEvents();
   boot();
+  cloudInit();
 });
 
 </script>
