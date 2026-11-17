@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-17 22:44
+  生成时间：2026-11-17 23:11
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -2439,7 +2439,7 @@ function bindEvents() {
     else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
     else if (act === 'cloud-login') { doCloudAuth('login'); }
     else if (act === 'cloud-signup') { doCloudAuth('signup'); }
-    else if (act === 'cloud-sync') { cloudPush().then(function (ok) { if (ok) toast('已上传到云端'); }); }
+    else if (act === 'cloud-sync') { cloudSyncNow(); }
     else if (act === 'cloud-logout') {
       CLOUD.session = null; cloudWriteSession(null); CLOUD.status = 'login'; CLOUD.lastError = '';
       renderCloudBox(); toast('已退出云同步（本地数据保留）');
@@ -2680,6 +2680,51 @@ function cloudSchedulePush() {
   CLOUD.timer = setTimeout(function () { cloudPush(); }, 1800);
 }
 
+/* 「立即同步」= 先拉后推（以前只推，会把别的设备的新改动顶掉） */
+async function cloudSyncNow() {
+  if (!cloudConfigured() || !CLOUD.session) { toast('还没有登录云同步'); return; }
+  if (CLOUD.busy) return;
+  try {
+    var result = await cloudPull(false);
+    await cloudPush();
+    renderCloudBox();
+    toast(result === 'applied' ? '已拉取别处的新改动' : '已上传到云端');
+  } catch (err) {
+    CLOUD.lastError = err.message;
+    renderCloudBox();
+    toast('同步失败：' + err.message);
+  }
+}
+
+/* 页面重新可见 / 窗口获得焦点 / 每 45 秒：自动拉一次。
+   没有这个，一直开着的页面永远看不到另一台设备的改动。 */
+var cloudPullRetry = null;
+
+function cloudAutoPull(reason) {
+  if (!cloudConfigured() || !CLOUD.session) return;
+  if (document.visibilityState !== 'visible') return;
+  var active = document.activeElement;
+  if (active && /^(INPUT|TEXTAREA|SELECT)$/.test(active.tagName)) return;  /* 正在输入就别打扰 */
+
+  /* 正有请求在飞：等它结束再来，别直接丢掉这次机会 */
+  if (CLOUD.busy || CLOUD.suspend) {
+    if (!cloudPullRetry) {
+      cloudPullRetry = setTimeout(function () {
+        cloudPullRetry = null;
+        cloudAutoPull('retry');
+      }, 1500);
+    }
+    return;
+  }
+
+  cloudPull(false).then(function (result) {
+    if (result === 'applied') toast('已同步到最新');
+  }).catch(function (err) {
+    CLOUD.lastError = err.message;
+    renderCloudBox();
+  });
+}
+
 function renderCloudBox() {
   var box = $('#cloudBox');
   if (!box) return;
@@ -2733,6 +2778,7 @@ async function doCloudAuth(mode) {
     }
     cloudSaveSession(json);
     CLOUD.status = 'ready';
+    cloudBindWatchers();
     var result = await cloudPull(false);
     if (result !== 'applied') await cloudPush();
     renderCloudBox();
@@ -2744,6 +2790,34 @@ async function doCloudAuth(mode) {
   }
 }
 
+var cloudWatchersBound = false;
+
+function cloudBindWatchers() {
+  if (cloudWatchersBound) return;
+  cloudWatchersBound = true;
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') cloudAutoPull('visible');
+  });
+  window.addEventListener('focus', function () { cloudAutoPull('focus'); });
+  setInterval(function () { cloudAutoPull('timer'); }, 45000);
+}
+
+/* 调试用（只读，不影响行为）。排查同步问题时可粘到控制台看状态。 */
+window.__cloudDebug = function () {
+  return {
+    status: CLOUD.status,
+    hasSession: !!(CLOUD.session && CLOUD.session.access_token),
+    busy: CLOUD.busy,
+    suspend: CLOUD.suspend,
+    watchersBound: cloudWatchersBound,
+    stamp: cloudStamp(),
+    lastSync: CLOUD.lastSync ? CLOUD.lastSync.toISOString() : null,
+    lastError: CLOUD.lastError,
+    visible: document.visibilityState
+  };
+};
+window.__cloudPullNow = function () { return cloudPull(true); };
+
 async function cloudInit() {
   CLOUD.cfg = await cloudLoadConfig();
   CLOUD.session = cloudReadSession();
@@ -2752,6 +2826,7 @@ async function cloudInit() {
 
   CLOUD.status = 'ready';
   renderCloudBox();
+  cloudBindWatchers();
   try {
     var result = await cloudPull(false);
     if (result === 'empty') await cloudPush();
