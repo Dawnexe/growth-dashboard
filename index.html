@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-18 17:08
+  生成时间：2026-11-18 22:54
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -735,6 +735,61 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
   .exp-tab { padding: 11px 13px; }
   .res-grid { grid-template-columns: 1fr; }
   .res-cover { height: 112px; }
+}
+
+
+/* ---------- 主线：投入分钟滑动条 ---------- */
+
+.invest { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line); }
+.invest-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+.invest-head b { font-family: var(--serif); font-size: 26px; line-height: 1; }
+.invest-head b i { font-style: normal; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-left: 4px; letter-spacing: 0.1em; }
+
+.invest-bar { display: none; height: 5px; background: var(--line); overflow: hidden; margin-bottom: 12px; }
+.invest-bar > i { display: block; height: 100%; background: var(--accent); transition: width 0.25s ease; }
+
+.invest input[type="range"] {
+  -webkit-appearance: none; appearance: none;
+  display: block; width: 100%; height: 22px; margin: 0 0 2px;
+  background: transparent; cursor: pointer;
+}
+.invest input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px;
+  background: var(--line-2);
+}
+.invest input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 16px; height: 16px; margin-top: -6px;
+  border-radius: 50%; background: var(--paper-3);
+  border: 2px solid var(--ink);
+  box-shadow: 0 1px 3px rgba(38, 34, 29, 0.22);
+}
+.invest input[type="range"]:active::-webkit-slider-thumb { background: var(--accent); border-color: var(--accent); }
+.invest input[type="range"]::-moz-range-track { height: 4px; border-radius: 2px; background: var(--line-2); }
+.invest input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: var(--paper-3); border: 2px solid var(--ink);
+}
+
+.invest-scale {
+  display: flex; justify-content: space-between;
+  font-family: var(--mono); font-size: 9px; color: var(--muted-2); letter-spacing: 0.08em;
+  margin: -2px 2px 10px;
+}
+.invest-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.invest-actions .solid-btn b { font-family: var(--mono); font-size: 12px; margin: 0 2px; }
+.invest-hint { font-size: 11.5px; color: var(--muted); line-height: 1.6; flex: 1 1 220px; }
+.invest-log { margin-top: 10px; }
+.invest-log li { font-size: 11.5px; }
+
+.invest-summary { margin-bottom: 4px; }
+.invest-summary-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.invest-summary-num { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+.invest-summary-num b { font-family: var(--serif); font-size: 19px; color: var(--ink); margin-right: 2px; }
+
+@media (max-width: 620px) {
+  .invest-actions .solid-btn { width: 100%; padding: 11px; font-size: 14px; }
+  .invest-hint { flex: 1 1 100%; }
 }
 
 /* ---------- 其他 ---------- */
@@ -2298,6 +2353,19 @@ function hydrateGrowth() {
   });
 }
 
+/* 旧数据迁移：主线从「勾选完成」升级为「实际投入分钟」 */
+function migrateToday() {
+  var m = state.today && state.today.main_task;
+  if (!m) return;
+  var changed = false;
+  if (m.actual_minutes === undefined || m.actual_minutes === null) {
+    m.actual_minutes = m.status === 'done' ? num(m.estimated_minutes) : 0;
+    changed = true;
+  }
+  if (!Array.isArray(m.invest_log)) { m.invest_log = []; changed = true; }
+  if (changed) saveLocal('today');
+}
+
 function applyData(data, source) {
   state.today = data.today;
   state.weekly = data.weekly;
@@ -2307,6 +2375,7 @@ function applyData(data, source) {
   if (data.oc !== undefined && data.oc) state.oc = data.oc;
   if (data.schedule !== undefined) state.schedule = data.schedule;
   state.source = source;
+  migrateToday();
 }
 
 /* 预留给 V0.2：把下面换成 fetch('/api/...')，UI 层不用改 */
@@ -2607,6 +2676,75 @@ function nextQuote() {
   renderQuote();
 }
 
+function investTarget() {
+  var m = (state.today || {}).main_task;
+  if (!m) return null;
+  if (m.actual_minutes === undefined || m.actual_minutes === null) m.actual_minutes = 0;
+  return m;
+}
+
+function confirmInvest() {
+  var m = investTarget();
+  if (!m) return;
+  var slider = $('#investSlider');
+  var value = slider ? num(slider.value) : num(m.actual_minutes);
+  var before = num(m.actual_minutes);
+  var delta = value - before;
+  m.actual_minutes = value;
+  m.invest_log = m.invest_log || [];
+  if (delta !== 0) {
+    var d = new Date();
+    m.invest_log.push({
+      at: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'),
+      minutes: value,
+      delta: delta
+    });
+    if (m.invest_log.length > 20) m.invest_log = m.invest_log.slice(-20);
+  }
+  m.status = num(m.estimated_minutes) > 0 && value >= num(m.estimated_minutes) ? 'done' : 'pending';
+  save('today');
+  renderToday();
+  toast(delta === 0 ? '没有变化' : (delta > 0 ? '今日创作 +' + delta + ' 分钟（累计 ' + value + '）' : '改为 ' + value + ' 分钟'));
+}
+
+function clearInvest() {
+  var m = investTarget();
+  if (!m) return;
+  var before = num(m.actual_minutes);
+  if (!before) { toast('今天还没记录'); return; }
+  m.actual_minutes = 0;
+  m.status = 'pending';
+  m.invest_log = m.invest_log || [];
+  var d = new Date();
+  m.invest_log.push({
+    at: String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'),
+    minutes: 0,
+    delta: -before
+  });
+  save('today');
+  renderToday();
+  toast('已清零，可以重新记录');
+}
+
+function bindInvestSlider() {
+  var slider = $('#investSlider');
+  if (!slider) return;
+  var m = investTarget();
+  var base = m ? num(m.actual_minutes) : 0;
+  slider.addEventListener('input', function () {
+    var v = num(slider.value);
+    var preview = $('#investPreview');
+    if (preview) preview.textContent = v;
+    var hint = $('#investHint');
+    if (hint) {
+      var d = v - base;
+      hint.textContent = d === 0
+        ? '拖到想要的分钟数，再点「确认投入」'
+        : (d > 0 ? '相对已记录 +' + d + ' 分钟' : '相对已记录 ' + d + ' 分钟（改小）');
+    }
+  });
+}
+
 function renderToday() {
   var t = state.today || {};
   var real = todayISO();
@@ -2641,6 +2779,10 @@ function renderModePick() {
   }).join('');
 }
 
+function investMax(m) {
+  return Math.max(480, Math.round(num(m.estimated_minutes) * 2 / 60) * 60);
+}
+
 function renderMainTask() {
   var t = state.today || {};
   var m = t.main_task;
@@ -2649,26 +2791,47 @@ function renderMainTask() {
     card.innerHTML = '<span class="eyebrow">今日主线</span><p class="empty">今天还没有主线任务。让 Agent 跑一次 Morning Planner，或者先专注手头这张画。</p>';
     return;
   }
-  var done = m.status === 'done';
+
+  var actual = num(m.actual_minutes);
+  var est = num(m.estimated_minutes);
+  var max = investMax(m);
+  var pct = est ? Math.min(100, Math.round(actual / est * 100)) : 0;
+  var reached = est > 0 && actual >= est;
+  var log = (m.invest_log || []).slice(-2).reverse().map(function (l) {
+    return '<li><span class="log-date">' + esc(l.at) + '</span>' + (l.delta > 0 ? '+' : '') + num(l.delta) + ' → ' + num(l.minutes) + ' 分钟</li>';
+  }).join('');
+
   card.innerHTML =
     '<div class="hero-main">' +
       '<div style="min-width:0">' +
         '<span class="eyebrow">今日主线 · Main Task</span>' +
         '<h3>' + esc(m.title) + '</h3>' +
         '<div class="hero-meta">' +
-          '<span>预计 ' + num(m.estimated_minutes) + ' 分钟</span>' +
+          '<span>预计 ' + est + ' 分钟</span>' +
           '<span>' + esc(m.category || '') + '</span>' +
-          '<span>' + (done ? '已完成' : '进行中') + '</span>' +
+          '<span>' + (reached ? '已达预计时长' : '进行中') + '</span>' +
         '</div>' +
       '</div>' +
-      '<span class="prio-tag">' + (done ? 'Done' : '优先') + '</span>' +
+      '<span class="prio-tag">' + (reached ? '达成' : '优先') + '</span>' +
     '</div>' +
     (m.note ? '<p class="hero-note">' + esc(m.note) + '</p>' : '') +
-    '<div class="btn-row">' +
-      '<button type="button" class="' + (done ? 'ghost-btn' : 'solid-btn') + '" data-act="toggle" data-id="' + esc(m.id) + '">' +
-        (done ? '取消完成' : '标记完成') +
-      '</button>' +
+
+    '<div class="invest">' +
+      '<div class="invest-head">' +
+        '<span class="eyebrow">今天实际投入</span>' +
+        '<b>' + actual + '<i>分钟</i></b>' +
+      '</div>' +
+      '<input type="range" id="investSlider" min="0" max="' + max + '" step="5" value="' + actual + '">' +
+      '<div class="invest-scale"><span>0</span><span>' + (max / 120) + 'h</span><span>' + (max / 60) + 'h</span></div>' +
+      '<div class="invest-actions">' +
+        '<button type="button" class="solid-btn" data-act="invest-confirm">确认投入 <b id="investPreview">' + actual + '</b> 分钟</button>' +
+        '<button type="button" class="ghost-btn" data-act="invest-clear">清零</button>' +
+      '</div>' +
+      '<p class="invest-hint" id="investHint">' + (actual ? '累计 ' + actual + ' / 预计 ' + est + ' 分钟' : '还没记录。晚上回来拖一下，比"点个勾"诚实') + '</p>' +
+      (log ? '<ul class="log-list invest-log">' + log + '</ul>' : '') +
     '</div>';
+
+  bindInvestSlider();
 }
 
 function renderAnchors() {
@@ -2743,21 +2906,31 @@ function renderFocus() {
 }
 
 function renderProgress() {
-  var tasks = todayTasks();
+  var t = state.today || {};
+  var main = t.main_task || {};
+  var tasks = todayTasks().filter(function (x) { return x.priority !== 'primary'; });
   var done = tasks.filter(function (x) { return x.status === 'done'; });
   var pct = tasks.length ? Math.round(done.length / tasks.length * 100) : 0;
-  var artMin = 0, learnMin = 0;
-  done.forEach(function (task) {
-    if (task.category === 'art' || task.priority === 'primary') artMin += num(task.estimated_minutes);
-    else learnMin += num(task.estimated_minutes);
-  });
+
+  var learnMin = 0;
+  done.forEach(function (task) { learnMin += num(task.estimated_minutes); });
   var left = tasks.length - done.length;
+
+  var actual = num(main.actual_minutes);
+  var est = num(main.estimated_minutes);
+  var artPct = est ? Math.min(100, Math.round(actual / est * 100)) : 0;
+
   $('#progressBox').innerHTML =
-    '<div class="progress-num"><b>' + done.length + '/' + tasks.length + '</b><span>已完成</span></div>' +
+    (est ? '<div class="invest-summary">' +
+      '<div class="invest-summary-head"><span class="eyebrow">创作投入</span>' +
+        '<span class="invest-summary-num"><b>' + actual + '</b> / ' + est + ' 分钟</span></div>' +
+      '<div class="bar"><i style="width:' + artPct + '%"></i></div>' +
+    '</div>' : '') +
+    '<div class="progress-num" style="margin-top:16px"><b>' + done.length + '/' + tasks.length + '</b><span>今日任务</span></div>' +
     '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
     '<div class="mini-stats">' +
-      '<div class="mini-stat"><b>' + artMin + 'm</b><span>创作</span></div>' +
-      '<div class="mini-stat"><b>' + learnMin + 'm</b><span>学习</span></div>' +
+      '<div class="mini-stat"><b>' + actual + 'm</b><span>创作</span></div>' +
+      '<div class="mini-stat"><b>' + learnMin + 'm</b><span>其他任务</span></div>' +
       '<div class="mini-stat"><b>' + left + '</b><span>剩余</span></div>' +
     '</div>';
 }
@@ -3494,6 +3667,8 @@ function bindEvents() {
     else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
     else if (act === 'quote-next') { nextQuote(); }
     else if (act === 'exp-tab') { expSwitchChannel(el.dataset.ch); }
+    else if (act === 'invest-confirm') { confirmInvest(); }
+    else if (act === 'invest-clear') { clearInvest(); }
     else if (act === 'exp-cat') { var ec = expUi(); ec.cat = el.dataset.cat; ec.offset = 0; renderExplore(); }
     else if (act === 'exp-kind') { var ek = expUi(); ek.kind = el.dataset.kind; ek.offset = 0; renderExplore(); }
     else if (act === 'exp-shuffle') { var es = expUi(); es.offset = num(es.offset) + 1; renderExplore(); toast('换了一批'); }
