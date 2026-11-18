@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-17 23:11
+  生成时间：2026-11-18 14:41
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -454,6 +454,86 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
 
 /* ---------- 其他 ---------- */
 
+/* ---------- 长期成长：技能路线 + OC 企划 ---------- */
+
+.skill-grid { display: flex; flex-direction: column; gap: 14px; }
+
+.skill-card {
+  border: 1px solid var(--line); background: var(--paper-3);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 12px;
+}
+.skill-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+.skill-head h3 { font-size: 17px; }
+.skill-role {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em;
+  color: var(--muted); border: 1px solid var(--line); padding: 1px 6px; margin-left: 6px;
+  vertical-align: middle;
+}
+.skill-goal { font-size: 12.5px; color: var(--ink-2); line-height: 1.7; margin-top: 4px; max-width: 62ch; }
+
+.status-badge {
+  flex: none; font-family: var(--mono); font-size: 9px; letter-spacing: 0.12em;
+  padding: 2px 8px; border: 1px solid var(--line-2); color: var(--muted);
+  text-transform: uppercase;
+}
+.status-badge.main { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.status-badge.maintain { border-color: #b9c4b6; color: var(--ok); }
+.status-badge.paused { border-color: var(--line-2); color: var(--muted-2); }
+
+.skill-meta { display: flex; gap: 16px; font-family: var(--mono); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; }
+
+.stage-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+.stage { display: flex; gap: 8px; font-size: 12.5px; color: var(--muted); align-items: baseline; }
+.stage-dot { font-family: var(--mono); font-size: 10px; width: 12px; flex: none; }
+.stage.is-done { color: var(--muted-2); text-decoration: line-through; }
+.stage.is-current { color: var(--ink); font-weight: 600; }
+.stage.is-current .stage-dot { color: var(--accent); }
+
+.skill-next label, .skill-log label {
+  display: block; font-family: var(--mono); font-size: 9px;
+  letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 5px;
+}
+.inline-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.inline-form input { flex: 1 1 240px; min-width: 0; }
+
+.log-list { list-style: none; margin: 8px 0 0; padding: 0; }
+.log-list li {
+  font-size: 12.5px; color: var(--ink-2); padding: 6px 0;
+  border-top: 1px dashed var(--line); display: flex; gap: 10px; align-items: baseline;
+}
+.log-date { flex: none; font-family: var(--mono); font-size: 10px; color: var(--muted-2); }
+
+.proj-list { list-style: none; margin: 0; padding: 0; }
+.proj { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; padding: 6px 0; color: var(--ink-2); }
+.proj.is-done span { color: var(--muted); text-decoration: line-through; }
+.proj .check { width: 16px; height: 16px; font-size: 10px; }
+
+.skill-suggest {
+  font-size: 12px; color: var(--muted); line-height: 1.75;
+  border-left: 2px solid var(--line-2); padding-left: 10px;
+}
+
+.oc-card { border: 1px solid var(--line-2); background: var(--paper-3); padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; }
+.oc-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.oc-field { display: flex; flex-direction: column; gap: 2px; }
+.oc-field b { font-family: var(--serif); font-size: 15px; font-weight: 600; }
+.oc-week { border: 1px dashed var(--line-2); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.oc-week-head { display: flex; align-items: center; gap: 10px; }
+.oc-empty { display: flex; flex-direction: column; gap: 10px; }
+
+.oc-archive { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.oc-archive ul { list-style: none; margin: 8px 0 0; padding: 0; }
+.oc-archive li { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13px; padding: 6px 0; border-top: 1px dashed var(--line); }
+
+@media (max-width: 620px) {
+  .oc-grid { grid-template-columns: minmax(0, 1fr); }
+  .skill-head { flex-direction: column; gap: 6px; }
+  .inline-form input { flex: 1 1 100%; }
+  .inline-form .solid-btn, .inline-form .ghost-btn { flex: 1 1 auto; }
+}
+
+/* ---------- 其他 ---------- */
+
 .fine { font-size: 12px; color: var(--muted); line-height: 1.7; }
 .fine strong { color: var(--ink-2); font-weight: 600; }
 
@@ -593,6 +673,7 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
     <nav class="nav" id="nav">
       <button type="button" class="nav-btn is-on" data-view="today"><b>今日</b><i>Today</i></button>
       <button type="button" class="nav-btn" data-view="week"><b>本周</b><i>This week</i></button>
+      <button type="button" class="nav-btn" data-view="growth"><b>成长</b><i>Skill &amp; OC</i></button>
       <button type="button" class="nav-btn" data-view="explore"><b>探索</b><i>Discover</i></button>
       <button type="button" class="nav-btn" data-view="library"><b>知识库</b><i>Library</i></button>
       <button type="button" class="nav-btn" data-view="review"><b>复盘</b><i>Review</i></button>
@@ -637,6 +718,7 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
             <p class="fine" id="anchorNote"></p>
           </article>
 
+          <article class="card" id="focusCard" hidden></article>
           <article class="card" id="rotationCard"></article>
           <article class="card" id="optionalCard"></article>
         </div>
@@ -705,6 +787,14 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
 
       <article class="card">
         <header class="card-head">
+          <h2>技能与 OC 本周</h2>
+          <span class="eyebrow">来自「成长」页</span>
+        </header>
+        <div id="weekGrowth"></div>
+      </article>
+
+      <article class="card">
+        <header class="card-head">
           <h2>被忽略的方向</h2>
           <span class="eyebrow">不是业绩报警</span>
         </header>
@@ -715,6 +805,17 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
         <article class="card" id="unknownCard"></article>
         <article class="card" id="deepCard"></article>
       </div>
+    </section>
+
+    <!-- 成长：技能路线 + OC 企划 -->
+    <section class="view" id="view-growth">
+      <header class="view-head">
+        <div>
+          <h2>Skill &amp; OC Lab</h2>
+          <p class="sub">长期技能路线 + 每周 OC 企划。技能一次只主攻一条，OC 每周一个小目标。</p>
+        </div>
+      </header>
+      <div id="growthBody"></div>
     </section>
 
     <!-- 探索 -->
@@ -771,6 +872,11 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
             <div id="dailyLog" class="note-list"></div>
           </article>
 
+          <article class="card">
+            <header class="card-head"><h2>技能与 OC 进展</h2><span class="eyebrow">本周汇总</span></header>
+            <div id="reviewGrowth"></div>
+          </article>
+
           <article class="card card-data">
             <header class="card-head"><h2>数据</h2><span class="eyebrow">导出才是备份</span></header>
             <p class="fine">
@@ -820,7 +926,7 @@ window.__SEED__ = {
     "anchors": [
       {
         "id": "task_20261116_a1",
-        "title": "吉他练习 10 分钟",
+        "title": "调音 + 热身 10 分钟",
         "category": "music",
         "date": "2026-11-16",
         "status": "pending",
@@ -922,12 +1028,12 @@ window.__SEED__ = {
       },
       {
         "target_id": "tgt_music_1",
-        "label": "吉他练习",
+        "label": "吉他练习（周五/六/日）",
         "direction": "music",
         "done": 0,
         "target": 3,
         "minutes": 0,
-        "minutes_per_time": 15
+        "minutes_per_time": 45
       },
       {
         "target_id": "tgt_tech_1",
@@ -958,9 +1064,9 @@ window.__SEED__ = {
       "2026-11-17": "reading_philosophy",
       "2026-11-18": "tech_frontier",
       "2026-11-19": "visual_art",
-      "2026-11-20": "literature",
-      "2026-11-21": "free_exploration",
-      "2026-11-22": "review"
+      "2026-11-20": "guitar",
+      "2026-11-21": "guitar",
+      "2026-11-22": "guitar"
     },
     "neglected_warnings": [],
     "unknown_domain_this_week": "（示例：本周待抽）",
@@ -1158,10 +1264,224 @@ window.__SEED__ = {
     "version": 1,
     "items": []
   },
+  "skills": {
+    "version": 1,
+    "updated_at": "2026-11-17",
+    "note": "长期技能路线。一次只主攻一条，其余低频维护或暂缓；不设每周期限，连续不推进不判定失败。",
+    "routes": [
+      {
+        "id": "skill_blender",
+        "name": "Blender",
+        "role": "三维辅助美术",
+        "goal": "掌握 Blender 基础功能，并能结合 AI 工具，把三维技术可靠地用于二维绘画辅助。",
+        "status": "main",
+        "current_stage": 0,
+        "stages": [
+          {
+            "name": "基础操作、视图与界面",
+            "done": false
+          },
+          {
+            "name": "基础建模、材质、灯光、摄影机",
+            "done": false
+          },
+          {
+            "name": "简单场景与道具搭建",
+            "done": false
+          },
+          {
+            "name": "3D 场景辅助插画构图与透视",
+            "done": false
+          },
+          {
+            "name": "AI 辅助材质、纹理和场景生产",
+            "done": false
+          },
+          {
+            "name": "独立完成可用于插画生产的 3D 辅助流程",
+            "done": false
+          }
+        ],
+        "next_task": "（示例：下一项实践任务）",
+        "stage_projects": [
+          {
+            "name": "（示例阶段项目）",
+            "done": false
+          }
+        ],
+        "last_touch": "",
+        "log": [],
+        "resources": [
+          {
+            "name": "Blender 官方基础教学（Donut 系列）",
+            "url": ""
+          }
+        ],
+        "suggestion": "先只做「三块面 + 灯 + 相机」。别在第一周就碰角色建模，会卡死在拓扑上。"
+      },
+      {
+        "id": "skill_ae",
+        "name": "After Effects",
+        "role": "动态视觉表达",
+        "goal": "掌握 AE 基础动画与合成，能做出有表现力的 PV、动态插画和手书。",
+        "status": "maintain",
+        "current_stage": 0,
+        "stages": [
+          {
+            "name": "时间轴、关键帧、曲线",
+            "done": false
+          },
+          {
+            "name": "图层、遮罩、合成",
+            "done": false
+          },
+          {
+            "name": "转场、镜头运动、文字动画",
+            "done": false
+          },
+          {
+            "name": "角色素材拆分与动态插画",
+            "done": false
+          },
+          {
+            "name": "摄影机、景深、节奏和音乐配合",
+            "done": false
+          },
+          {
+            "name": "独立制作一支完整短篇 PV 或手书",
+            "done": false
+          }
+        ],
+        "next_task": "（示例：下一项实践任务）",
+        "stage_projects": [
+          {
+            "name": "（示例阶段项目）",
+            "done": false
+          }
+        ],
+        "last_touch": "",
+        "log": [],
+        "resources": [
+          {
+            "name": "AE 官方「入门 10 分钟」",
+            "url": ""
+          }
+        ],
+        "suggestion": "维护期只做一个动作：把已有插画变成 3 秒动图。别学套模板。"
+      },
+      {
+        "id": "skill_aiart",
+        "name": "AI 美术管线",
+        "role": "技术整合与快速原型",
+        "goal": "掌握 AI 美术工具与工作流，能自建可复用的生产流程，快速产出美术 Demo、概念验证和灵感参照。",
+        "status": "maintain",
+        "current_stage": 0,
+        "stages": [
+          {
+            "name": "理解模型、节点、工作流、API 等基础概念",
+            "done": false
+          },
+          {
+            "name": "掌握图像生成与局部重绘",
+            "done": false
+          },
+          {
+            "name": "理解图像条件控制、ControlNet 等技术",
+            "done": false
+          },
+          {
+            "name": "学习 ComfyUI 等节点式工作流工具",
+            "done": false
+          },
+          {
+            "name": "掌握多工具组合与自动化",
+            "done": false
+          },
+          {
+            "name": "独立搭建可复用的美术生产管线",
+            "done": false
+          }
+        ],
+        "next_task": "（示例：下一项实践任务）",
+        "stage_projects": [
+          {
+            "name": "（示例阶段项目）",
+            "done": false
+          }
+        ],
+        "last_touch": "",
+        "log": [],
+        "resources": [
+          {
+            "name": "ComfyUI 官方示例工作流",
+            "url": ""
+          }
+        ],
+        "suggestion": "暂缓是合理的。等 Blender 阶段二做完再回来，那时你会有具体需求去驱动管线。"
+      },
+      {
+        "id": "skill_guitar",
+        "name": "指弹吉他",
+        "role": "音乐（周末党版）",
+        "goal": "12 周内完整弹下两首指弹曲，并建立可持续的周末练习节奏。",
+        "status": "maintain",
+        "current_stage": 0,
+        "stages": [
+          {
+            "name": "L1 先把旋律弹完整（《小星星》《天空之城》简化版）",
+            "done": false
+          },
+          {
+            "name": "L2 加入技巧与低音线（押尾《风之诗》、岸部《花》）",
+            "done": false
+          },
+          {
+            "name": "L3 特殊调弦 + 打板（岸部《奇迹的山》、押尾《Fight》）",
+            "done": false
+          },
+          {
+            "name": "L4 你想弹的那一挂（陈亮《无题》、Rauscher《Memories》）",
+            "done": false
+          }
+        ],
+        "next_task": "（示例：下一项实践任务）",
+        "stage_projects": [
+          {
+            "name": "（示例阶段项目）",
+            "done": false
+          }
+        ],
+        "last_touch": "",
+        "log": [],
+        "resources": [
+          {
+            "name": "吉他世界（HOYO-MiX 专区）",
+            "url": "https://www.guitarworld.com.cn"
+          },
+          {
+            "name": "虫虫吉他（手机看谱）",
+            "url": "https://www.ccguitar.cn"
+          },
+          {
+            "name": "B 站：元子弹吉他 / 老默er",
+            "url": ""
+          }
+        ],
+        "suggestion": "一周只弹三个晚上。别在周二三四碰琴——那四天只做「不碰琴的四件事」。"
+      }
+    ]
+  },
+  "oc": {
+    "version": 1,
+    "updated_at": "",
+    "active_id": "",
+    "projects": []
+  },
   "history": [],
   "schedule": {
-    "version": 1,
+    "version": 2,
     "term": "",
+    "note": "v2：按「指弹路线 · 周末党版」重排——吉他占周五/周六/周日三个晚上，周一早上只热身，平日不碰琴。",
     "rotation_map": {
       "1": {
         "slot": "visual_art",
@@ -1182,28 +1502,72 @@ window.__SEED__ = {
         "direction": "tech"
       },
       "4": {
-        "slot": "visual_art",
-        "title": "视觉审美：研究配色、构图或角色设计",
-        "minutes": 20,
-        "direction": "art"
-      },
-      "5": {
         "slot": "literature",
         "title": "文学与灵感：诗歌、电影、典故或创作素材",
         "minutes": 20,
         "direction": "read"
       },
+      "5": {
+        "slot": "guitar",
+        "title": "吉他 40′：学新东西（前 8 小节或新指法）",
+        "minutes": 40,
+        "direction": "music"
+      },
       "6": {
-        "slot": "free_exploration",
-        "title": "自由探索：看电影、听音乐、逛作品集",
-        "minutes": 30,
-        "direction": "art"
+        "slot": "guitar",
+        "title": "吉他 60′：攻难点（难点两小节循环 10–15 遍）",
+        "minutes": 60,
+        "direction": "music"
       },
       "7": {
-        "slot": "review",
-        "title": "整理与复盘：回收本周笔记，调整下周安排",
-        "minutes": 15,
-        "direction": "self"
+        "slot": "guitar",
+        "title": "吉他 40′：串联 + 录音（整首慢速过一遍）",
+        "minutes": 40,
+        "direction": "music"
+      }
+    },
+    "music_plan": {
+      "1": {
+        "mode": "warmup",
+        "title": "调音 + 热身 10 分钟",
+        "minutes": 10,
+        "note": "只调音和空弦热身，别学新东西——早上学会等于白学。作用是「别让手冷掉」。"
+      },
+      "2": {
+        "mode": "off-hands",
+        "title": "平日微练习 10 分钟（不碰琴）",
+        "minutes": 10,
+        "note": "通勤拍手 60BPM、课间背指型、睡前桌沿按弦，任选其一。"
+      },
+      "3": {
+        "mode": "off-hands",
+        "title": "平日微练习 10 分钟（不碰琴）",
+        "minutes": 10,
+        "note": "通勤拍手 60BPM、课间背指型、睡前桌沿按弦，任选其一。"
+      },
+      "4": {
+        "mode": "off-hands",
+        "title": "平日微练习 10 分钟（不碰琴）",
+        "minutes": 10,
+        "note": "通勤拍手 60BPM、课间背指型、睡前桌沿按弦，任选其一。"
+      },
+      "5": {
+        "mode": "session",
+        "title": "吉他 40′：学新东西",
+        "minutes": 40,
+        "note": "周五只学，不攻坚。把指法定死，不改。"
+      },
+      "6": {
+        "mode": "session",
+        "title": "吉他 60′：攻难点",
+        "minutes": 60,
+        "note": "难点两小节单独循环 10–15 遍就停，别死磕一整晚。"
+      },
+      "7": {
+        "mode": "session",
+        "title": "吉他 40′：串联 + 录音",
+        "minutes": 40,
+        "note": "整首慢速过一遍并录音。半首×3 ≠ 一首。"
       }
     },
     "weekly_explore_channels": [
@@ -1235,7 +1599,9 @@ const KEY = {
   weekly: 'pgd.v1.weekly',
   resources: 'pgd.v1.resources',
   notes: 'pgd.v1.notes',
-  history: 'pgd.v1.history'
+  history: 'pgd.v1.history',
+  skills: 'pgd.v1.skills',
+  oc: 'pgd.v1.oc'
 };
 
 const DATA_URL = {
@@ -1243,7 +1609,9 @@ const DATA_URL = {
   weekly: '../data/weekly.json',
   resources: '../data/resources.json',
   notes: '../data/notes.json',
-  schedule: '../config/schedule.json'
+  schedule: '../config/schedule.json',
+  skills: '../data/skills.json',
+  oc: '../data/oc.json'
 };
 
 const WEEK_CN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -1256,7 +1624,8 @@ const SLOT_LABEL = {
   tech_frontier: '科技前沿',
   literature: '文学灵感',
   free_exploration: '自由探索',
-  review: '整理复盘'
+  review: '整理复盘',
+  guitar: '吉他（周末）'
 };
 
 const CHANNEL_LABEL = { known: '已有兴趣', adjacent: '相邻领域', random: '完全陌生' };
@@ -1328,6 +1697,8 @@ const state = {
   weekly: null,
   resources: null,
   notes: null,
+  skills: null,
+  oc: null,
   schedule: null,
   history: [],
   source: '',
@@ -1451,12 +1822,20 @@ function readLocal() {
     var r = localStorage.getItem(KEY.resources);
     var n = localStorage.getItem(KEY.notes);
     if (!t || !w || !r || !n) return null;
-    return {
+    var data = {
       today: JSON.parse(t),
       weekly: JSON.parse(w),
       resources: JSON.parse(r),
       notes: JSON.parse(n)
     };
+    /* 成长模块是后加的：老数据里没有也不算损坏，缺什么补什么 */
+    try {
+      var sk = localStorage.getItem(KEY.skills);
+      var oc = localStorage.getItem(KEY.oc);
+      if (sk) data.skills = JSON.parse(sk);
+      if (oc) data.oc = JSON.parse(oc);
+    } catch (err) { /* ignore */ }
+    return data;
   } catch (err) {
     return null;
   }
@@ -1481,11 +1860,11 @@ function save(key) {
 /* 只落本地、不打时间、不推送：用于首次加载种子数据，
    否则一台新设备会把"种子"当成"我的最新修改"，反过来覆盖云端。 */
 function saveLocalAll() {
-  ['today', 'weekly', 'resources', 'notes'].forEach(saveLocal);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc'].forEach(saveLocal);
 }
 
 function saveAll() {
-  ['today', 'weekly', 'resources', 'notes'].forEach(save);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc'].forEach(save);
 }
 
 function readHistory() {
@@ -1530,11 +1909,26 @@ function loadFromJSON() {
     fetchJSON(DATA_URL.weekly),
     fetchJSON(DATA_URL.resources),
     fetchJSON(DATA_URL.notes),
-    fetchJSON(DATA_URL.schedule).catch(function () { return null; })
+    fetchJSON(DATA_URL.schedule).catch(function () { return null; }),
+    fetchJSON(DATA_URL.skills).catch(function () { return null; }),
+    fetchJSON(DATA_URL.oc).catch(function () { return null; })
   ]).then(function (arr) {
     return {
-      today: arr[0], weekly: arr[1], resources: arr[2], notes: arr[3], schedule: arr[4]
+      today: arr[0], weekly: arr[1], resources: arr[2], notes: arr[3],
+      schedule: arr[4], skills: arr[5], oc: arr[6]
     };
+  });
+}
+
+/* 老版本用户升级时：只有成长模块的数据文件缺失，补取一次，不动其他数据 */
+function hydrateGrowth() {
+  return Promise.all([
+    state.skills ? Promise.resolve(null) : fetchJSON(DATA_URL.skills).catch(function () { return null; }),
+    state.oc ? Promise.resolve(null) : fetchJSON(DATA_URL.oc).catch(function () { return null; })
+  ]).then(function (arr) {
+    if (arr[0]) { state.skills = arr[0]; saveLocal('skills'); }
+    if (arr[1]) { state.oc = arr[1]; saveLocal('oc'); }
+    if (arr[0] || arr[1]) renderAll();
   });
 }
 
@@ -1543,6 +1937,8 @@ function applyData(data, source) {
   state.weekly = data.weekly;
   state.resources = data.resources;
   state.notes = data.notes;
+  if (data.skills !== undefined && data.skills) state.skills = data.skills;
+  if (data.oc !== undefined && data.oc) state.oc = data.oc;
   if (data.schedule !== undefined) state.schedule = data.schedule;
   state.source = source;
 }
@@ -1552,7 +1948,9 @@ var api = {
   saveToday: function () { save('today'); },
   saveWeekly: function () { save('weekly'); },
   saveResources: function () { save('resources'); },
-  saveNotes: function () { save('notes'); }
+  saveNotes: function () { save('notes'); },
+  saveSkills: function () { save('skills'); },
+  saveOc: function () { save('oc'); }
 };
 
 /* ============ 3. 启动 ============ */
@@ -1563,6 +1961,7 @@ function boot() {
   if (local) {
     applyData(local, 'localStorage');
     renderAll();
+    hydrateGrowth();
     /* 本地已有数据时也去取一次周轮盘，失败了用内置兜底 */
     fetchJSON(DATA_URL.schedule).then(function (s) {
       state.schedule = s;
@@ -1580,6 +1979,8 @@ function boot() {
       weekly: seed.weekly || JSON.parse(JSON.stringify(FALLBACK.weekly)),
       resources: seed.resources || JSON.parse(JSON.stringify(FALLBACK.resources)),
       notes: seed.notes || JSON.parse(JSON.stringify(FALLBACK.notes)),
+      skills: seed.skills || null,
+      oc: seed.oc || null,
       schedule: seed.schedule || null
     }, 'seed');
     if (Array.isArray(seed.history) && seed.history.length) {
@@ -1616,6 +2017,7 @@ function renderAll() {
   renderLibrary();
   renderReview();
   renderCloudBox();
+  if (window.GrowthModule) window.GrowthModule.render();
   setView(hashView() || state.view, true);
 }
 
@@ -1772,9 +2174,16 @@ function rolloverDay() {
 
 /* ============ 4. 今日 ============ */
 
+function allTodayPool() {
+  var t = state.today || {};
+  return [t.main_task]
+    .concat(t.anchors || [], [t.rotation, t.optional_exploration])
+    .concat(t.focus_tasks || []);
+}
+
 function todayTasks() {
   var t = state.today || {};
-  var list = [t.main_task].concat(t.anchors || [], [t.rotation, t.optional_exploration]);
+  var list = allTodayPool();
   var paused = t.mode && t.mode !== 'green';
   return list.filter(function (task) {
     if (!task) return false;
@@ -1784,8 +2193,7 @@ function todayTasks() {
 }
 
 function findTask(id) {
-  var t = state.today || {};
-  var pool = [t.main_task].concat(t.anchors || [], [t.rotation, t.optional_exploration]);
+  var pool = allTodayPool();
   for (var i = 0; i < pool.length; i++) {
     if (pool[i] && pool[i].id === id) return pool[i];
   }
@@ -1820,6 +2228,7 @@ function renderToday() {
   renderAnchors();
   renderRotation();
   renderOptional();
+  renderFocus();
   renderProgress();
   renderLowEnergy();
   renderTodayNotes();
@@ -1914,6 +2323,27 @@ function renderOptional() {
     (paused
       ? '<p class="empty">' + MODE_LABEL[t.mode] + '模式：已收起。</p>'
       : '<ul class="tasks">' + taskRow(o) + '</ul>');
+}
+
+function renderFocus() {
+  var t = state.today || {};
+  var list = t.focus_tasks || [];
+  var card = $('#focusCard');
+  if (!card) return;
+  if (!list.length) { card.hidden = true; return; }
+  card.hidden = false;
+  card.innerHTML =
+    '<header class="card-head"><h2>今日推进</h2><span class="eyebrow">来自技能 / OC</span></header>' +
+    '<ul class="tasks">' + list.map(function (task) {
+      var src = task.link
+        ? '<span class="skippable">' + (task.link.type === 'skill' ? '技能' : 'OC') + '</span>'
+        : '';
+      return '<li class="task' + (task.status === 'done' ? ' is-done' : '') + '">' +
+        '<button type="button" class="check" data-act="toggle" data-id="' + esc(task.id) + '">✓</button>' +
+        '<div class="task-body"><div class="task-title">' + esc(task.title) + src + '</div></div>' +
+        '<span class="task-side">' + num(task.estimated_minutes) + ' min</span>' +
+        '</li>';
+    }).join('') + '</ul>';
 }
 
 function renderProgress() {
@@ -2241,7 +2671,7 @@ function renderDailyLog() {
 
 /* ============ 9. 交互动作 ============ */
 
-var VIEWS = ['today', 'week', 'explore', 'library', 'review'];
+var VIEWS = ['today', 'week', 'growth', 'explore', 'library', 'review'];
 
 function hashView() {
   var h = (location.hash || '').replace('#', '');
@@ -2350,6 +2780,8 @@ function exportJSON() {
     weekly: state.weekly,
     resources: state.resources,
     notes: state.notes,
+    skills: state.skills,
+    oc: state.oc,
     history: state.history
   };
   var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -2604,8 +3036,12 @@ function cloudApplyPayload(payload) {
     if (payload.weekly) state.weekly = payload.weekly;
     if (payload.resources) state.resources = payload.resources;
     if (payload.notes) state.notes = payload.notes;
+    if (payload.skills) state.skills = payload.skills;
+    if (payload.oc) state.oc = payload.oc;
     if (Array.isArray(payload.history)) state.history = payload.history;
     saveLocal('today'); saveLocal('weekly'); saveLocal('resources'); saveLocal('notes');
+    if (payload.skills) saveLocal('skills');
+    if (payload.oc) saveLocal('oc');
     try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
   } finally {
     CLOUD.suspend = false;
@@ -2650,6 +3086,8 @@ async function cloudPush() {
         weekly: state.weekly,
         resources: state.resources,
         notes: state.notes,
+        skills: state.skills,
+        oc: state.oc,
         history: state.history
       },
       updated_at: now
@@ -2843,6 +3281,497 @@ document.addEventListener('DOMContentLoaded', function () {
   boot();
   cloudInit();
 });
+
+</script>
+<script>
+/* 长期成长模块：技能路线（Skill Roadmap）+ 每周 OC 企划
+   依赖 app.js 暴露的全局：state / esc / $ / num / toast / save / todayISO / shortDate / weekdayOf
+   数据写在 state.skills / state.oc，落 localStorage 的 pgd.v1.skills / pgd.v1.oc */
+
+(function () {
+  'use strict';
+
+  var STATUS_LABEL = { main: '主攻', maintain: '维护', paused: '暂缓' };
+  var STATUS_ORDER = ['main', 'maintain', 'paused'];
+
+  function skills() { return state.skills || { routes: [] }; }
+  function ocd() { return state.oc || { projects: [], active_id: '' }; }
+  function routes() { return skills().routes || []; }
+  function projects() { return ocd().projects || []; }
+
+  function activeProject() {
+    var id = ocd().active_id;
+    var list = projects();
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === id) return list[i];
+    }
+    return null;
+  }
+
+  function currentWeekGoal(p) {
+    if (!p || !p.weekly) return null;
+    var start = weekStart();
+    for (var i = 0; i < p.weekly.length; i++) {
+      if (p.weekly[i].week_start === start) return p.weekly[i];
+    }
+    return null;
+  }
+
+  function weekStart() {
+    var d = new Date();
+    var wd = d.getDay();
+    var diff = wd === 0 ? -6 : 1 - wd;
+    var monday = new Date(d);
+    monday.setDate(d.getDate() + diff);
+    return monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0');
+  }
+
+  function stamp(dateStr) {
+    return dateStr || todayISO();
+  }
+
+  /* ---------------- 渲染 ---------------- */
+
+  function skillCard(route) {
+    var stages = route.stages || [];
+    var cur = num(route.current_stage);
+    var doneCount = stages.filter(function (s) { return s.done; }).length;
+    var pct = stages.length ? Math.round(doneCount / stages.length * 100) : 0;
+
+    var stageHtml = stages.map(function (s, i) {
+      var cls = i === cur ? ' is-current' : (s.done ? ' is-done' : '');
+      return '<li class="stage' + cls + '">' +
+        '<span class="stage-dot">' + (s.done ? '✓' : (i === cur ? '▶' : '○')) + '</span>' +
+        '<span class="stage-name">' + esc(s.name) + '</span>' +
+        '</li>';
+    }).join('');
+
+    var logHtml = (route.log || []).slice(-3).reverse().map(function (l) {
+      return '<li><span class="log-date">' + esc(shortDate(l.date)) + '</span>' + esc(l.text) + '</li>';
+    }).join('');
+
+    var statusBtns = STATUS_ORDER.map(function (st) {
+      return '<button type="button" class="' + (route.status === st ? 'solid-btn' : 'ghost-btn') +
+        '" data-act="skill-status" data-id="' + esc(route.id) + '" data-status="' + st + '">' +
+        STATUS_LABEL[st] + '</button>';
+    }).join('');
+
+    return '<article class="skill-card">' +
+      '<header class="skill-head">' +
+        '<div><h3>' + esc(route.name) + ' <span class="skill-role">' + esc(route.role || '') + '</span></h3>' +
+        '<p class="skill-goal">' + esc(route.goal || '') + '</p></div>' +
+        '<span class="status-badge ' + esc(route.status) + '">' + esc(STATUS_LABEL[route.status] || '') + '</span>' +
+      '</header>' +
+
+      '<div class="skill-meta">' +
+        '<span>阶段 ' + Math.min(cur + 1, stages.length) + '/' + stages.length + '</span>' +
+        '<span>最近推进 ' + esc(route.last_touch ? shortDate(route.last_touch) : '还没开始') + '</span>' +
+      '</div>' +
+      '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+
+      '<ul class="stage-list">' + stageHtml + '</ul>' +
+
+      '<div class="skill-next">' +
+        '<label>下一项实践任务</label>' +
+        '<div class="inline-form">' +
+          '<input type="text" id="next-' + esc(route.id) + '" value="' + esc(route.next_task || '') + '" placeholder="写下一次具体做什么，不要写「学 Blender」">' +
+          '<button type="button" class="ghost-btn" data-act="skill-next-save" data-id="' + esc(route.id) + '">保存</button>' +
+          '<button type="button" class="solid-btn" data-act="skill-push-today" data-id="' + esc(route.id) + '">排进今天</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="skill-log">' +
+        '<div class="inline-form">' +
+          '<input type="text" id="log-' + esc(route.id) + '" placeholder="今天推进了什么（一句话，写日期自动记）">' +
+          '<button type="button" class="ghost-btn" data-act="skill-log-add" data-id="' + esc(route.id) + '">记下</button>' +
+        '</div>' +
+        (logHtml ? '<ul class="log-list">' + logHtml + '</ul>' : '') +
+      '</div>' +
+
+      '<div class="btn-row">' + statusBtns +
+        (cur > 0 ? '<button type="button" class="ghost-btn" data-act="skill-stage-back" data-id="' + esc(route.id) + '">退回上一阶段</button>' : '') +
+        '<button type="button" class="ghost-btn" data-act="skill-stage-done" data-id="' + esc(route.id) + '">完成当前阶段</button>' +
+      '</div>' +
+
+      ((route.stage_projects || []).length
+        ? '<ul class="proj-list">' + route.stage_projects.map(function (p, i) {
+            return '<li class="proj' + (p.done ? ' is-done' : '') + '">' +
+              '<button type="button" class="check" data-act="skill-project-toggle" data-id="' + esc(route.id) + '" data-idx="' + i + '">✓</button>' +
+              '<span>' + esc(p.name) + '</span></li>';
+          }).join('') + '</ul>'
+        : '') +
+
+      (route.suggestion ? '<p class="skill-suggest">' + esc(route.suggestion) + '</p>' : '') +
+      '</article>';
+  }
+
+  function ocBlock() {
+    var p = activeProject();
+    var list = projects();
+
+    if (!p) {
+      return '<div class="oc-empty">' +
+        '<p class="fine">还没有 OC 企划。先建一个：名字和一句话概念就够，细节以后再补。</p>' +
+        '<div class="inline-form">' +
+          '<input type="text" id="ocNewName" placeholder="企划名称，例如「潮湿港口的守灯人」">' +
+          '<input type="text" id="ocNewConcept" placeholder="一句话核心概念">' +
+          '<button type="button" class="solid-btn" data-act="oc-new">建立企划</button>' +
+        '</div>' +
+        (list.length ? '<p class="fine">已有 ' + list.length + ' 个归档企划，可在下方恢复。</p>' : '') +
+        '</div>';
+    }
+
+    var goal = currentWeekGoal(p);
+    var outputs = (goal && goal.outputs) || [];
+    var outputsHtml = outputs.slice(-4).reverse().map(function (o) {
+      return '<li><span class="log-date">' + esc(shortDate(o.date)) + '</span>' + esc(o.text) + '</li>';
+    }).join('');
+
+    return '<div class="oc-card">' +
+      '<header class="skill-head">' +
+        '<div><h3>' + esc(p.name) + '</h3>' +
+        '<p class="skill-goal">' + esc(p.concept || '（还没写核心概念）') + '</p></div>' +
+        '<span class="status-badge main">进行中</span>' +
+      '</header>' +
+
+      '<div class="oc-grid">' +
+        '<div class="oc-field"><span class="eyebrow">当前阶段</span><b>' + esc(p.stage || '概念') + '</b></div>' +
+        '<div class="oc-field"><span class="eyebrow">最近推进</span><b>' + esc(p.last_touch ? shortDate(p.last_touch) : '还没开始') + '</b></div>' +
+        '<div class="oc-field"><span class="eyebrow">已完成内容</span><b>' + (p.done || []).length + ' 项</b></div>' +
+      '</div>' +
+
+      '<div class="oc-week">' +
+        '<div class="oc-week-head"><span class="eyebrow">本周小目标</span>' +
+          (goal && goal.done ? '<span class="status-badge main">已完成</span>' : '') + '</div>' +
+        '<div class="inline-form">' +
+          '<input type="text" id="ocGoal" value="' + esc(goal ? goal.goal : '') + '" placeholder="这一周只要完成一件小事，例如「完成一个角色剪影探索」">' +
+          '<button type="button" class="ghost-btn" data-act="oc-goal-save">保存</button>' +
+          (goal && !goal.done ? '<button type="button" class="solid-btn" data-act="oc-goal-done">标记完成</button>' : '') +
+        '</div>' +
+
+        '<div class="inline-form">' +
+          '<input type="text" id="ocOutput" placeholder="记录本周实际产出（画了什么、做到哪一步）">' +
+          '<button type="button" class="ghost-btn" data-act="oc-output-add">添加产出</button>' +
+        '</div>' +
+        (outputsHtml ? '<ul class="log-list">' + outputsHtml + '</ul>' : '<p class="fine">还没有产出记录。</p>') +
+      '</div>' +
+
+      '<div class="skill-next">' +
+        '<label>下一步计划</label>' +
+        '<div class="inline-form">' +
+          '<input type="text" id="ocNext" value="' + esc(p.next || '') + '" placeholder="下一步做什么">' +
+          '<button type="button" class="ghost-btn" data-act="oc-next-save">保存</button>' +
+          '<button type="button" class="solid-btn" data-act="oc-push-today">排进今天</button>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="btn-row">' +
+        '<button type="button" class="ghost-btn" data-act="oc-new">新建企划</button>' +
+        '<button type="button" class="ghost-btn" data-act="oc-archive" data-id="' + esc(p.id) + '">归档这个企划</button>' +
+      '</div>' +
+      '</div>';
+  }
+
+  function archiveBlock() {
+    var archived = projects().filter(function (p) { return p.status === 'archived'; });
+    if (!archived.length) return '';
+    return '<div class="oc-archive">' +
+      '<span class="eyebrow">历史企划</span>' +
+      '<ul>' + archived.map(function (p) {
+        return '<li><span>' + esc(p.name) + '</span>' +
+          '<button type="button" class="ghost-btn" data-act="oc-activate" data-id="' + esc(p.id) + '">恢复为进行中</button></li>';
+      }).join('') + '</ul></div>';
+  }
+
+  function renderGrowth() {
+    var host = document.getElementById('growthBody');
+    if (!host) return;
+
+    var mainRoute = routes().filter(function (r) { return r.status === 'main'; })[0];
+    var summary =
+      '<div class="week-top">' +
+        '<div class="stat"><span class="eyebrow">主攻技能</span><b>' + esc(mainRoute ? mainRoute.name : '未设置') + '</b></div>' +
+        '<div class="stat"><span class="eyebrow">技能路线</span><b>' + routes().length + ' 条</b></div>' +
+        '<div class="stat"><span class="eyebrow">OC 企划</span><b>' + projects().length + ' 个</b></div>' +
+      '</div>';
+
+    host.innerHTML = summary +
+      '<article class="card">' +
+        '<header class="card-head"><h2>技能成长路线</h2><span class="eyebrow">一次只主攻一条</span></header>' +
+        '<div class="skill-grid">' + routes().map(skillCard).join('') + '</div>' +
+      '</article>' +
+      '<article class="card">' +
+        '<header class="card-head"><h2>OC 企划</h2><span class="eyebrow">每周一个小目标，可以跨周</span></header>' +
+        ocBlock() + archiveBlock() +
+      '</article>';
+  }
+
+  /* 本周 / 复盘 里的小结 */
+  function renderWeekGrowth() {
+    var host = document.getElementById('weekGrowth');
+    if (!host) return;
+    var mainRoute = routes().filter(function (r) { return r.status === 'main'; })[0];
+    var p = activeProject();
+    var goal = currentWeekGoal(p);
+    host.innerHTML =
+      '<div class="warn-item"><span class="warn-tag">技能</span><div>' +
+        '<div class="task-title">' + esc(mainRoute ? mainRoute.name : '未设置主攻技能') + '</div>' +
+        '<div class="task-hint">' + esc(mainRoute ? (mainRoute.next_task || '还没写下一项任务') : '去「成长」页设一条') + '</div>' +
+      '</div></div>' +
+      '<div class="warn-item"><span class="warn-tag">OC</span><div>' +
+        '<div class="task-title">' + esc(p ? p.name : '还没有企划') + '</div>' +
+        '<div class="task-hint">' + esc(goal && goal.goal ? goal.goal : '本周还没设小目标') +
+        (goal && goal.done ? ' · 已完成' : '') + '</div>' +
+      '</div></div>';
+  }
+
+  function renderReviewGrowth() {
+    var host = document.getElementById('reviewGrowth');
+    if (!host) return;
+    var moved = routes().filter(function (r) { return r.last_touch && r.last_touch >= weekStart(); });
+    var p = activeProject();
+    var goal = currentWeekGoal(p);
+    var outs = (goal && goal.outputs) || [];
+    host.innerHTML =
+      '<div class="mini-stats">' +
+        '<div class="mini-stat"><b>' + moved.length + '/' + routes().length + '</b><span>本周有推进的技能</span></div>' +
+        '<div class="mini-stat"><b>' + (goal && goal.done ? '1' : '0') + '</b><span>OC 本周目标</span></div>' +
+        '<div class="mini-stat"><b>' + outs.length + '</b><span>OC 产出记录</span></div>' +
+      '</div>' +
+      (moved.length ? '<p class="fine">本周推进：' + moved.map(function (r) { return esc(r.name); }).join('、') + '</p>' : '<p class="fine">本周还没有技能推进记录。</p>');
+  }
+
+  /* ---------------- 交互 ---------------- */
+
+  function findRoute(id) {
+    return routes().filter(function (r) { return r.id === id; })[0] || null;
+  }
+
+  function setMainStatus(id, status) {
+    var list = routes();
+    list.forEach(function (r) {
+      if (r.id === id) {
+        r.status = status;
+      } else if (status === 'main' && r.status === 'main') {
+        r.status = 'maintain';   /* 主攻互斥：旧的降为维护 */
+      }
+    });
+    save('skills');
+    renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+  }
+
+  function pushToToday(title, linkType, linkId) {
+    var t = state.today;
+    if (!t) return;
+    t.focus_tasks = t.focus_tasks || [];
+    var seq = t.focus_tasks.length + 1;
+    t.focus_tasks.push({
+      id: 'task_' + String(t.date).replace(/-/g, '') + '_f' + seq,
+      title: title,
+      category: linkType === 'oc' ? 'art' : 'skill',
+      date: t.date,
+      status: 'pending',
+      priority: 'focus',
+      estimated_minutes: 30,
+      kind: 'focus',
+      link: { type: linkType, id: linkId }
+    });
+    save('today');
+    renderAll();
+    toast('已排进今天：' + title);
+  }
+
+  function bind() {
+    document.addEventListener('click', function (e) {
+      var el = e.target.closest('[data-act]');
+      if (!el) return;
+      var act = el.dataset.act;
+      var id = el.dataset.id;
+
+      if (act === 'skill-status') { setMainStatus(id, el.dataset.status); return; }
+
+      if (act === 'skill-next-save') {
+        var r = findRoute(id);
+        var input = document.getElementById('next-' + id);
+        if (!r || !input) return;
+        r.next_task = input.value.trim();
+        r.last_touch = stamp();
+        save('skills'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('下一项任务已保存');
+        return;
+      }
+
+      if (act === 'skill-push-today') {
+        var r2 = findRoute(id);
+        if (!r2) return;
+        if (!r2.next_task) { toast('先写一条「下一项实践任务」'); return; }
+        pushToToday(r2.next_task, 'skill', id);
+        return;
+      }
+
+      if (act === 'skill-log-add') {
+        var r3 = findRoute(id);
+        var li = document.getElementById('log-' + id);
+        if (!r3 || !li) return;
+        var text = li.value.trim();
+        if (!text) { toast('写一句推进了什么'); return; }
+        r3.log = r3.log || [];
+        r3.log.push({ date: todayISO(), text: text });
+        r3.last_touch = todayISO();
+        save('skills'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('已记录推进');
+        return;
+      }
+
+      if (act === 'skill-stage-done') {
+        var r4 = findRoute(id);
+        if (!r4) return;
+        var idx = num(r4.current_stage);
+        if (r4.stages[idx]) r4.stages[idx].done = true;
+        r4.current_stage = Math.min(idx + 1, r4.stages.length - 1);
+        r4.last_touch = todayISO();
+        save('skills'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('进入下一阶段：' + (r4.stages[r4.current_stage] || {}).name);
+        return;
+      }
+
+      if (act === 'skill-stage-back') {
+        var r5 = findRoute(id);
+        if (!r5) return;
+        var i5 = num(r5.current_stage);
+        if (i5 > 0) { r5.stages[i5].done = false; r5.current_stage = i5 - 1; }
+        save('skills'); renderGrowth();
+        return;
+      }
+
+      if (act === 'skill-project-toggle') {
+        var r6 = findRoute(id);
+        if (!r6) return;
+        var ix = num(el.dataset.idx);
+        if (r6.stage_projects && r6.stage_projects[ix]) {
+          r6.stage_projects[ix].done = !r6.stage_projects[ix].done;
+          if (r6.stage_projects[ix].done) r6.last_touch = todayISO();
+        }
+        save('skills'); renderGrowth();
+        return;
+      }
+
+      /* ---- OC ---- */
+      if (act === 'oc-new') {
+        var nameEl = document.getElementById('ocNewName');
+        var conceptEl = document.getElementById('ocNewConcept');
+        var name = nameEl ? nameEl.value.trim() : '';
+        if (!name) { toast('先写企划名称'); return; }
+        var p = {
+          id: 'oc_' + Date.now().toString(36),
+          name: name,
+          concept: conceptEl ? conceptEl.value.trim() : '',
+          theme: '', setting: '', refs: [], stage: '概念',
+          status: 'active', done: [], weekly: [],
+          next: '', created_at: todayISO(), last_touch: ''
+        };
+        var list = projects(); list.push(p);
+        state.oc = state.oc || {};
+        state.oc.projects = list;
+        state.oc.active_id = p.id;
+        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('企划已建立：' + name);
+        return;
+      }
+
+      if (act === 'oc-archive') {
+        var pa = projects().filter(function (x) { return x.id === id; })[0];
+        if (!pa) return;
+        pa.status = 'archived';
+        var next = projects().filter(function (x) { return x.status === 'active'; })[0];
+        state.oc.active_id = next ? next.id : '';
+        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('已归档');
+        return;
+      }
+
+      if (act === 'oc-activate') {
+        var pb = projects().filter(function (x) { return x.id === id; })[0];
+        if (!pb) return;
+        pb.status = 'active';
+        state.oc.active_id = pb.id;
+        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('已恢复');
+        return;
+      }
+
+      if (act === 'oc-goal-save') {
+        var p1 = activeProject();
+        var gi = document.getElementById('ocGoal');
+        if (!p1 || !gi) return;
+        var g1 = currentWeekGoal(p1);
+        if (!g1) { g1 = { week_start: weekStart(), goal: '', outputs: [], done: false }; p1.weekly = p1.weekly || []; p1.weekly.push(g1); }
+        g1.goal = gi.value.trim();
+        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('本周小目标已保存');
+        return;
+      }
+
+      if (act === 'oc-goal-done') {
+        var p2 = activeProject();
+        var g2 = currentWeekGoal(p2);
+        if (!g2) return;
+        g2.done = true;
+        p2.last_touch = todayISO();
+        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('本周 OC 目标完成');
+        return;
+      }
+
+      if (act === 'oc-output-add') {
+        var p3 = activeProject();
+        var out = document.getElementById('ocOutput');
+        if (!p3 || !out) return;
+        var text3 = out.value.trim();
+        if (!text3) { toast('写一句实际产出了什么'); return; }
+        var g3 = currentWeekGoal(p3);
+        if (!g3) { g3 = { week_start: weekStart(), goal: '', outputs: [], done: false }; p3.weekly = p3.weekly || []; p3.weekly.push(g3); }
+        g3.outputs = g3.outputs || [];
+        g3.outputs.push({ date: todayISO(), text: text3 });
+        p3.done = p3.done || [];
+        p3.done.push({ date: todayISO(), text: text3 });
+        p3.last_touch = todayISO();
+        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+        toast('已记入产出');
+        return;
+      }
+
+      if (act === 'oc-next-save') {
+        var p4 = activeProject();
+        var ni = document.getElementById('ocNext');
+        if (!p4 || !ni) return;
+        p4.next = ni.value.trim();
+        save('oc'); renderGrowth();
+        toast('下一步已保存');
+        return;
+      }
+
+      if (act === 'oc-push-today') {
+        var p5 = activeProject();
+        if (!p5) return;
+        if (!p5.next) { toast('先写一条「下一步计划」'); return; }
+        pushToToday(p5.next, 'oc', p5.id);
+        return;
+      }
+    });
+  }
+
+  window.GrowthModule = {
+    render: function () { renderGrowth(); renderWeekGrowth(); renderReviewGrowth(); },
+    bind: bind
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bind);
+  } else {
+    bind();
+  }
+})();
 
 </script>
 </body>
