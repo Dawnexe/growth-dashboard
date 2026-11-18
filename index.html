@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-18 14:41
+  生成时间：2026-11-18 17:08
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -11,6 +11,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>个人成长驾驶舱</title>
+<meta name="theme-color" content="#26221d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="成长驾驶舱">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 /* Personal Growth Dashboard · V0.1
    视觉方向：编辑部工作台 / 个人研究室
@@ -157,6 +164,32 @@ button { cursor: pointer; }
 }
 
 .hero { font-size: clamp(26px, 3.1vw, 38px); margin: 6px 0 8px; line-height: 1.25; }
+
+/* 今日一句 */
+.today-quote {
+  margin: 18px 0 0; padding: 14px 0 0 18px;
+  border-top: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  position: relative; max-width: 46ch;
+}
+.q-open, .q-close {
+  font-family: var(--serif); font-size: 30px; line-height: 0;
+  color: var(--accent); vertical-align: -6px;
+}
+.q-close { vertical-align: -10px; }
+.q-text {
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(18px, 1.9vw, 23px); line-height: 1.55; color: var(--ink);
+  letter-spacing: 0.01em;
+}
+.q-next {
+  display: block; margin-top: 8px;
+  background: none; border: 0; padding: 0;
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.16em;
+  color: var(--muted-2); text-transform: uppercase;
+  transition: color 0.15s;
+}
+.q-next:hover { color: var(--accent); }
 
 .sub { font-size: 13px; color: var(--muted); }
 
@@ -532,6 +565,178 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
   .inline-form .solid-btn, .inline-form .ghost-btn { flex: 1 1 auto; }
 }
 
+/* ---------- 创作训练面板（七维度） ---------- */
+
+.accept-banner {
+  border: 1px solid var(--line-2); border-left: 3px solid var(--warn);
+  background: var(--paper-3);
+  padding: 14px 16px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px;
+}
+.accept-banner.is-ok { border-left-color: var(--ok); }
+.accept-head { display: flex; align-items: center; gap: 10px; }
+.accept-line { font-size: 14px; color: var(--ink-2); }
+.accept-line b { font-family: var(--serif); font-size: 20px; }
+
+.dim-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; margin: 14px 0; }
+
+.dim-card {
+  text-align: left; background: var(--paper-3); border: 1px solid var(--line);
+  padding: 12px 13px; display: flex; flex-direction: column; gap: 5px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.dim-card:hover { border-color: var(--line-2); background: #fff; }
+.dim-code { font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--accent); }
+.dim-card h4 { font-size: 14px; font-family: var(--serif); line-height: 1.35; }
+.dim-brief { font-size: 11.5px; color: var(--muted); line-height: 1.5; }
+.dim-stats { font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+.dim-stats b { font-family: var(--serif); font-size: 17px; margin-right: 2px; }
+.dim-week {
+  font-family: var(--mono); font-size: 9px; color: var(--ok);
+  border: 1px solid #b9c4b6; padding: 1px 5px; margin-left: 6px;
+}
+.dim-last { font-family: var(--mono); font-size: 9.5px; color: var(--muted-2); letter-spacing: 0.04em; }
+
+.dim-detail {
+  border: 1px solid var(--line-2); background: var(--paper-3);
+  padding: 16px 18px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;
+}
+.dim-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.plain-list { list-style: none; margin: 6px 0 0; padding: 0; }
+.plain-list li { font-size: 12.5px; color: var(--ink-2); padding: 3px 0 3px 12px; position: relative; }
+.plain-list li::before {
+  content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--line-2);
+  position: absolute; left: 0; top: 10px;
+}
+
+.result-form {
+  border-top: 1px dashed var(--line); padding-top: 16px; margin-top: 8px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.form-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.form-head h3 { font-size: 15px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+.req { font-family: var(--mono); font-size: 9px; color: var(--bad); margin-left: 4px; }
+.opt { font-family: var(--mono); font-size: 9px; color: var(--muted-2); margin-left: 4px; }
+
+.result-list { list-style: none; margin: 6px 0 0; padding: 0; }
+.result-row {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 7px 0; border-top: 1px dashed var(--line); font-size: 12.5px; color: var(--ink-2);
+}
+.result-row.is-pending { opacity: 0.72; }
+.result-title { flex: 1 1 220px; min-width: 0; }
+.result-focus {
+  font-size: 11px; color: var(--muted); margin-left: 6px;
+  border-left: 1px solid var(--line); padding-left: 6px;
+}
+.result-state { font-family: var(--mono); font-size: 9px; color: var(--muted); letter-spacing: 0.08em; }
+.dim-tag {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.06em;
+  border: 1px solid var(--line); padding: 1px 5px; margin-left: 5px; color: var(--muted);
+}
+.ghost-btn.tiny { padding: 3px 8px; font-size: 10.5px; }
+.mini-select { width: auto; min-width: 130px; padding: 5px 8px; font-size: 12px; }
+.history-block { margin-top: 18px; border-top: 1px dashed var(--line); padding-top: 14px; }
+
+@media (max-width: 620px) {
+  .dim-grid { grid-template-columns: 1fr 1fr; }
+  .dim-two, .grid-2 { grid-template-columns: 1fr; }
+  .dim-card h4 { font-size: 13px; }
+}
+
+
+/* ---------- 探索：双频道 ---------- */
+
+.exp-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.exp-tab {
+  position: relative; text-align: left; background: var(--paper-2); border: 1px solid var(--line);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 3px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.exp-tab b { font-family: var(--serif); font-size: 17px; }
+.exp-tab i { font-style: normal; font-size: 11.5px; color: var(--muted); }
+.exp-tab span {
+  position: absolute; right: 14px; top: 12px;
+  font-family: var(--mono); font-size: 10px; color: var(--muted-2);
+}
+.exp-tab.is-on { background: var(--paper-3); border-color: var(--ink); box-shadow: var(--shadow); }
+.exp-tab.is-on span { color: var(--accent); }
+
+.exp-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.exp-meta { display: flex; flex-direction: column; gap: 6px; }
+.exp-meta-line { display: flex; gap: 14px; align-items: baseline; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.exp-meta-line b { font-family: var(--serif); font-size: 16px; color: var(--ink); }
+.exp-meta-actions { display: flex; gap: 8px; }
+
+.exp-filters { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.exp-filters input[type="search"] { max-width: 420px; }
+.chip.is-empty { opacity: 0.42; }
+.chip.chip-line { border-style: dashed; }
+.chip.chip-line.is-on { border-style: solid; }
+
+.exp-entries {
+  border: 1px solid var(--line); background: var(--paper-2);
+  padding: 12px 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px;
+}
+.entry-block ul { list-style: none; margin: 6px 0 0; padding: 0; }
+.entry-block li {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 6px 0; border-top: 1px dashed var(--line); font-size: 12.5px;
+}
+.entry-title { font-weight: 600; color: var(--ink); }
+.entry-note { color: var(--muted); flex: 1 1 200px; font-size: 11.5px; }
+
+.res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+
+.res-art { display: flex; flex-direction: column; }
+.res-cover {
+  height: 132px; background: linear-gradient(135deg, #efe8db, #e3dac9);
+  display: grid; place-items: center; overflow: hidden;
+}
+.res-cover img { width: 100%; height: 100%; object-fit: cover; }
+.cover-ph {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em;
+  color: rgba(38, 34, 29, 0.42); text-transform: uppercase;
+}
+.cover-ph i { font-style: normal; font-size: 8px; letter-spacing: 0.2em; opacity: 0.55; }
+.res-art-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 8px; }
+.res-summary { font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+.res-why { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+.res-why b { color: var(--ink-2); font-weight: 600; }
+
+.res-points { font-size: 12px; color: var(--ink-2); }
+.res-points ul { list-style: none; margin: 4px 0 0; padding: 0; }
+.res-points li { padding: 2px 0 2px 11px; position: relative; line-height: 1.65; }
+.res-points li::before {
+  content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--accent);
+  position: absolute; left: 0; top: 9px; opacity: 0.55;
+}
+
+.res-top .tag { flex: none; white-space: nowrap; align-self: flex-start; }
+
+.res-know { padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; }
+.res-know h3 { font-size: 16px; }
+.res-art h3 { font-size: 15px; }
+
+.res.is-read { opacity: 0.82; }
+.res.is-read h3::after {
+  content: "已读"; font-family: var(--mono); font-size: 9px; color: var(--muted-2);
+  border: 1px solid var(--line); padding: 0 5px; margin-left: 6px; vertical-align: 2px;
+}
+
+.note-row { display: flex; gap: 8px; margin-top: 8px; }
+.note-row input { flex: 1; font-size: 12px; padding: 7px 9px; }
+.link-btn { text-decoration: none; display: inline-flex; align-items: center; }
+.exp-foot { margin-top: 18px; max-width: 70ch; }
+
+@media (max-width: 620px) {
+  .exp-tabs { grid-template-columns: 1fr; gap: 8px; }
+  .exp-tab { padding: 11px 13px; }
+  .res-grid { grid-template-columns: 1fr; }
+  .res-cover { height: 112px; }
+}
+
 /* ---------- 其他 ---------- */
 
 .fine { font-size: 12px; color: var(--muted); line-height: 1.7; }
@@ -694,6 +899,12 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
         <p class="eyebrow" id="todayDate">—</p>
         <h1 class="hero" id="greeting">今天，也向前一点。</h1>
         <p class="sub" id="headSub">创作优先 · 均衡成长 · 自由探索</p>
+        <blockquote class="today-quote" id="todayQuote" title="点一下换一句">
+          <span class="q-open">“</span>
+          <span class="q-text" id="quoteText"></span>
+          <span class="q-close">”</span>
+          <button type="button" class="q-next" data-act="quote-next">换一句</button>
+        </blockquote>
       </div>
       <div class="head-right">
         <span class="store-badge" id="storeBadge">本地存储</span>
@@ -818,16 +1029,28 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
       <div id="growthBody"></div>
     </section>
 
-    <!-- 探索 -->
+    <!-- 探索：双频道 -->
     <section class="view" id="view-explore">
-      <header class="view-head">
-        <div>
-          <h2>灵感探索</h2>
-          <p class="sub" id="exploreMeta">—</p>
-        </div>
+      <div class="exp-tabs" id="exploreTabs"></div>
+
+      <div class="exp-toolbar">
+        <div class="exp-meta" id="exploreMeta"></div>
+      </div>
+
+      <div class="exp-filters">
         <div class="filter-row" id="channelFilter"></div>
-      </header>
-      <div class="res-list" id="resList"></div>
+        <div class="filter-row" id="kindFilter"></div>
+        <input type="search" id="expSearch" placeholder="在这个频道里搜：关键词、标题、知识点">
+      </div>
+
+      <div class="exp-entries" id="expEntries" hidden></div>
+
+      <div class="res-grid" id="resList"></div>
+
+      <p class="fine exp-foot">
+        内容来自三层：自动采集（RSS / 公开网站）· AI 搜索策展 · 人工探索入口。
+        打不开的平台不硬抓，只给关键词和方向。「换一批」只在本地轮转，不会额外发起请求。
+      </p>
     </section>
 
     <!-- 知识库 -->
@@ -1078,13 +1301,15 @@ window.__SEED__ = {
     }
   },
   "resources": {
-    "version": 1,
-    "demo": true,
-    "note": "以下为 V0.1 演示条目，用于验证页面结构；V0.4 起由 Discovery Curator 真实检索后写入。demo=true 表示这些不是策展结果。",
+    "version": 2,
+    "updated_at": "2026-11-18",
+    "note": "探索模块 v2：双频道。channel=art|knowledge；kind=roam/study（美术）或 frontier/deep/horizon（知识），另有 creator/keyword 两种探索入口。entry_only=true 表示这是探索入口（关键词/创作者），不是已验证的具体作品。",
     "items": [
       {
-        "id": "res_20261115_01",
-        "added_at": "2026-11-15",
+        "id": "res_20261118_a1",
+        "channel": "art",
+        "kind": "study",
+        "category": "绘画与插画",
         "title": "Character Art Styles Guide: Cool Ideas for Unique Designs",
         "source": {
           "name": "VSQUAD Studio",
@@ -1093,56 +1318,32 @@ window.__SEED__ = {
           "published_at": "2026-03-16",
           "type": "article"
         },
-        "channel": "known",
-        "domains": [
-          "角色设计",
-          "风格定位"
-        ],
         "summary": "一线美术总监拆解角色风格如何被技术管线与市场定位反向约束，并给出剪影、形体语言、风格混搭的具体做法。",
-        "why": "示例条目：这里会写这条为什么值得你看。",
-        "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
-        "next_step": "示例：这里会写想深入的话下一步看什么。",
-        "credibility": {
-          "kind": "expert",
-          "score": 82,
-          "basis": "在职 Art Director 署名，有一手项目案例（Wayfinder / SMITE 等），属商业博客但为一线经验叙述"
-        },
-        "reading_depth": "skim",
-        "feedback": null,
-        "demo": true
-      },
-      {
-        "id": "res_20261115_02",
-        "added_at": "2026-11-15",
-        "title": "Epic 罕见公开《堡垒之夜》设计全流程，首次证实使用生成式 AI",
-        "source": {
-          "name": "17173 新闻",
-          "url": "https://news.17173.com/content/06172026/173721479.shtml",
-          "author": "",
-          "published_at": "2026-06-17",
-          "type": "article"
-        },
-        "channel": "known",
-        "domains": [
-          "游戏行业",
-          "AI 与创作流程"
+        "reason": "讲的是「风格选择即生产决策」，正好补上「为什么别人这样设计」的一环。",
+        "key_points": [
+          "剪影测试：涂成全黑还认得出是谁吗",
+          "形状语言：圆=亲和、方=稳、三角=危险",
+          "风格混搭要限定在共同的艺术语言内"
         ],
-        "summary": "Epic 公开皮肤概念设计流程，说明生成式 AI 在概念阶段的位置与边界。",
+        "questions": [
+          "你自己那张图，涂黑之后还认得出角色是谁吗？"
+        ],
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "demo": true,
         "why": "示例条目：这里会写这条为什么值得你看。",
         "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
-        "next_step": "示例：这里会写想深入的话下一步看什么。",
-        "credibility": {
-          "kind": "community",
-          "score": 55,
-          "basis": "二手新闻报道，未见原始官方文档；结论方向可信，细节需回溯一手来源"
-        },
-        "reading_depth": "skim",
-        "feedback": null,
-        "demo": true
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
       },
       {
-        "id": "res_20261115_03",
-        "added_at": "2026-11-15",
+        "id": "res_20261118_a2",
+        "channel": "art",
+        "kind": "roam",
+        "category": "设计与视觉",
         "title": "ArtStation Magazine",
         "source": {
           "name": "ArtStation",
@@ -1151,27 +1352,95 @@ window.__SEED__ = {
           "published_at": "",
           "type": "work"
         },
-        "channel": "known",
-        "domains": [
-          "概念设计",
-          "创作访谈"
-        ],
         "summary": "ArtStation 官方编辑栏目，含艺术家访谈与项目 Breakdown。",
+        "reason": "你要看的不只是成品图，而是「别人怎么走到这张图的」。Breakdown 是唯一能看到过程的地方。",
+        "key_points": [
+          "挑一篇 Breakdown，只看草图迭代次数和放弃的方向"
+        ],
+        "questions": [
+          "他一开始想画的方向，和最后成品差多远？"
+        ],
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "demo": true,
         "why": "示例条目：这里会写这条为什么值得你看。",
         "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
-        "next_step": "示例：这里会写想深入的话下一步看什么。",
-        "credibility": {
-          "kind": "curated",
-          "score": 74,
-          "basis": "平台官方策展，作者多为在职从业者；编辑内容偏展示，深度不均"
-        },
-        "reading_depth": "skim",
-        "feedback": null,
-        "demo": true
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
       },
       {
-        "id": "res_20261115_04",
-        "added_at": "2026-11-15",
+        "id": "res_20261118_a3",
+        "channel": "art",
+        "kind": "roam",
+        "category": "自由探索",
+        "title": "跨领域惊喜：传统织物的纹样组织方式",
+        "source": {
+          "name": "探索入口（主题）",
+          "url": "",
+          "author": "",
+          "published_at": "",
+          "type": "theme"
+        },
+        "summary": "先不追某个具体作品，直接去看「织物怎么把图案排成循环单元」这件事本身。",
+        "reason": "纹样的重复单元、错位、镜像，和角色服装上的图案逻辑是同一套东西。",
+        "key_points": [],
+        "questions": [
+          "一个循环单元里，最少需要几个元素才不显得重复？"
+        ],
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "entry_only": true,
+        "demo": true,
+        "why": "示例条目：这里会写这条为什么值得你看。",
+        "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
+      },
+      {
+        "id": "res_20261118_k1",
+        "channel": "knowledge",
+        "kind": "frontier",
+        "category": "AI 与科技",
+        "title": "Epic 罕见公开《堡垒之夜》设计全流程，首次证实使用生成式 AI",
+        "source": {
+          "name": "17173 新闻",
+          "url": "https://news.17173.com/content/06172026/173721479.shtml",
+          "author": "",
+          "published_at": "2026-06-17",
+          "type": "article"
+        },
+        "summary": "Epic 公开皮肤概念设计流程，说明生成式 AI 在概念阶段的位置与边界。",
+        "reason": "不是「AI 会不会取代美术」，而是「大厂把 AI 放在流程的哪一格」——这直接影响你现在该练什么。",
+        "key_points": [
+          "AI 介入的是发散阶段还是收敛阶段",
+          "人负责的是判断还是执行"
+        ],
+        "questions": [
+          "如果 AI 负责出选项、你负责选，那你的判断力从哪来的？"
+        ],
+        "fact_opinion": "报道本身是二手信息，结论方向可信，细节需回溯 Epic 官方或 GDC 演讲。",
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "demo": true,
+        "why": "示例条目：这里会写这条为什么值得你看。",
+        "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
+      },
+      {
+        "id": "res_20261118_k2",
+        "channel": "knowledge",
+        "kind": "deep",
+        "category": "游戏与创作行业",
         "title": "GDC Vault — 免费演讲档案",
         "source": {
           "name": "GDC Vault",
@@ -1180,83 +1449,172 @@ window.__SEED__ = {
           "published_at": "",
           "type": "video"
         },
-        "channel": "adjacent",
-        "domains": [
-          "游戏开发",
-          "美术生产",
-          "团队协作"
-        ],
         "summary": "GDC 历年演讲档案，含美术生产管线、风格统一、外包管理等主题。",
+        "reason": "你想进游戏行业，这里能听到「制作人怎么抱怨美术」——从需求端反推作品该长什么样。",
+        "key_points": [
+          "找一场讲「美术风格统一」的，记录他们用什么规则约束外包"
+        ],
+        "questions": [
+          "如果外包画跑偏了，团队靠什么把它拉回来？"
+        ],
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "demo": true,
         "why": "示例条目：这里会写这条为什么值得你看。",
         "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
-        "next_step": "示例：这里会写想深入的话下一步看什么。",
-        "credibility": {
-          "kind": "primary",
-          "score": 88,
-          "basis": "行业会议一手演讲录像，讲者多为在职开发者；部分内容付费"
-        },
-        "reading_depth": "skim",
-        "feedback": null,
-        "demo": true
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
       },
       {
-        "id": "res_20261115_05",
-        "added_at": "2026-11-15",
-        "title": "城市声景（Soundscape）· 本周陌生领域",
+        "id": "res_20261118_k3",
+        "channel": "knowledge",
+        "kind": "horizon",
+        "category": "跨领域新知",
+        "title": "城市声景（Soundscape）",
         "source": {
-          "name": "待补充：可靠入门资料",
+          "name": "探索入口（陌生领域）",
           "url": "",
           "author": "",
           "published_at": "",
-          "type": "discussion"
+          "type": "theme"
         },
-        "channel": "random",
-        "domains": [
-          "声学",
-          "城市规划",
-          "环境心理学"
-        ],
         "summary": "城市设计为什么不仅需要考虑视觉景观，还要考虑声音景观。",
+        "reason": "你的场景设计目前只处理「看得见」的部分；声音是同一空间里另一半信息。",
+        "key_points": [],
+        "questions": [
+          "一条街的声音地图，和它的功能分区是否重合？"
+        ],
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "entry_only": true,
+        "demo": true,
         "why": "示例条目：这里会写这条为什么值得你看。",
         "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
-        "next_step": "示例：这里会写想深入的话下一步看什么。",
-        "credibility": {
-          "kind": "community",
-          "score": 40,
-          "basis": "占位条目：尚未检索到具体入门资料，不构成推荐"
-        },
-        "reading_depth": "unused",
-        "feedback": null,
-        "demo": true
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
       },
       {
-        "id": "res_20261115_06",
-        "added_at": "2026-11-15",
-        "title": "《庄子》· 与阅读线 A 的连接",
+        "id": "res_20261118_c1",
+        "channel": "art",
+        "kind": "creator",
+        "category": "摄影与影像",
+        "title": "电影感日常影像的创作者",
         "source": {
-          "name": "阅读线 A（精神阅读）",
+          "name": "探索入口（创作者雷达）",
           "url": "",
-          "author": "庄周",
+          "author": "",
           "published_at": "",
-          "type": "work"
+          "type": "creator"
         },
-        "channel": "adjacent",
-        "domains": [
-          "哲学",
-          "创作观"
+        "summary": "不指定具体人，先给你去找的方向：擅长把普通生活拍出电影感的那类创作者。",
+        "reason": "你要的不是「好看的图」，而是「同样的日常为什么他拍得有情绪」。",
+        "key_points": [],
+        "questions": [
+          "他用的光是窗光还是路灯？镜头离人有多远？"
         ],
-        "summary": "不急着给正确答案，而是不断改变你观察问题的角度。",
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "entry_only": true,
+        "demo": true,
         "why": "示例条目：这里会写这条为什么值得你看。",
         "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
-        "next_step": "示例：这里会写想深入的话下一步看什么。",
-        "credibility": {
-          "kind": "primary",
-          "score": 95,
-          "basis": "原始典籍，无需二手解读即可读"
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
+      },
+      {
+        "id": "res_20261118_w1",
+        "channel": "art",
+        "kind": "keyword",
+        "category": "摄影与影像",
+        "title": "cinematic daily vlog",
+        "source": {
+          "name": "搜索关键词",
+          "url": "",
+          "author": "",
+          "published_at": "",
+          "type": "keyword"
         },
-        "reading_depth": "unused",
-        "feedback": null,
-        "demo": true
+        "summary": "拿去 B 站 / YouTube / 小红书 搜，看别人怎么拍日常。",
+        "reason": "关键词比收藏夹好用：它每次都能给你新的一批。",
+        "key_points": [],
+        "questions": [],
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "entry_only": true,
+        "demo": true,
+        "why": "示例条目：这里会写这条为什么值得你看。",
+        "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
+      },
+      {
+        "id": "res_20261118_w2",
+        "channel": "art",
+        "kind": "keyword",
+        "category": "绘画与插画",
+        "title": "character silhouette breakdown",
+        "source": {
+          "name": "搜索关键词",
+          "url": "",
+          "author": "",
+          "published_at": "",
+          "type": "keyword"
+        },
+        "summary": "专门找「剪影怎么被拆解」的内容，比泛泛搜角色设计准得多。",
+        "reason": "剪影是角色辨识度的地基，这个关键词能直接命中做拆解的人。",
+        "key_points": [],
+        "questions": [],
+        "cover": "",
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "entry_only": true,
+        "demo": true,
+        "why": "示例条目：这里会写这条为什么值得你看。",
+        "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
+      },
+      {
+        "id": "res_20261118_w3",
+        "channel": "knowledge",
+        "kind": "keyword",
+        "category": "科学与自然",
+        "title": "animal camouflage mechanism",
+        "source": {
+          "name": "搜索关键词",
+          "url": "",
+          "author": "",
+          "published_at": "",
+          "type": "keyword"
+        },
+        "summary": "伪装不是「颜色像背景」这么简单，还有破坏性斑纹、拟态、反荫蔽。",
+        "reason": "生物伪装几乎是现成的视觉谜题，转成角色或怪物设计极快。",
+        "key_points": [],
+        "questions": [],
+        "fetched_at": "2026-11-18",
+        "favorite": false,
+        "read": false,
+        "note": "",
+        "depth": "",
+        "entry_only": true,
+        "demo": true,
+        "why": "示例条目：这里会写这条为什么值得你看。",
+        "look_for": "示例：这里会放一个具体值得观察的细节或问题。",
+        "next_step": "示例：这里会写想深入的话下一步看什么。"
       }
     ]
   },
@@ -1472,10 +1830,10 @@ window.__SEED__ = {
     ]
   },
   "oc": {
-    "version": 1,
+    "version": 2,
     "updated_at": "",
-    "active_id": "",
-    "projects": []
+    "results": [],
+    "legacy_projects": []
   },
   "history": [],
   "schedule": {
@@ -1691,6 +2049,14 @@ const FALLBACK = {
   resources: { version: 1, demo: true, items: [] },
   notes: { version: 1, items: [] }
 };
+
+/* 首页那句：每天轮一句，点「换一句」可以自己翻 */
+const QUOTES = [
+  'The best way out is always through.',
+  'Lights out and away we go.',
+  'For what could never been.'
+];
+const QUOTE_KEY = 'pgd.v1.quote';
 
 const state = {
   today: null,
@@ -2212,6 +2578,35 @@ function taskRow(task) {
     '</li>';
 }
 
+function readQuoteState() {
+  try {
+    var raw = localStorage.getItem(QUOTE_KEY);
+    var obj = raw ? JSON.parse(raw) : null;
+    if (obj && obj.date === todayISO() && typeof obj.offset === 'number') return obj;
+  } catch (err) { /* ignore */ }
+  return { date: todayISO(), offset: 0 };
+}
+
+function quoteIndex() {
+  var st = readQuoteState();
+  var seed = Math.floor(new Date(todayISO() + 'T00:00:00').getTime() / 86400000);
+  return Math.abs(seed + st.offset) % QUOTES.length;
+}
+
+function renderQuote() {
+  var el = $('#quoteText');
+  if (!el) return;
+  el.textContent = QUOTES[quoteIndex()];
+}
+
+function nextQuote() {
+  var st = readQuoteState();
+  st.offset = (st.offset || 0) + 1;
+  st.date = todayISO();
+  try { localStorage.setItem(QUOTE_KEY, JSON.stringify(st)); } catch (err) { /* ignore */ }
+  renderQuote();
+}
+
 function renderToday() {
   var t = state.today || {};
   var real = todayISO();
@@ -2224,6 +2619,7 @@ function renderToday() {
     : state.source === 'seed' ? '数据在本机浏览器' : '内置示例';
 
   renderModePick();
+  renderQuote();
   renderMainTask();
   renderAnchors();
   renderRotation();
@@ -2487,81 +2883,310 @@ function renderNeglect(w) {
     : '<p class="empty">没有方向被长期忽略。专注创作导致的空缺不算失败。</p>';
 }
 
-/* ============ 6. 探索 ============ */
+/* ============ 6. 探索（双频道） ============ */
 
-function renderExplore() {
-  var res = state.resources || {};
-  var items = res.items || [];
-  var counts = { known: 0, adjacent: 0, random: 0 };
-  items.forEach(function (item) { counts[item.channel] = num(counts[item.channel]) + 1; });
+const EXP_CHANNELS = {
+  art: {
+    label: '美术与审美',
+    desc: '看见美、发现灵感、拓宽感知',
+    cats: ['绘画与插画', '设计与视觉', '摄影与影像', '电影与动画', '音乐与声音', '文学与文字', '生活与文化', '自由探索'],
+    kinds: { roam: '审美漫游', study: '专业学习' }
+  },
+  knowledge: {
+    label: '知识与视野',
+    desc: '理解世界、学习知识、建立认知',
+    cats: ['AI 与科技', '黑科技与前沿', '人文与哲学', '文学与生命智慧', '游戏与创作行业', '科学与自然', '跨领域新知'],
+    kinds: { frontier: '前沿动态', deep: '深度知识', horizon: '视野拓展' }
+  }
+};
 
-  var mix = res.exploration_mix || { known: 0.5, adjacent: 0.3, random: 0.2 };
-  $('#exploreMeta').textContent =
-    '本期 ' + items.length + ' 条 · 已有 ' + counts.known + ' / 相邻 ' + counts.adjacent + ' / 陌生 ' + counts.random +
-    '（目标 ' + Math.round(mix.known * 10) + ' : ' + Math.round(mix.adjacent * 10) + ' : ' + Math.round(mix.random * 10) + '）' +
-    (res.demo ? ' · 演示数据，非策展结果' : '');
+const EXP_ENTRY_LABEL = { creator: '创作者雷达', keyword: '搜索关键词', theme: '探索主题' };
 
-  var filters = [['all', '全部', items.length],
-    ['known', '已有兴趣', counts.known],
-    ['adjacent', '相邻领域', counts.adjacent],
-    ['random', '完全陌生', counts.random]];
+function expChannel() { return state.ui.expChannel || 'art'; }
 
-  $('#channelFilter').innerHTML = filters.map(function (f) {
-    return '<button type="button" class="chip' + (state.ui.channel === f[0] ? ' is-on' : '') +
-      '" data-act="filter" data-channel="' + f[0] + '">' + f[1] + '<span>' + f[2] + '</span></button>';
-  }).join('');
+/* 每个频道各自的筛选与滚动位置，切 Tab 不会互相影响 */
+function expUi(ch) {
+  state.ui.exp = state.ui.exp || {};
+  var key = ch || expChannel();
+  var box = state.ui.exp[key];
+  if (!box) {
+    box = { cat: 'all', kind: 'all', offset: 0, scroll: 0 };
+    state.ui.exp[key] = box;
+  }
+  return box;
+}
+function expItems() { return ((state.resources && state.resources.items) || []); }
+function expIsEntry(item) { return item.kind === 'creator' || item.kind === 'keyword' || item.kind === 'theme'; }
 
-  var list = items.filter(function (item) {
-    return state.ui.channel === 'all' || item.channel === state.ui.channel;
+/* 旧数据（channel = known/adjacent/random）迁移到双频道，不丢任何条目 */
+function migrateResources() {
+  var res = state.resources;
+  if (!res || !Array.isArray(res.items)) return;
+  var changed = false;
+  res.items.forEach(function (it) {
+    if (it.channel !== 'art' && it.channel !== 'knowledge') {
+      if (!it.reach) it.reach = it.channel || 'known';
+      var hay = (it.domains || []).join(' ') + ' ' + (it.category || '');
+      var knowledgeish = /AI|游戏|哲学|科学|行业|技术|人文/.test(hay) && !/角色|插画|构图|色彩|设计/.test(hay);
+      it.channel = knowledgeish ? 'knowledge' : 'art';
+      it.kind = it.kind || (knowledgeish ? 'deep' : 'roam');
+      it.category = it.category || (knowledgeish ? 'AI 与科技' : '绘画与插画');
+      changed = true;
+    }
+    if (!it.kind) { it.kind = it.channel === 'knowledge' ? 'deep' : 'roam'; changed = true; }
+    if (it.favorite === undefined) { it.favorite = false; changed = true; }
+    if (it.read === undefined) { it.read = false; changed = true; }
+    if (it.note === undefined) { it.note = ''; changed = true; }
+    if (it.depth === undefined) { it.depth = ''; changed = true; }
   });
-
-  $('#resList').innerHTML = list.length
-    ? list.map(resourceCard).join('')
-    : '<p class="empty">这个通道还没有内容。等 Discovery Curator 跑一次，或先收集一张你真正喜欢的图。</p>';
+  if (changed) save('resources');
 }
 
-function resourceCard(item) {
-  var src = item.source || {};
-  var cred = item.credibility || {};
-  var titleHtml = src.url
-    ? '<a href="' + esc(src.url) + '" target="_blank" rel="noopener noreferrer">' + esc(item.title) + '</a>'
-    : esc(item.title);
-  var srcLine = [
-    src.name || '未标注来源',
-    src.author || '',
-    src.published_at || '',
-    src.type || ''
-  ].filter(Boolean).join(' · ');
 
+function expSwitchChannel(ch) {
+  if (!EXP_CHANNELS[ch] || ch === expChannel()) return;
+  expUi(expChannel()).scroll = window.scrollY;
+  state.ui.expChannel = ch;
+  renderExplore();
+  window.scrollTo({ top: expUi(ch).scroll || 0, behavior: 'auto' });
+}
+
+function expFind(id) {
+  var list = expItems();
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return null;
+}
+
+function expToggle(id, field) {
+  var it = expFind(id);
+  if (!it) return;
+  it[field] = !it[field];
+  save('resources');
+  renderExplore();
+  toast(field === 'favorite' ? (it.favorite ? '已收藏' : '取消收藏') : (it.read ? '标记为已读' : '标记为未读'));
+}
+
+function expSetDepth(id, depth) {
+  var it = expFind(id);
+  if (!it) return;
+  it.depth = it.depth === depth ? '' : depth;
+  if (it.depth) it.read = true;
+  save('resources');
+  renderExplore();
+  if (it.depth === 'deep') toast('标记「深入看看」');
+  else if (it.depth === 'inspired') toast('标记「产生了灵感」');
+}
+
+function expSaveNote(id) {
+  var it = expFind(id);
+  var input = document.getElementById('note-' + id);
+  if (!it || !input) return;
+  it.note = input.value.trim();
+  save('resources');
+  toast(it.note ? '感想已记下' : '已清空');
+}
+
+function expCopy(text) {
+  if (!text) return;
+  var done = function () { toast('已复制：' + text); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, function () { toast('复制失败，可以手动选中'); });
+  } else {
+    toast('这个浏览器不让自动复制，手动选中即可：' + text);
+  }
+}
+
+function expFiltered() {
+  var ch = expChannel();
+  var ui = expUi(ch);
+  var cat = ui.cat || 'all';
+  var kind = ui.kind || 'all';
+  var q = (state.ui.expSearch || '').trim().toLowerCase();
+  var unreadOnly = !!state.ui.expUnreadOnly;
+
+  var list = expItems().filter(function (it) {
+    if (it.channel !== ch) return false;
+    if (expIsEntry(it)) return false;
+    if (cat !== 'all' && it.category !== cat) return false;
+    if (kind !== 'all' && it.kind !== kind) return false;
+    if (unreadOnly && it.read) return false;
+    if (q) {
+      var hay = [it.title, it.summary, it.reason, it.category, (it.key_points || []).join(' ')].join(' ').toLowerCase();
+      if (hay.indexOf(q) < 0) return false;
+    }
+    return true;
+  });
+
+  /* 换一批：按偏移轮转，不触发任何网络请求 */
+  var offset = num(ui.offset) % Math.max(1, list.length);
+  if (offset > 0) list = list.slice(offset).concat(list.slice(0, offset));
+  return list;
+}
+
+function expEntries() {
+  var ch = expChannel();
+  return expItems().filter(function (it) { return it.channel === ch && expIsEntry(it); });
+}
+
+function renderExplore() {
+  migrateResources();
+  var ch = expChannel();
+  var cfg = EXP_CHANNELS[ch];
+  var items = expItems().filter(function (it) { return it.channel === ch; });
+  var cards = items.filter(function (it) { return !expIsEntry(it); });
+  var entries = items.filter(expIsEntry);
+  var readCount = cards.filter(function (it) { return it.read; }).length;
+  var favCount = cards.filter(function (it) { return it.favorite; }).length;
+  var shown = expFiltered();
+
+  /* 顶部 Tab */
+  var tabs = Object.keys(EXP_CHANNELS).map(function (key) {
+    var c = EXP_CHANNELS[key];
+    var n = expItems().filter(function (it) { return it.channel === key && !expIsEntry(it); }).length;
+    return '<button type="button" class="exp-tab' + (key === ch ? ' is-on' : '') + '" data-act="exp-tab" data-ch="' + key + '">' +
+      '<b>' + esc(c.label) + '</b><i>' + esc(c.desc) + '</i><span>' + n + '</span></button>';
+  }).join('');
+  $('#exploreTabs').innerHTML = tabs;
+
+  var mixText = ch === 'art' ? '漫游 ' + cards.filter(function (i) { return i.kind === 'roam'; }).length +
+      ' / 学习 ' + cards.filter(function (i) { return i.kind === 'study'; }).length : '';
+
+  $('#exploreMeta').innerHTML =
+    '<div class="exp-meta-line">' +
+      '<span>本批 <b>' + shown.length + '</b> 条' + (mixText ? '（' + esc(mixText) + '）' : '') + '</span>' +
+      '<span>已读 ' + readCount + '/' + cards.length + '</span>' +
+      '<span>收藏 ' + favCount + '</span>' +
+      (state.resources && state.resources.demo ? '<span class="tag">示例数据</span>' : '') +
+    '</div>' +
+    '<div class="exp-meta-actions">' +
+      '<button type="button" class="ghost-btn" data-act="exp-shuffle">换一批</button>' +
+      '<button type="button" class="' + (state.ui.expUnreadOnly ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-unread">只看未读</button>' +
+    '</div>';
+
+  /* 分类 + 类型筛选 */
+  var catCounts = {};
+  cards.forEach(function (it) { catCounts[it.category] = (catCounts[it.category] || 0) + 1; });
+  var cats = ['all'].concat(cfg.cats);
+  var curCat = expUi(ch).cat || 'all';
+  $('#channelFilter').innerHTML = cats.map(function (c) {
+    var n = c === 'all' ? cards.length : (catCounts[c] || 0);
+    return '<button type="button" class="chip' + (curCat === c ? ' is-on' : '') + (n ? '' : ' is-empty') +
+      '" data-act="exp-cat" data-cat="' + esc(c) + '">' + (c === 'all' ? '全部' : esc(c)) +
+      '<span>' + n + '</span></button>';
+  }).join('');
+
+  var kinds = ['all'].concat(Object.keys(cfg.kinds));
+  $('#kindFilter').innerHTML = kinds.map(function (k) {
+    var name = k === 'all' ? '全部形式' : cfg.kinds[k];
+    return '<button type="button" class="chip chip-line' + ((expUi(ch).kind || 'all') === k ? ' is-on' : '') +
+      '" data-act="exp-kind" data-kind="' + k + '">' + esc(name) + '</button>';
+  }).join('');
+
+  /* 探索入口：创作者 / 关键词 / 主题 */
+  var byKind = { creator: [], keyword: [], theme: [] };
+  entries.forEach(function (e) { (byKind[e.kind] = byKind[e.kind] || []).push(e); });
+  var entryHtml = ['creator', 'keyword', 'theme'].map(function (k) {
+    var list = byKind[k] || [];
+    if (!list.length) return '';
+    return '<div class="entry-block"><span class="eyebrow">' + esc(EXP_ENTRY_LABEL[k]) + '</span><ul>' +
+      list.map(function (e) {
+        return '<li>' +
+          '<span class="entry-title">' + esc(e.title) + '</span>' +
+          '<span class="entry-note">' + esc(e.summary || '') + '</span>' +
+          '<button type="button" class="ghost-btn tiny" data-act="exp-copy" data-text="' + esc(e.title) + '">复制去搜</button>' +
+          '</li>';
+      }).join('') + '</ul></div>';
+  }).join('');
+  $('#expEntries').innerHTML = entryHtml;
+  $('#expEntries').hidden = !entryHtml;
+
+  $('#resList').innerHTML = shown.length
+    ? shown.map(function (it) {
+        return ch === 'art' ? artCard(it) : knowledgeCard(it);
+      }).join('')
+    : '<p class="empty">这个筛选下没有内容。换个分类，或点「换一批」。</p>';
+}
+
+function expActions(item) {
   var fav = item.favorite === true;
+  var read = item.read === true;
+  var deep = item.depth === 'deep';
+  var inspired = item.depth === 'inspired';
+  var url = (item.source || {}).url || '';
+  return '<div class="res-foot">' +
+    '<button type="button" class="' + (fav ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-fav" data-id="' + esc(item.id) + '">' +
+      (fav ? '已收藏' : '喜欢 / 收藏') + '</button>' +
+    '<button type="button" class="' + (deep ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-depth" data-id="' + esc(item.id) + '" data-depth="deep">深入看看</button>' +
+    '<button type="button" class="' + (inspired ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-depth" data-id="' + esc(item.id) + '" data-depth="inspired">产生了灵感</button>' +
+    '<button type="button" class="ghost-btn" data-act="exp-read" data-id="' + esc(item.id) + '">' + (read ? '已读' : '标记已读') + '</button>' +
+    (url ? '<a class="ghost-btn link-btn" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">打开来源</a>' : '') +
+  '</div>' +
+  '<div class="note-row">' +
+    '<input type="text" id="note-' + esc(item.id) + '" value="' + esc(item.note || '') + '" placeholder="一句感想（可选，不写也没关系）">' +
+    '<button type="button" class="ghost-btn tiny" data-act="exp-note-save" data-id="' + esc(item.id) + '">记下</button>' +
+  '</div>';
+}
 
-  return '<article class="res">' +
+function expSourceLine(item) {
+  var src = item.source || {};
+  return [src.name || '未标注来源', src.author || '', src.published_at || ''].filter(Boolean).join(' · ');
+}
+
+function artCard(item) {
+  var cover = item.cover
+    ? '<img src="' + esc(item.cover) + '" alt="" loading="lazy">'
+    : '<div class="cover-ph"><span>' + esc(item.category || '自由探索') + '</span><i>no cover</i></div>';
+  var points = (item.key_points || []).length
+    ? '<div class="res-points"><span class="eyebrow">看点</span><ul>' +
+      item.key_points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>'
+    : '';
+  var qs = (item.questions || []).length
+    ? '<div class="res-points"><span class="eyebrow">可以问自己</span><ul>' +
+      item.questions.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>'
+    : '';
+
+  return '<article class="res res-art' + (item.read ? ' is-read' : '') + '">' +
+    '<div class="res-cover">' + cover + '</div>' +
+    '<div class="res-art-body">' +
+      '<div class="res-top">' +
+        '<div style="min-width:0"><h3>' + esc(item.title) + '</h3>' +
+        '<div class="res-src">' + esc(expSourceLine(item)) + '</div></div>' +
+        '<span class="tag">' + esc((EXP_CHANNELS.art.kinds[item.kind] || '')) + '</span>' +
+      '</div>' +
+      '<p class="res-summary">' + esc(item.summary || '') + '</p>' +
+      '<p class="res-why"><b>为什么看</b> ' + esc(item.reason || '') + '</p>' +
+      points + qs +
+      '<div class="tags"><span class="tag">' + esc(item.category || '') + '</span>' +
+        (item.entry_only ? '<span class="tag">探索入口 · 非具体作品</span>' : '') +
+        (item.demo ? '<span class="tag">示例</span>' : '') + '</div>' +
+      expActions(item) +
+    '</div>' +
+  '</article>';
+}
+
+function knowledgeCard(item) {
+  var points = (item.key_points || []).length
+    ? '<div class="res-line"><b>关键点</b><span>' + item.key_points.map(esc).join('；') + '</span></div>' : '';
+  var qs = (item.questions || []).length
+    ? '<div class="res-line"><b>继续想</b><span>' + item.questions.map(esc).join('；') + '</span></div>' : '';
+  var fo = item.fact_opinion
+    ? '<div class="res-line"><b>事实/观点</b><span>' + esc(item.fact_opinion) + '</span></div>' : '';
+
+  return '<article class="res res-know' + (item.read ? ' is-read' : '') + '">' +
     '<div class="res-top">' +
-      '<div style="min-width:0"><h3>' + titleHtml + '</h3>' +
-      '<div class="res-src">' + esc(srcLine) + '</div></div>' +
-      (item.demo ? '<span class="tag">演示</span>' : '') +
+      '<div style="min-width:0"><h3>' + esc(item.title) + '</h3>' +
+      '<div class="res-src">' + esc(expSourceLine(item)) + '</div></div>' +
+      '<span class="tag">' + esc(EXP_CHANNELS.knowledge.kinds[item.kind] || '') + '</span>' +
     '</div>' +
+    '<p class="res-summary">' + esc(item.summary || '') + '</p>' +
     '<div class="res-body">' +
-      '<div class="res-line"><b>讲了什么</b><span>' + esc(item.summary || '') + '</span></div>' +
-      '<div class="res-line"><b>为什么</b><span>' + esc(item.why || '') + '</span></div>' +
-      '<div class="res-line"><b>看什么</b><span>' + esc(item.look_for || '') + '</span></div>' +
-      '<div class="res-line"><b>下一步</b><span>' + esc(item.next_step || '') + '</span></div>' +
+      '<div class="res-line"><b>为什么</b><span>' + esc(item.reason || '') + '</span></div>' +
+      points + qs + fo +
     '</div>' +
-    '<div class="tags">' +
-      '<span class="tag ch-' + esc(item.channel) + '">' + esc(CHANNEL_LABEL[item.channel] || item.channel || '') + '</span>' +
-      (item.domains || []).map(function (d) { return '<span class="tag">' + esc(d) + '</span>'; }).join('') +
-      (cred.kind ? '<span class="tag cr">' + esc(CRED_LABEL[cred.kind] || cred.kind) + (cred.score ? ' ' + num(cred.score) : '') + '</span>' : '') +
-    '</div>' +
-    '<div class="res-foot">' +
-      '<button type="button" class="' + (fav ? 'solid-btn' : 'ghost-btn') + '" data-act="fav" data-id="' + esc(item.id) + '">' +
-        (fav ? '已收藏' : '收藏') +
-      '</button>' +
-      '<select data-act="feedback" data-id="' + esc(item.id) + '" aria-label="反馈">' +
-        FEEDBACK_OPTIONS.map(function (o) {
-          return '<option value="' + o[0] + '"' + ((item.feedback || '') === o[0] ? ' selected' : '') + '>' + o[1] + '</option>';
-        }).join('') +
-      '</select>' +
-    '</div>' +
+    '<div class="tags"><span class="tag">' + esc(item.category || '') + '</span>' +
+      (item.entry_only ? '<span class="tag">探索入口</span>' : '') +
+      (item.demo ? '<span class="tag">示例</span>' : '') + '</div>' +
+    expActions(item) +
   '</article>';
 }
 
@@ -2858,8 +3483,6 @@ function bindEvents() {
 
     if (act === 'toggle') { toggleTask(el.dataset.id); }
     else if (act === 'mode') { setMode(el.dataset.mode); }
-    else if (act === 'fav') { toggleFav(el.dataset.id); }
-    else if (act === 'filter') { state.ui.channel = el.dataset.channel; renderExplore(); }
     else if (act === 'q-inc') { stepQuota(el.dataset.id, 1); }
     else if (act === 'q-dec') { stepQuota(el.dataset.id, -1); }
     else if (act === 'del-note') { deleteNote(el.dataset.id); }
@@ -2869,6 +3492,17 @@ function bindEvents() {
     else if (act === 'reset') { resetDemo(); }
     else if (act === 'rollover-day') { rolloverDay(); }
     else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
+    else if (act === 'quote-next') { nextQuote(); }
+    else if (act === 'exp-tab') { expSwitchChannel(el.dataset.ch); }
+    else if (act === 'exp-cat') { var ec = expUi(); ec.cat = el.dataset.cat; ec.offset = 0; renderExplore(); }
+    else if (act === 'exp-kind') { var ek = expUi(); ek.kind = el.dataset.kind; ek.offset = 0; renderExplore(); }
+    else if (act === 'exp-shuffle') { var es = expUi(); es.offset = num(es.offset) + 1; renderExplore(); toast('换了一批'); }
+    else if (act === 'exp-unread') { state.ui.expUnreadOnly = !state.ui.expUnreadOnly; renderExplore(); }
+    else if (act === 'exp-fav') { expToggle(el.dataset.id, 'favorite'); }
+    else if (act === 'exp-read') { expToggle(el.dataset.id, 'read'); }
+    else if (act === 'exp-depth') { expSetDepth(el.dataset.id, el.dataset.depth); }
+    else if (act === 'exp-note-save') { expSaveNote(el.dataset.id); }
+    else if (act === 'exp-copy') { expCopy(el.dataset.text); }
     else if (act === 'cloud-login') { doCloudAuth('login'); }
     else if (act === 'cloud-signup') { doCloudAuth('signup'); }
     else if (act === 'cloud-sync') { cloudSyncNow(); }
@@ -2876,11 +3510,6 @@ function bindEvents() {
       CLOUD.session = null; cloudWriteSession(null); CLOUD.status = 'login'; CLOUD.lastError = '';
       renderCloudBox(); toast('已退出云同步（本地数据保留）');
     }
-  });
-
-  document.addEventListener('change', function (e) {
-    var el = e.target.closest('[data-act="feedback"]');
-    if (el) setFeedback(el.dataset.id, el.value);
   });
 
   $('#noteForm').addEventListener('submit', function (e) {
@@ -2901,6 +3530,15 @@ function bindEvents() {
     api.saveWeekly();
     $('#threeQState').textContent = '已保存 ' + nowStamp();
   });
+
+  var expSearchEl = $('#expSearch');
+  if (expSearchEl) {
+    expSearchEl.addEventListener('input', function (e) {
+      state.ui.expSearch = e.target.value;
+      expUi().offset = 0;
+      renderExplore();
+    });
+  }
 
   $('#libSearch').addEventListener('input', function (e) {
     state.ui.search = e.target.value;
@@ -3284,9 +3922,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 <script>
-/* 长期成长模块：技能路线（Skill Roadmap）+ 每周 OC 企划
+/* 长期成长模块
+   A. 技能路线（Skill Roadmap）
+   B. 创作训练面板（7 个能力维度 + 成果登记 + 每周验收）—— 原「OC 企划」改版
+
    依赖 app.js 暴露的全局：state / esc / $ / num / toast / save / todayISO / shortDate / weekdayOf
-   数据写在 state.skills / state.oc，落 localStorage 的 pgd.v1.skills / pgd.v1.oc */
+   数据：state.skills（pgd.v1.skills）、state.oc（pgd.v1.oc） */
 
 (function () {
   'use strict';
@@ -3294,43 +3935,119 @@ document.addEventListener('DOMContentLoaded', function () {
   var STATUS_LABEL = { main: '主攻', maintain: '维护', paused: '暂缓' };
   var STATUS_ORDER = ['main', 'maintain', 'paused'];
 
+  /* ---------------- 七个训练维度（定义固定，数据只存成果） ---------------- */
+
+  var DIMENSIONS = [
+    {
+      id: 'color', code: '01', name: '色彩与构成', brief: '日绘 · 色彩实验 · 构图',
+      goal: '提高短时间内的视觉构思、色彩组织和画面构成能力。',
+      contents: ['短时间构思练习', '日绘', '色彩搭配与配色实验', '构图探索', '色彩氛围与视觉节奏'],
+      examples: ['色彩练习', '构图草图', '小幅日绘', '视觉实验']
+    },
+    {
+      id: 'story', code: '02', name: '叙事与文字', brief: '灵感写作 · 故事 · 文案',
+      goal: '培养故事构思、文字表达、人物塑造和叙事能力。',
+      contents: ['故事灵感记录', '人物性格与关系构思', '角色独白', '短篇写作', '世界观和企划文案', '插画叙事构思'],
+      examples: ['故事片段', '人物设定文字', '角色独白', '企划文案']
+    },
+    {
+      id: 'character', code: '03', name: '角色与文化企划', brief: '角色设计 · 文化考据 · 立绘',
+      goal: '提升角色设计能力，并学会从文化、历史、服饰、地域等素材中提取设计灵感。',
+      contents: ['角色原型构思', '文化考据与视觉符号提取', '服装与造型设计', '角色配色', '角色视觉锚点', '角色立绘与设定图', '原创角色企划'],
+      examples: ['角色设定', '服装设计稿', '立绘', '角色视觉方案']
+    },
+    {
+      id: 'illustration', code: '04', name: '插画与 CG', brief: '完整彩图 · 光影 · 氛围',
+      goal: '提升完整彩图的创作能力和画面表现能力。',
+      contents: ['完整插画', '光影与氛围塑造', '画面叙事', '人物与环境融合', '视觉焦点与画面组织', 'CG 表现与精修'],
+      examples: ['完整插画', 'CG', '系列插画', '主题作品']
+    },
+    {
+      id: 'humanities', code: '05', name: '人文与灵感转化', brief: '知识积累 · 视觉实验',
+      goal: '积累人文、历史、哲学、艺术、文学等领域的知识，并尝试将知识转化为视觉创作。',
+      contents: ['阅读与知识积累', '艺术史和设计史观察', '文化、历史、哲学素材研究', '典故与符号收集', '灵感联想', '将知识转化为视觉实验'],
+      examples: ['主题草图', '视觉概念', '灵感实验', '文化主题插画'],
+      warn: '单纯阅读或收藏资料不增加进度，必须产生实际的知识转化或创作成果。'
+    },
+    {
+      id: 'software', code: '06', name: '软件与技术协作', brief: 'Blender · AE · AI 管线',
+      goal: '通过实际操作掌握创作软件和 AI 工具，建立可重复使用的技术辅助生产能力。',
+      contents: ['Blender', 'After Effects', 'ComfyUI 等 AI 工作流工具', 'AI 美术生产管线', '软件协作', '技术 Demo', '工具与创作流程整合'],
+      examples: ['软件实验', '工作流', '技术 Demo', '动态作品', 'AI 辅助生产案例']
+    },
+    {
+      id: 'concept', code: '07', name: '概念与跨领域设计', brief: '场景 · 道具 · 概念设计',
+      goal: '将其他领域的知识、观察和灵感转化为视觉概念设计，拓宽创作表达范围。',
+      contents: ['场景设计', '道具设计', '建筑与环境概念', '世界观视觉系统', '跨领域知识转化', '其他类型的视觉设计实验'],
+      examples: ['场景稿', '道具设计', '概念设计', '视觉系统', '跨领域设计实验']
+    }
+  ];
+
+  function dimById(id) {
+    for (var i = 0; i < DIMENSIONS.length; i++) if (DIMENSIONS[i].id === id) return DIMENSIONS[i];
+    return null;
+  }
+
+  /* ---------------- 数据访问 ---------------- */
+
   function skills() { return state.skills || { routes: [] }; }
-  function ocd() { return state.oc || { projects: [], active_id: '' }; }
   function routes() { return skills().routes || []; }
-  function projects() { return ocd().projects || []; }
 
-  function activeProject() {
-    var id = ocd().active_id;
-    var list = projects();
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].id === id) return list[i];
+  function ocData() { return state.oc || { results: [], legacy_projects: [] }; }
+  function results() { return (ocData().results || []).slice(); }
+  function legacyProjects() { return ocData().legacy_projects || []; }
+
+  /* 旧版（以企划为中心）的数据迁移：企划挪到 legacy_projects，成果列表补空，不丢任何记录 */
+  function migrateOc() {
+    var d = state.oc;
+    if (!d) return;
+    var changed = false;
+    if (Array.isArray(d.projects)) {
+      d.legacy_projects = (d.legacy_projects || []).concat(d.projects);
+      delete d.projects;
+      delete d.active_id;
+      changed = true;
     }
-    return null;
+    if (!Array.isArray(d.results)) { d.results = []; changed = true; }
+    if (!Array.isArray(d.legacy_projects)) { d.legacy_projects = []; changed = true; }
+    d.version = 2;
+    if (changed) save('oc');
   }
 
-  function currentWeekGoal(p) {
-    if (!p || !p.weekly) return null;
-    var start = weekStart();
-    for (var i = 0; i < p.weekly.length; i++) {
-      if (p.weekly[i].week_start === start) return p.weekly[i];
-    }
-    return null;
-  }
+  function isVerified(r) { return r.status === 'verified'; }
+  function dimAll(id) { return results().filter(function (r) { return r.dimension === id; }); }
+  function dimProgress(id) { return dimAll(id).filter(isVerified).length; }
 
-  function weekStart() {
+  function pad2(n) { return String(n).padStart(2, '0'); }
+  function weekStartISO() {
     var d = new Date();
     var wd = d.getDay();
     var diff = wd === 0 ? -6 : 1 - wd;
-    var monday = new Date(d);
-    monday.setDate(d.getDate() + diff);
-    return monday.getFullYear() + '-' + String(monday.getMonth() + 1).padStart(2, '0') + '-' + String(monday.getDate()).padStart(2, '0');
+    var m = new Date(d);
+    m.setDate(d.getDate() + diff);
+    return m.getFullYear() + '-' + pad2(m.getMonth() + 1) + '-' + pad2(m.getDate());
+  }
+  function inThisWeek(dateStr) { return !!dateStr && dateStr >= weekStartISO(); }
+  function weekVerified() {
+    return results().filter(function (r) { return isVerified(r) && inThisWeek(r.date); });
+  }
+  function dimWeekCount(id) {
+    return weekVerified().filter(function (r) { return r.dimension === id; }).length;
+  }
+  function lastTrainDate(id) {
+    var list = dimAll(id).filter(isVerified).map(function (r) { return r.date; }).sort();
+    return list.length ? list[list.length - 1] : '';
+  }
+  function daysSince(dateStr) {
+    if (!dateStr) return null;
+    return Math.floor((new Date(todayISO() + 'T00:00:00') - new Date(dateStr + 'T00:00:00')) / 86400000);
   }
 
-  function stamp(dateStr) {
-    return dateStr || todayISO();
+  function findRoute(id) {
+    return routes().filter(function (r) { return r.id === id; })[0] || null;
   }
 
-  /* ---------------- 渲染 ---------------- */
+  /* ---------------- 技能路线渲染 ---------------- */
 
   function skillCard(route) {
     var stages = route.stages || [];
@@ -3342,8 +4059,7 @@ document.addEventListener('DOMContentLoaded', function () {
       var cls = i === cur ? ' is-current' : (s.done ? ' is-done' : '');
       return '<li class="stage' + cls + '">' +
         '<span class="stage-dot">' + (s.done ? '✓' : (i === cur ? '▶' : '○')) + '</span>' +
-        '<span class="stage-name">' + esc(s.name) + '</span>' +
-        '</li>';
+        '<span class="stage-name">' + esc(s.name) + '</span></li>';
     }).join('');
 
     var logHtml = (route.log || []).slice(-3).reverse().map(function (l) {
@@ -3352,8 +4068,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var statusBtns = STATUS_ORDER.map(function (st) {
       return '<button type="button" class="' + (route.status === st ? 'solid-btn' : 'ghost-btn') +
-        '" data-act="skill-status" data-id="' + esc(route.id) + '" data-status="' + st + '">' +
-        STATUS_LABEL[st] + '</button>';
+        '" data-act="skill-status" data-id="' + esc(route.id) + '" data-status="' + st + '">' + STATUS_LABEL[st] + '</button>';
     }).join('');
 
     return '<article class="skill-card">' +
@@ -3362,137 +4077,201 @@ document.addEventListener('DOMContentLoaded', function () {
         '<p class="skill-goal">' + esc(route.goal || '') + '</p></div>' +
         '<span class="status-badge ' + esc(route.status) + '">' + esc(STATUS_LABEL[route.status] || '') + '</span>' +
       '</header>' +
-
-      '<div class="skill-meta">' +
-        '<span>阶段 ' + Math.min(cur + 1, stages.length) + '/' + stages.length + '</span>' +
-        '<span>最近推进 ' + esc(route.last_touch ? shortDate(route.last_touch) : '还没开始') + '</span>' +
-      '</div>' +
+      '<div class="skill-meta"><span>阶段 ' + Math.min(cur + 1, stages.length) + '/' + stages.length + '</span>' +
+        '<span>最近推进 ' + esc(route.last_touch ? shortDate(route.last_touch) : '还没开始') + '</span></div>' +
       '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
-
       '<ul class="stage-list">' + stageHtml + '</ul>' +
-
-      '<div class="skill-next">' +
-        '<label>下一项实践任务</label>' +
+      '<div class="skill-next"><label>下一项实践任务</label>' +
         '<div class="inline-form">' +
           '<input type="text" id="next-' + esc(route.id) + '" value="' + esc(route.next_task || '') + '" placeholder="写下一次具体做什么，不要写「学 Blender」">' +
           '<button type="button" class="ghost-btn" data-act="skill-next-save" data-id="' + esc(route.id) + '">保存</button>' +
           '<button type="button" class="solid-btn" data-act="skill-push-today" data-id="' + esc(route.id) + '">排进今天</button>' +
-        '</div>' +
-      '</div>' +
-
-      '<div class="skill-log">' +
-        '<div class="inline-form">' +
-          '<input type="text" id="log-' + esc(route.id) + '" placeholder="今天推进了什么（一句话，写日期自动记）">' +
+        '</div></div>' +
+      '<div class="skill-log"><div class="inline-form">' +
+          '<input type="text" id="log-' + esc(route.id) + '" placeholder="今天推进了什么（一句话）">' +
           '<button type="button" class="ghost-btn" data-act="skill-log-add" data-id="' + esc(route.id) + '">记下</button>' +
-        '</div>' +
-        (logHtml ? '<ul class="log-list">' + logHtml + '</ul>' : '') +
-      '</div>' +
-
+        '</div>' + (logHtml ? '<ul class="log-list">' + logHtml + '</ul>' : '') + '</div>' +
       '<div class="btn-row">' + statusBtns +
         (cur > 0 ? '<button type="button" class="ghost-btn" data-act="skill-stage-back" data-id="' + esc(route.id) + '">退回上一阶段</button>' : '') +
-        '<button type="button" class="ghost-btn" data-act="skill-stage-done" data-id="' + esc(route.id) + '">完成当前阶段</button>' +
-      '</div>' +
-
-      ((route.stage_projects || []).length
-        ? '<ul class="proj-list">' + route.stage_projects.map(function (p, i) {
-            return '<li class="proj' + (p.done ? ' is-done' : '') + '">' +
-              '<button type="button" class="check" data-act="skill-project-toggle" data-id="' + esc(route.id) + '" data-idx="' + i + '">✓</button>' +
-              '<span>' + esc(p.name) + '</span></li>';
-          }).join('') + '</ul>'
-        : '') +
-
+        '<button type="button" class="ghost-btn" data-act="skill-stage-done" data-id="' + esc(route.id) + '">完成当前阶段</button></div>' +
+      ((route.stage_projects || []).length ? '<ul class="proj-list">' + route.stage_projects.map(function (p, i) {
+        return '<li class="proj' + (p.done ? ' is-done' : '') + '">' +
+          '<button type="button" class="check" data-act="skill-project-toggle" data-id="' + esc(route.id) + '" data-idx="' + i + '">✓</button>' +
+          '<span>' + esc(p.name) + '</span></li>';
+      }).join('') + '</ul>' : '') +
       (route.suggestion ? '<p class="skill-suggest">' + esc(route.suggestion) + '</p>' : '') +
       '</article>';
   }
 
-  function ocBlock() {
-    var p = activeProject();
-    var list = projects();
+  /* ---------------- 创作训练面板渲染 ---------------- */
 
-    if (!p) {
-      return '<div class="oc-empty">' +
-        '<p class="fine">还没有 OC 企划。先建一个：名字和一句话概念就够，细节以后再补。</p>' +
-        '<div class="inline-form">' +
-          '<input type="text" id="ocNewName" placeholder="企划名称，例如「潮湿港口的守灯人」">' +
-          '<input type="text" id="ocNewConcept" placeholder="一句话核心概念">' +
-          '<button type="button" class="solid-btn" data-act="oc-new">建立企划</button>' +
-        '</div>' +
-        (list.length ? '<p class="fine">已有 ' + list.length + ' 个归档企划，可在下方恢复。</p>' : '') +
-        '</div>';
-    }
+  function weekBanner() {
+    var wk = weekVerified();
+    var ok = wk.length > 0;
+    var dims = {};
+    wk.forEach(function (r) { dims[r.dimension] = true; });
+    var names = Object.keys(dims).map(function (id) { var d = dimById(id); return d ? d.name : id; });
 
-    var goal = currentWeekGoal(p);
-    var outputs = (goal && goal.outputs) || [];
-    var outputsHtml = outputs.slice(-4).reverse().map(function (o) {
-      return '<li><span class="log-date">' + esc(shortDate(o.date)) + '</span>' + esc(o.text) + '</li>';
-    }).join('');
+    return '<div class="accept-banner' + (ok ? ' is-ok' : '') + '">' +
+      '<div class="accept-head">' +
+        '<span class="eyebrow">本周验收（第 ' + esc(shortDate(weekStartISO())) + ' 周起）</span>' +
+        '<span class="status-badge ' + (ok ? 'main' : 'paused') + '">' + (ok ? '已达成' : '未达成') + '</span>' +
+      '</div>' +
+      '<p class="accept-line"><b>' + wk.length + '</b> 项有效成果' +
+        (ok ? ' · ' + esc(names.join('、')) : '') + '</p>' +
+      '<p class="fine">' + (ok
+        ? '任意一个维度有实质进展就算达成，不需要七个都推进。'
+        : '还没登记本周成果。一张日绘、一页设定、一段文字、一次软件实验都算 —— 做完在下面登记一条即可。') + '</p>' +
+      (ok ? '<ul class="log-list">' + wk.slice(-5).reverse().map(function (r) {
+        var d = dimById(r.dimension);
+        return '<li><span class="log-date">' + esc(shortDate(r.date)) + '</span>' +
+          esc(r.title) + ' <span class="dim-tag">' + esc(d ? d.name : '') + '</span></li>';
+      }).join('') + '</ul>' : '') +
+      '</div>';
+  }
 
-    return '<div class="oc-card">' +
+  function dimCard(d) {
+    var total = dimProgress(d.id);
+    var weekN = dimWeekCount(d.id);
+    var last = lastTrainDate(d.id);
+    var idle = daysSince(last);
+    var idleText = '';
+    if (total === 0) idleText = '还没开始';
+    else if (idle !== null && idle >= 30) idleText = '已 ' + idle + ' 天没推进';
+
+    return '<button type="button" class="dim-card" data-act="oc-dim" data-id="' + esc(d.id) + '">' +
+      '<span class="dim-code">' + esc(d.code) + '</span>' +
+      '<h4>' + esc(d.name) + '</h4>' +
+      '<p class="dim-brief">' + esc(d.brief) + '</p>' +
+      '<div class="dim-stats">' +
+        '<b>' + total + '</b> 项累计' +
+        (weekN ? '<span class="dim-week">本周 +' + weekN + '</span>' : '') +
+      '</div>' +
+      '<div class="dim-last">' + (last ? '最近 ' + esc(shortDate(last)) : '还没开始') +
+        (idleText ? ' · ' + esc(idleText) : '') + '</div>' +
+      '</button>';
+  }
+
+  function dimDetail(d) {
+    var list = dimAll(d.id).sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
+    var total = dimProgress(d.id);
+    var weekN = dimWeekCount(d.id);
+
+    var historyHtml = list.length ? list.slice(0, 12).map(function (r) {
+      return '<li class="result-row' + (isVerified(r) ? '' : ' is-pending') + '">' +
+        '<span class="log-date">' + esc(shortDate(r.date)) + '</span>' +
+        '<span class="result-title">' + esc(r.title) + (r.type ? '<span class="dim-tag">' + esc(r.type) + '</span>' : '') + '</span>' +
+        (!isVerified(r) ? '<button type="button" class="ghost-btn tiny" data-act="oc-verify" data-id="' + esc(r.id) + '">设为已验收</button>' : '') +
+        '<button type="button" class="note-del" data-act="oc-del" data-id="' + esc(r.id) + '">×</button>' +
+        '</li>';
+    }).join('') : '<li class="fine">这个维度还没有成果记录。</li>';
+
+    return '<article class="dim-detail">' +
       '<header class="skill-head">' +
-        '<div><h3>' + esc(p.name) + '</h3>' +
-        '<p class="skill-goal">' + esc(p.concept || '（还没写核心概念）') + '</p></div>' +
-        '<span class="status-badge main">进行中</span>' +
+        '<div><h3>' + esc(d.code) + ' ' + esc(d.name) + '</h3>' +
+        '<p class="skill-goal">' + esc(d.goal) + '</p></div>' +
+        '<button type="button" class="ghost-btn" data-act="oc-dim-close">收起</button>' +
       '</header>' +
-
-      '<div class="oc-grid">' +
-        '<div class="oc-field"><span class="eyebrow">当前阶段</span><b>' + esc(p.stage || '概念') + '</b></div>' +
-        '<div class="oc-field"><span class="eyebrow">最近推进</span><b>' + esc(p.last_touch ? shortDate(p.last_touch) : '还没开始') + '</b></div>' +
-        '<div class="oc-field"><span class="eyebrow">已完成内容</span><b>' + (p.done || []).length + ' 项</b></div>' +
-      '</div>' +
-
-      '<div class="oc-week">' +
-        '<div class="oc-week-head"><span class="eyebrow">本周小目标</span>' +
-          (goal && goal.done ? '<span class="status-badge main">已完成</span>' : '') + '</div>' +
-        '<div class="inline-form">' +
-          '<input type="text" id="ocGoal" value="' + esc(goal ? goal.goal : '') + '" placeholder="这一周只要完成一件小事，例如「完成一个角色剪影探索」">' +
-          '<button type="button" class="ghost-btn" data-act="oc-goal-save">保存</button>' +
-          (goal && !goal.done ? '<button type="button" class="solid-btn" data-act="oc-goal-done">标记完成</button>' : '') +
-        '</div>' +
-
-        '<div class="inline-form">' +
-          '<input type="text" id="ocOutput" placeholder="记录本周实际产出（画了什么、做到哪一步）">' +
-          '<button type="button" class="ghost-btn" data-act="oc-output-add">添加产出</button>' +
-        '</div>' +
-        (outputsHtml ? '<ul class="log-list">' + outputsHtml + '</ul>' : '<p class="fine">还没有产出记录。</p>') +
-      '</div>' +
-
-      '<div class="skill-next">' +
-        '<label>下一步计划</label>' +
-        '<div class="inline-form">' +
-          '<input type="text" id="ocNext" value="' + esc(p.next || '') + '" placeholder="下一步做什么">' +
-          '<button type="button" class="ghost-btn" data-act="oc-next-save">保存</button>' +
-          '<button type="button" class="solid-btn" data-act="oc-push-today">排进今天</button>' +
+      '<div class="skill-meta"><span>累计 ' + total + ' 项有效成果</span><span>本周 +' + weekN + '</span>' +
+        '<span>最近 ' + esc(lastTrainDate(d.id) ? shortDate(lastTrainDate(d.id)) : '还没开始') + '</span></div>' +
+      '<div class="dim-two">' +
+        '<div><span class="eyebrow">训练内容</span><ul class="plain-list">' +
+          d.contents.map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('') + '</ul></div>' +
+        '<div><span class="eyebrow">可验收的成果</span><ul class="plain-list">' +
+          d.examples.map(function (c) { return '<li>' + esc(c) + '</li>'; }).join('') + '</ul>' +
+          (d.warn ? '<p class="fine" style="margin-top:8px">' + esc(d.warn) + '</p>' : '') +
         '</div>' +
       '</div>' +
+      '<div class="skill-log"><span class="eyebrow">历史成果</span>' +
+        '<ul class="result-list">' + historyHtml + '</ul></div>' +
+      '<p class="fine">进度只表示"训练成果的积累"，不代表能力百分比。</p>' +
+      '</article>';
+  }
 
+  function newResultForm() {
+    var opts = DIMENSIONS.map(function (d) {
+      return '<option value="' + esc(d.id) + '">' + esc(d.code + ' ' + d.name) + '</option>';
+    }).join('');
+    var sel = state.ui.ocDim || 'color';
+
+    return '<div class="result-form">' +
+      '<div class="form-head"><h3>登记一项成果</h3><span class="eyebrow">只需要登记，不用上传文件</span></div>' +
+      '<div class="grid-2">' +
+        '<label class="q">作品名称 <span class="req">必填</span>' +
+          '<input type="text" id="ocTitle" placeholder="例如：秋日配色实验"></label>' +
+        '<label class="q">训练维度' +
+          '<select id="ocDim">' + opts.replace('value="' + sel + '"', 'value="' + sel + '" selected') + '</select></label>' +
+        '<label class="q">成果类型' +
+          '<input type="text" id="ocType" placeholder="日绘 / 草图 / 立绘 / 一段文字"></label>' +
+        '<label class="q">完成日期' +
+          '<input type="date" id="ocDate" value="' + esc(todayISO()) + '"></label>' +
+      '</div>' +
+      '<label class="q">这次主要锻炼了什么？<span class="opt">选填，但很有用</span>' +
+        '<input type="text" id="ocFocus" placeholder="限制色相 / 冷暖关系 / 剪影辨识度 / 光影层次…"></label>' +
+      '<label class="q">简短总结' +
+        '<textarea id="ocNote" rows="2" placeholder="一两句就够：想解决什么问题、做到了什么程度"></textarea></label>' +
+      '<label class="q">文件位置或链接<span class="opt">选填</span>' +
+        '<input type="text" id="ocLink" placeholder="D:\\作品\\2026\\日绘 或 网盘链接"></label>' +
       '<div class="btn-row">' +
-        '<button type="button" class="ghost-btn" data-act="oc-new">新建企划</button>' +
-        '<button type="button" class="ghost-btn" data-act="oc-archive" data-id="' + esc(p.id) + '">归档这个企划</button>' +
+        '<button type="button" class="solid-btn" data-act="oc-add">登记并计入进度</button>' +
+        '<button type="button" class="ghost-btn" data-act="oc-add-pending">先存为待验收</button>' +
       '</div>' +
       '</div>';
   }
 
-  function archiveBlock() {
-    var archived = projects().filter(function (p) { return p.status === 'archived'; });
-    if (!archived.length) return '';
-    return '<div class="oc-archive">' +
-      '<span class="eyebrow">历史企划</span>' +
-      '<ul>' + archived.map(function (p) {
-        return '<li><span>' + esc(p.name) + '</span>' +
-          '<button type="button" class="ghost-btn" data-act="oc-activate" data-id="' + esc(p.id) + '">恢复为进行中</button></li>';
-      }).join('') + '</ul></div>';
+  function historyBlock() {
+    var list = results().slice().sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
+    var filter = state.ui.ocFilter || 'all';
+    var shown = filter === 'all' ? list : list.filter(function (r) { return r.dimension === filter; });
+
+    var filterOpts = ['<option value="all"' + (filter === 'all' ? ' selected' : '') + '>全部维度</option>']
+      .concat(DIMENSIONS.map(function (d) {
+        return '<option value="' + esc(d.id) + '"' + (filter === d.id ? ' selected' : '') + '>' + esc(d.name) + '</option>';
+      })).join('');
+
+    var rows = shown.length ? shown.slice(0, 40).map(function (r) {
+      var d = dimById(r.dimension);
+      return '<li class="result-row' + (isVerified(r) ? '' : ' is-pending') + '">' +
+        '<span class="log-date">' + esc(r.date) + '</span>' +
+        '<span class="result-title">' + esc(r.title) + ' <span class="dim-tag">' + esc(d ? d.name : '') + '</span>' +
+          (r.type ? '<span class="dim-tag">' + esc(r.type) + '</span>' : '') +
+          (r.focus ? '<span class="result-focus">' + esc(r.focus) + '</span>' : '') + '</span>' +
+        '<span class="result-state">' + (isVerified(r) ? '已验收' : '待验收') + '</span>' +
+        (!isVerified(r) ? '<button type="button" class="ghost-btn tiny" data-act="oc-verify" data-id="' + esc(r.id) + '">验收</button>' : '') +
+        '<button type="button" class="note-del" data-act="oc-del" data-id="' + esc(r.id) + '">×</button>' +
+        '</li>';
+    }).join('') : '<li class="fine">还没有记录。完成一件作品后在上面登记一条。</li>';
+
+    var idle = DIMENSIONS.map(function (d) {
+      var last = lastTrainDate(d.id);
+      return { name: d.name, idle: last ? daysSince(last) : null, total: dimProgress(d.id) };
+    }).filter(function (x) { return x.idle === null || x.idle >= 21; });
+
+    return '<div class="history-block">' +
+      '<div class="form-head"><h3>历史训练记录</h3>' +
+        '<select id="ocFilter" class="mini-select">' + filterOpts + '</select></div>' +
+      '<ul class="result-list">' + rows + '</ul>' +
+      (idle.length ? '<p class="fine">超过三周没推进：' + idle.map(function (x) {
+        return esc(x.name) + (x.total ? '' : '（还没开始）');
+      }).join('、') + '。这不代表失败，只是提醒。</p>' : '') +
+      '</div>';
   }
 
   function renderGrowth() {
     var host = document.getElementById('growthBody');
     if (!host) return;
+    migrateOc();
 
     var mainRoute = routes().filter(function (r) { return r.status === 'main'; })[0];
+    var wk = weekVerified();
+    var sel = state.ui.ocDim ? dimById(state.ui.ocDim) : null;
+
     var summary =
       '<div class="week-top">' +
         '<div class="stat"><span class="eyebrow">主攻技能</span><b>' + esc(mainRoute ? mainRoute.name : '未设置') + '</b></div>' +
         '<div class="stat"><span class="eyebrow">技能路线</span><b>' + routes().length + ' 条</b></div>' +
-        '<div class="stat"><span class="eyebrow">OC 企划</span><b>' + projects().length + ' 个</b></div>' +
+        '<div class="stat"><span class="eyebrow">本周成果</span><b>' + wk.length + ' 项</b></div>' +
+        '<div class="stat"><span class="eyebrow">累计训练</span><b>' + results().filter(isVerified).length + ' 项</b></div>' +
       '</div>';
 
     host.innerHTML = summary +
@@ -3500,9 +4279,16 @@ document.addEventListener('DOMContentLoaded', function () {
         '<header class="card-head"><h2>技能成长路线</h2><span class="eyebrow">一次只主攻一条</span></header>' +
         '<div class="skill-grid">' + routes().map(skillCard).join('') + '</div>' +
       '</article>' +
+
       '<article class="card">' +
-        '<header class="card-head"><h2>OC 企划</h2><span class="eyebrow">每周一个小目标，可以跨周</span></header>' +
-        ocBlock() + archiveBlock() +
+        '<header class="card-head"><h2>创作训练</h2><span class="eyebrow">七个维度，每周至少一项成果</span></header>' +
+        weekBanner() +
+        '<div class="dim-grid">' + DIMENSIONS.map(dimCard).join('') + '</div>' +
+        (sel ? dimDetail(sel) : '<p class="fine">点任意一张卡片看它的训练内容、历史成果和进度。</p>') +
+        (legacyProjects().length
+          ? '<p class="fine">旧的 OC 企划档案已保留 ' + legacyProjects().length + ' 个，不再参与这里计数。</p>' : '') +
+        newResultForm() +
+        historyBlock() +
       '</article>';
   }
 
@@ -3511,50 +4297,46 @@ document.addEventListener('DOMContentLoaded', function () {
     var host = document.getElementById('weekGrowth');
     if (!host) return;
     var mainRoute = routes().filter(function (r) { return r.status === 'main'; })[0];
-    var p = activeProject();
-    var goal = currentWeekGoal(p);
+    var wk = weekVerified();
     host.innerHTML =
       '<div class="warn-item"><span class="warn-tag">技能</span><div>' +
         '<div class="task-title">' + esc(mainRoute ? mainRoute.name : '未设置主攻技能') + '</div>' +
         '<div class="task-hint">' + esc(mainRoute ? (mainRoute.next_task || '还没写下一项任务') : '去「成长」页设一条') + '</div>' +
       '</div></div>' +
-      '<div class="warn-item"><span class="warn-tag">OC</span><div>' +
-        '<div class="task-title">' + esc(p ? p.name : '还没有企划') + '</div>' +
-        '<div class="task-hint">' + esc(goal && goal.goal ? goal.goal : '本周还没设小目标') +
-        (goal && goal.done ? ' · 已完成' : '') + '</div>' +
+      '<div class="warn-item"><span class="warn-tag">训练</span><div>' +
+        '<div class="task-title">本周成果 ' + wk.length + ' 项' + (wk.length ? ' · 已达成' : ' · 未达成') + '</div>' +
+        '<div class="task-hint">' + esc(wk.length ? wk.map(function (r) { return r.title; }).slice(-2).join('、') : '任意一个维度做一项小产出即可') + '</div>' +
       '</div></div>';
   }
 
   function renderReviewGrowth() {
     var host = document.getElementById('reviewGrowth');
     if (!host) return;
-    var moved = routes().filter(function (r) { return r.last_touch && r.last_touch >= weekStart(); });
-    var p = activeProject();
-    var goal = currentWeekGoal(p);
-    var outs = (goal && goal.outputs) || [];
+    var moved = routes().filter(function (r) { return r.last_touch && r.last_touch >= weekStartISO(); });
+    var wk = weekVerified();
+    var dimsThisWeek = {};
+    wk.forEach(function (r) { dimsThisWeek[r.dimension] = (dimsThisWeek[r.dimension] || 0) + 1; });
+    var dimList = Object.keys(dimsThisWeek).map(function (id) {
+      var d = dimById(id);
+      return esc(d ? d.name : id) + ' +' + dimsThisWeek[id];
+    }).join('、');
+
     host.innerHTML =
       '<div class="mini-stats">' +
         '<div class="mini-stat"><b>' + moved.length + '/' + routes().length + '</b><span>本周有推进的技能</span></div>' +
-        '<div class="mini-stat"><b>' + (goal && goal.done ? '1' : '0') + '</b><span>OC 本周目标</span></div>' +
-        '<div class="mini-stat"><b>' + outs.length + '</b><span>OC 产出记录</span></div>' +
+        '<div class="mini-stat"><b>' + wk.length + '</b><span>本周训练成果</span></div>' +
+        '<div class="mini-stat"><b>' + results().filter(isVerified).length + '</b><span>累计有效成果</span></div>' +
       '</div>' +
-      (moved.length ? '<p class="fine">本周推进：' + moved.map(function (r) { return esc(r.name); }).join('、') + '</p>' : '<p class="fine">本周还没有技能推进记录。</p>');
+      (dimList ? '<p class="fine">本周进度：' + dimList + '</p>' : '<p class="fine">本周还没有训练成果登记。</p>') +
+      (moved.length ? '<p class="fine">技能推进：' + moved.map(function (r) { return esc(r.name); }).join('、') + '</p>' : '');
   }
 
   /* ---------------- 交互 ---------------- */
 
-  function findRoute(id) {
-    return routes().filter(function (r) { return r.id === id; })[0] || null;
-  }
-
   function setMainStatus(id, status) {
-    var list = routes();
-    list.forEach(function (r) {
-      if (r.id === id) {
-        r.status = status;
-      } else if (status === 'main' && r.status === 'main') {
-        r.status = 'maintain';   /* 主攻互斥：旧的降为维护 */
-      }
+    routes().forEach(function (r) {
+      if (r.id === id) r.status = status;
+      else if (status === 'main' && r.status === 'main') r.status = 'maintain';
     });
     save('skills');
     renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
@@ -3567,18 +4349,40 @@ document.addEventListener('DOMContentLoaded', function () {
     var seq = t.focus_tasks.length + 1;
     t.focus_tasks.push({
       id: 'task_' + String(t.date).replace(/-/g, '') + '_f' + seq,
-      title: title,
-      category: linkType === 'oc' ? 'art' : 'skill',
-      date: t.date,
-      status: 'pending',
-      priority: 'focus',
-      estimated_minutes: 30,
-      kind: 'focus',
-      link: { type: linkType, id: linkId }
+      title: title, category: linkType === 'oc' ? 'art' : 'skill', date: t.date,
+      status: 'pending', priority: 'focus', estimated_minutes: 30,
+      kind: 'focus', link: { type: linkType, id: linkId }
     });
     save('today');
     renderAll();
     toast('已排进今天：' + title);
+  }
+
+  function addResult(status) {
+    var title = (document.getElementById('ocTitle') || {}).value || '';
+    if (!title.trim()) { toast('先写作品名称'); return; }
+    var dim = (document.getElementById('ocDim') || {}).value || 'color';
+    var rec = {
+      id: 'res_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      title: title.trim(),
+      dimension: dim,
+      type: ((document.getElementById('ocType') || {}).value || '').trim(),
+      date: (document.getElementById('ocDate') || {}).value || todayISO(),
+      focus: ((document.getElementById('ocFocus') || {}).value || '').trim(),
+      note: ((document.getElementById('ocNote') || {}).value || '').trim(),
+      link: ((document.getElementById('ocLink') || {}).value || '').trim(),
+      status: status,
+      created_at: new Date().toISOString()
+    };
+    if (!state.oc) state.oc = { results: [], legacy_projects: [] };
+    state.oc.results = state.oc.results || [];
+    state.oc.results.push(rec);
+    save('oc');
+    var d = dimById(dim);
+    renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+    toast(status === 'verified'
+      ? (d ? d.name : '维度') + ' +1（' + rec.title + '）'
+      : '已存为待验收，验收后才计入进度');
   }
 
   function bind() {
@@ -3588,41 +4392,32 @@ document.addEventListener('DOMContentLoaded', function () {
       var act = el.dataset.act;
       var id = el.dataset.id;
 
+      /* ---- 技能 ---- */
       if (act === 'skill-status') { setMainStatus(id, el.dataset.status); return; }
 
       if (act === 'skill-next-save') {
-        var r = findRoute(id);
-        var input = document.getElementById('next-' + id);
+        var r = findRoute(id); var input = document.getElementById('next-' + id);
         if (!r || !input) return;
-        r.next_task = input.value.trim();
-        r.last_touch = stamp();
+        r.next_task = input.value.trim(); r.last_touch = todayISO();
         save('skills'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('下一项任务已保存');
-        return;
+        toast('下一项任务已保存'); return;
       }
-
       if (act === 'skill-push-today') {
         var r2 = findRoute(id);
         if (!r2) return;
         if (!r2.next_task) { toast('先写一条「下一项实践任务」'); return; }
-        pushToToday(r2.next_task, 'skill', id);
-        return;
+        pushToToday(r2.next_task, 'skill', id); return;
       }
-
       if (act === 'skill-log-add') {
-        var r3 = findRoute(id);
-        var li = document.getElementById('log-' + id);
+        var r3 = findRoute(id); var li = document.getElementById('log-' + id);
         if (!r3 || !li) return;
-        var text = li.value.trim();
-        if (!text) { toast('写一句推进了什么'); return; }
+        if (!li.value.trim()) { toast('写一句推进了什么'); return; }
         r3.log = r3.log || [];
-        r3.log.push({ date: todayISO(), text: text });
+        r3.log.push({ date: todayISO(), text: li.value.trim() });
         r3.last_touch = todayISO();
         save('skills'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('已记录推进');
-        return;
+        toast('已记录推进'); return;
       }
-
       if (act === 'skill-stage-done') {
         var r4 = findRoute(id);
         if (!r4) return;
@@ -3631,19 +4426,15 @@ document.addEventListener('DOMContentLoaded', function () {
         r4.current_stage = Math.min(idx + 1, r4.stages.length - 1);
         r4.last_touch = todayISO();
         save('skills'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('进入下一阶段：' + (r4.stages[r4.current_stage] || {}).name);
-        return;
+        toast('进入下一阶段：' + (r4.stages[r4.current_stage] || {}).name); return;
       }
-
       if (act === 'skill-stage-back') {
         var r5 = findRoute(id);
         if (!r5) return;
         var i5 = num(r5.current_stage);
         if (i5 > 0) { r5.stages[i5].done = false; r5.current_stage = i5 - 1; }
-        save('skills'); renderGrowth();
-        return;
+        save('skills'); renderGrowth(); return;
       }
-
       if (act === 'skill-project-toggle') {
         var r6 = findRoute(id);
         if (!r6) return;
@@ -3652,111 +4443,50 @@ document.addEventListener('DOMContentLoaded', function () {
           r6.stage_projects[ix].done = !r6.stage_projects[ix].done;
           if (r6.stage_projects[ix].done) r6.last_touch = todayISO();
         }
-        save('skills'); renderGrowth();
-        return;
+        save('skills'); renderGrowth(); return;
       }
 
-      /* ---- OC ---- */
-      if (act === 'oc-new') {
-        var nameEl = document.getElementById('ocNewName');
-        var conceptEl = document.getElementById('ocNewConcept');
-        var name = nameEl ? nameEl.value.trim() : '';
-        if (!name) { toast('先写企划名称'); return; }
-        var p = {
-          id: 'oc_' + Date.now().toString(36),
-          name: name,
-          concept: conceptEl ? conceptEl.value.trim() : '',
-          theme: '', setting: '', refs: [], stage: '概念',
-          status: 'active', done: [], weekly: [],
-          next: '', created_at: todayISO(), last_touch: ''
-        };
-        var list = projects(); list.push(p);
-        state.oc = state.oc || {};
-        state.oc.projects = list;
-        state.oc.active_id = p.id;
+      /* ---- 创作训练 ---- */
+      if (act === 'oc-dim') {
+        state.ui.ocDim = (state.ui.ocDim === id) ? null : id;
+        renderGrowth();
+        if (state.ui.ocDim) {
+          var dEl = document.querySelector('.dim-detail');
+          if (dEl && dEl.scrollIntoView) dEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return;
+      }
+      if (act === 'oc-dim-close') { state.ui.ocDim = null; renderGrowth(); return; }
+
+      if (act === 'oc-add') { addResult('verified'); return; }
+      if (act === 'oc-add-pending') { addResult('pending'); return; }
+
+      if (act === 'oc-verify') {
+        var list = (state.oc && state.oc.results) || [];
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].id === id && list[i].status !== 'verified') {
+            list[i].status = 'verified';
+            var d2 = dimById(list[i].dimension);
+            save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
+            toast((d2 ? d2.name : '维度') + ' +1');
+            return;
+          }
+        }
+        return;
+      }
+      if (act === 'oc-del') {
+        if (!confirm('删除这条成果记录？删除后该维度的进度会相应减少。')) return;
+        var arr = (state.oc && state.oc.results) || [];
+        state.oc.results = arr.filter(function (r) { return r.id !== id; });
         save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('企划已建立：' + name);
-        return;
+        toast('已删除'); return;
       }
+    });
 
-      if (act === 'oc-archive') {
-        var pa = projects().filter(function (x) { return x.id === id; })[0];
-        if (!pa) return;
-        pa.status = 'archived';
-        var next = projects().filter(function (x) { return x.status === 'active'; })[0];
-        state.oc.active_id = next ? next.id : '';
-        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('已归档');
-        return;
-      }
-
-      if (act === 'oc-activate') {
-        var pb = projects().filter(function (x) { return x.id === id; })[0];
-        if (!pb) return;
-        pb.status = 'active';
-        state.oc.active_id = pb.id;
-        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('已恢复');
-        return;
-      }
-
-      if (act === 'oc-goal-save') {
-        var p1 = activeProject();
-        var gi = document.getElementById('ocGoal');
-        if (!p1 || !gi) return;
-        var g1 = currentWeekGoal(p1);
-        if (!g1) { g1 = { week_start: weekStart(), goal: '', outputs: [], done: false }; p1.weekly = p1.weekly || []; p1.weekly.push(g1); }
-        g1.goal = gi.value.trim();
-        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('本周小目标已保存');
-        return;
-      }
-
-      if (act === 'oc-goal-done') {
-        var p2 = activeProject();
-        var g2 = currentWeekGoal(p2);
-        if (!g2) return;
-        g2.done = true;
-        p2.last_touch = todayISO();
-        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('本周 OC 目标完成');
-        return;
-      }
-
-      if (act === 'oc-output-add') {
-        var p3 = activeProject();
-        var out = document.getElementById('ocOutput');
-        if (!p3 || !out) return;
-        var text3 = out.value.trim();
-        if (!text3) { toast('写一句实际产出了什么'); return; }
-        var g3 = currentWeekGoal(p3);
-        if (!g3) { g3 = { week_start: weekStart(), goal: '', outputs: [], done: false }; p3.weekly = p3.weekly || []; p3.weekly.push(g3); }
-        g3.outputs = g3.outputs || [];
-        g3.outputs.push({ date: todayISO(), text: text3 });
-        p3.done = p3.done || [];
-        p3.done.push({ date: todayISO(), text: text3 });
-        p3.last_touch = todayISO();
-        save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
-        toast('已记入产出');
-        return;
-      }
-
-      if (act === 'oc-next-save') {
-        var p4 = activeProject();
-        var ni = document.getElementById('ocNext');
-        if (!p4 || !ni) return;
-        p4.next = ni.value.trim();
-        save('oc'); renderGrowth();
-        toast('下一步已保存');
-        return;
-      }
-
-      if (act === 'oc-push-today') {
-        var p5 = activeProject();
-        if (!p5) return;
-        if (!p5.next) { toast('先写一条「下一步计划」'); return; }
-        pushToToday(p5.next, 'oc', p5.id);
-        return;
+    document.addEventListener('change', function (e) {
+      if (e.target.id === 'ocFilter') {
+        state.ui.ocFilter = e.target.value;
+        renderGrowth();
       }
     });
   }
