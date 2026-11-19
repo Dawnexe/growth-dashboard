@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-19 15:52
+  生成时间：2026-11-19 17:17
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -895,6 +895,72 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
   .lib-switch-btn { width: 100%; justify-content: space-between; }
 }
 
+
+/* ---------- 探索雷达 ---------- */
+
+.radar-block {
+  border: 1px solid var(--line); background: var(--paper-2);
+  padding: 16px 18px; margin-bottom: 14px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.radar-block:empty { display: none; }
+
+.radar-week-head, .radar-random-head {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap;
+}
+.radar-week-head .fine, .radar-random-head .fine { max-width: 62ch; }
+.radar-week-dim { font-size: 13px; color: var(--ink-2); }
+.radar-week-dim b { font-family: var(--serif); font-size: 15px; }
+
+.radar-pick { border-top: 1px dashed var(--line); padding-top: 12px; display: flex; flex-direction: column; gap: 6px; }
+.radar-pick h3 { font-family: var(--serif); font-size: 20px; }
+
+.dim-radar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; margin-bottom: 16px; }
+
+.dim-radar-card {
+  border: 1px solid var(--line); background: var(--paper-2);
+  padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 8px;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+.dim-radar-card:hover { border-color: var(--line-2); box-shadow: var(--shadow); transform: translateY(-1px); }
+.dim-radar-card h3 { font-family: var(--serif); font-size: 16px; line-height: 1.4; }
+.dim-radar-intro { font-size: 12px; color: var(--muted); line-height: 1.75; flex: 1; }
+.dim-radar-card .ghost-btn { align-self: flex-start; }
+
+.radar-prompt {
+  border: 1px solid var(--ink); background: var(--paper-3);
+  padding: 16px 18px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px;
+  box-shadow: var(--shadow);
+}
+.radar-prompt-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.radar-prompt-head h3 { font-family: var(--serif); font-size: 19px; margin-top: 2px; }
+.radar-prompt-body {
+  font-family: var(--mono); font-size: 12px; line-height: 1.85;
+  color: var(--ink-2); background: var(--paper-2);
+  border: 1px solid var(--line); padding: 14px 16px; margin: 0;
+  white-space: pre-wrap; word-break: break-word; max-height: 340px; overflow: auto;
+}
+
+.radar-log-form { border-bottom: 1px dashed var(--line); padding-bottom: 14px; display: flex; flex-direction: column; gap: 10px; }
+.radar-log-list-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.mini-select { max-width: 190px; font-size: 12px; padding: 5px 8px; }
+
+.radar-log-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.radar-log-list li {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 9px 0; border-top: 1px dashed var(--line); font-size: 12.5px;
+}
+.radar-log-list li:first-child { border-top: 0; }
+.radar-log-name { font-weight: 600; color: var(--ink); }
+.radar-log-gain { color: var(--muted); flex: 1 1 220px; }
+.radar-log-list .note-del { margin-left: auto; }
+
+@media (max-width: 620px) {
+  .dim-radar-grid { grid-template-columns: 1fr; }
+  .radar-block { padding: 13px 14px; }
+  .radar-prompt-body { font-size: 11.5px; padding: 11px 12px; }
+}
+
 /* ---------- 其他 ---------- */
 
 .fine { font-size: 12px; color: var(--muted); line-height: 1.7; }
@@ -1187,27 +1253,29 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
       <div id="growthBody"></div>
     </section>
 
-    <!-- 探索：双频道 -->
+    <!-- 探索雷达：只导航领域，不做内容推荐 -->
     <section class="view" id="view-explore">
+      <header class="view-head">
+        <div>
+          <h2>探索雷达</h2>
+          <p class="sub">这里不推荐内容。它只提醒你：世界还有哪些方向没去过；然后把探索交给 ChatGPT。</p>
+        </div>
+      </header>
+
       <div class="exp-tabs" id="exploreTabs"></div>
 
-      <div class="exp-toolbar">
-        <div class="exp-meta" id="exploreMeta"></div>
-      </div>
+      <div class="radar-block" id="radarWeekly"></div>
+      <div class="radar-block" id="radarRandom"></div>
 
-      <div class="exp-filters">
-        <div class="filter-row" id="channelFilter"></div>
-        <div class="filter-row" id="kindFilter"></div>
-        <input type="search" id="expSearch" placeholder="在这个频道里搜：关键词、标题、知识点">
-      </div>
+      <div id="radarDims"></div>
 
-      <div class="exp-entries" id="expEntries" hidden></div>
+      <div class="radar-prompt" id="radarPrompt" hidden></div>
 
-      <div class="res-grid" id="resList"></div>
+      <div class="radar-block" id="radarLogs"></div>
 
       <p class="fine exp-foot">
-        内容来自三层：自动采集（RSS / 公开网站）· AI 搜索策展 · 人工探索入口。
-        打不开的平台不硬抓，只给关键词和方向。「换一批」只在本地轮转，不会额外发起请求。
+        这个页面不联网、不抓取、不生成推荐。点「开始探索」得到的是一段可以复制给
+        ChatGPT 的指令——由它去找真实资料，由你决定什么值得花时间。
       </p>
     </section>
 
@@ -2016,6 +2084,13 @@ window.__SEED__ = {
     "updated_at": "",
     "items": []
   },
+  "radar": {
+    "version": 1,
+    "updated_at": "",
+    "migrated": true,
+    "weekly": {},
+    "logs": []
+  },
   "history": [],
   "schedule": {
     "version": 2,
@@ -2142,7 +2217,8 @@ const KEY = {
   skills: 'pgd.v1.skills',
   oc: 'pgd.v1.oc',
   works: 'pgd.v1.works',
-  prompts: 'pgd.v1.prompts'
+  prompts: 'pgd.v1.prompts',
+  radar: 'pgd.v1.radar'
 };
 
 const DATA_URL = {
@@ -2154,7 +2230,8 @@ const DATA_URL = {
   skills: '../data/skills.json',
   oc: '../data/oc.json',
   works: '../data/works.json',
-  prompts: '../data/prompts.json'
+  prompts: '../data/prompts.json',
+  radar: '../data/radar.json'
 };
 
 const WEEK_CN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -2252,6 +2329,7 @@ const state = {
   oc: null,
   works: null,
   prompts: null,
+  radar: null,
   schedule: null,
   history: [],
   source: '',
@@ -2387,10 +2465,12 @@ function readLocal() {
       var oc = localStorage.getItem(KEY.oc);
       var wk = localStorage.getItem(KEY.works);
       var pr = localStorage.getItem(KEY.prompts);
+      var rd = localStorage.getItem(KEY.radar);
       if (sk) data.skills = JSON.parse(sk);
       if (oc) data.oc = JSON.parse(oc);
       if (wk) data.works = JSON.parse(wk);
       if (pr) data.prompts = JSON.parse(pr);
+      if (rd) data.radar = JSON.parse(rd);
     } catch (err) { /* ignore */ }
     return data;
   } catch (err) {
@@ -2417,11 +2497,11 @@ function save(key) {
 /* 只落本地、不打时间、不推送：用于首次加载种子数据，
    否则一台新设备会把"种子"当成"我的最新修改"，反过来覆盖云端。 */
 function saveLocalAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts'].forEach(saveLocal);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts', 'radar'].forEach(saveLocal);
 }
 
 function saveAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts'].forEach(save);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts', 'radar'].forEach(save);
 }
 
 function readHistory() {
@@ -2470,11 +2550,12 @@ function loadFromJSON() {
     fetchJSON(DATA_URL.skills).catch(function () { return null; }),
     fetchJSON(DATA_URL.oc).catch(function () { return null; }),
     fetchJSON(DATA_URL.works).catch(function () { return null; }),
-    fetchJSON(DATA_URL.prompts).catch(function () { return null; })
+    fetchJSON(DATA_URL.prompts).catch(function () { return null; }),
+    fetchJSON(DATA_URL.radar).catch(function () { return null; })
   ]).then(function (arr) {
     return {
       today: arr[0], weekly: arr[1], resources: arr[2], notes: arr[3],
-      schedule: arr[4], skills: arr[5], oc: arr[6], works: arr[7], prompts: arr[8]
+      schedule: arr[4], skills: arr[5], oc: arr[6], works: arr[7], prompts: arr[8], radar: arr[9]
     };
   });
 }
@@ -2485,13 +2566,15 @@ function hydrateGrowth() {
     state.skills ? Promise.resolve(null) : fetchJSON(DATA_URL.skills).catch(function () { return null; }),
     state.oc ? Promise.resolve(null) : fetchJSON(DATA_URL.oc).catch(function () { return null; }),
     state.works ? Promise.resolve(null) : fetchJSON(DATA_URL.works).catch(function () { return null; }),
-    state.prompts ? Promise.resolve(null) : fetchJSON(DATA_URL.prompts).catch(function () { return null; })
+    state.prompts ? Promise.resolve(null) : fetchJSON(DATA_URL.prompts).catch(function () { return null; }),
+    state.radar ? Promise.resolve(null) : fetchJSON(DATA_URL.radar).catch(function () { return null; })
   ]).then(function (arr) {
     if (arr[0]) { state.skills = arr[0]; saveLocal('skills'); }
     if (arr[1]) { state.oc = arr[1]; saveLocal('oc'); }
     if (arr[2]) { state.works = arr[2]; saveLocal('works'); }
     if (arr[3]) { state.prompts = arr[3]; saveLocal('prompts'); }
-    if (arr[0] || arr[1] || arr[2] || arr[3]) renderAll();
+    if (arr[4]) { state.radar = arr[4]; saveLocal('radar'); }
+    if (arr[0] || arr[1] || arr[2] || arr[3] || arr[4]) renderAll();
   });
 }
 
@@ -2517,6 +2600,7 @@ function applyData(data, source) {
   if (data.oc !== undefined && data.oc) state.oc = data.oc;
   if (data.works !== undefined && data.works) state.works = data.works;
   if (data.prompts !== undefined && data.prompts) state.prompts = data.prompts;
+  if (data.radar !== undefined && data.radar) state.radar = data.radar;
   if (data.schedule !== undefined) state.schedule = data.schedule;
   state.source = source;
   migrateToday();
@@ -2531,7 +2615,8 @@ var api = {
   saveSkills: function () { save('skills'); },
   saveOc: function () { save('oc'); },
   saveWorks: function () { save('works'); },
-  savePrompts: function () { save('prompts'); }
+  savePrompts: function () { save('prompts'); },
+  saveRadar: function () { save('radar'); }
 };
 
 /* ============ 3. 启动 ============ */
@@ -2564,6 +2649,7 @@ function boot() {
       oc: seed.oc || null,
       works: seed.works || null,
       prompts: seed.prompts || null,
+      radar: seed.radar || null,
       schedule: seed.schedule || null
     }, 'seed');
     if (Array.isArray(seed.history) && seed.history.length) {
@@ -3204,311 +3290,350 @@ function renderNeglect(w) {
     : '<p class="empty">没有方向被长期忽略。专注创作导致的空缺不算失败。</p>';
 }
 
-/* ============ 6. 探索（双频道） ============ */
+/* ============ 6. 探索雷达 ============
+   这里不再做内容推荐 / 采集 / 已读未读。
+   只做三件事：摆出该涉猎的领域 → 给一段可复制的探索指令 → 让用户自己留一条记录。 */
 
-const EXP_CHANNELS = {
+const RADAR = {
   art: {
     label: '美术与审美',
     desc: '看见美、发现灵感、拓宽感知',
-    cats: ['绘画与插画', '设计与视觉', '摄影与影像', '电影与动画', '音乐与声音', '文学与文字', '生活与文化', '自由探索'],
-    kinds: { roam: '审美漫游', study: '专业学习' }
+    dims: [
+      { id: 'art_painting', name: '绘画与插画', intro: '用手绘或数字方式组织形象、空间与色彩的地方。' },
+      { id: 'art_design', name: '设计与视觉', intro: '所有被安排过的形状、字号、材质与秩序。' },
+      { id: 'art_photo', name: '影像与摄影', intro: '光在真实世界里留下的证据。' },
+      { id: 'art_film', name: '电影与动画', intro: '时间里的画面、节奏与叙事。' },
+      { id: 'art_music', name: '音乐与声音', intro: '耳朵能分辨的结构与情绪。' },
+      { id: 'art_writing', name: '文学与文字', intro: '语言如何组织经验、记忆与想象。' },
+      { id: 'art_culture', name: '艺术与文化', intro: '人类把观念做成东西的历史。' },
+      { id: 'art_life', name: '生活与综合审美', intro: '日常里被忽略、却一直在影响判断的那些东西。' }
+    ]
   },
   knowledge: {
     label: '知识与视野',
-    desc: '理解世界、学习知识、建立认知',
-    cats: ['AI 与科技', '黑科技与前沿', '人文与哲学', '文学与生命智慧', '游戏与创作行业', '科学与自然', '跨领域新知'],
-    kinds: { frontier: '前沿动态', deep: '深度知识', horizon: '视野拓展' }
+    desc: '理解世界、建立认知、跳出去',
+    dims: [
+      { id: 'k_philo', name: '哲学与思想', intro: '人如何提问、如何论证、如何怀疑。' },
+      { id: 'k_history', name: '人文与历史', intro: '过去的人怎么活、怎么想、留下了什么。' },
+      { id: 'k_life', name: '文学与生命智慧', intro: '别人用一生写下的答案与犹豫。' },
+      { id: 'k_aesthetic', name: '美学与艺术理论', intro: '为什么某些东西被认为美、有力、重要。' },
+      { id: 'k_ai', name: 'AI 与科技', intro: '工具如何改变生产、判断与创作。' },
+      { id: 'k_game', name: '游戏与创作行业', intro: '作品是怎么被做出来、卖出去、被记住的。' },
+      { id: 'k_science', name: '科学与自然', intro: '世界在没有我们的时候是什么样。' },
+      { id: 'k_society', name: '社会与现实世界', intro: '人如何一起生活、分配、冲突与妥协。' },
+      { id: 'k_cross', name: '跨领域知识探索', intro: '两个不相干的领域之间那条没人走过的小路。' }
+    ]
   }
 };
 
-const EXP_ENTRY_LABEL = { creator: '创作者雷达', keyword: '搜索关键词', theme: '探索主题' };
-
-function expChannel() { return state.ui.expChannel || 'art'; }
-
-/* 每个频道各自的筛选与滚动位置，切 Tab 不会互相影响 */
-function expUi(ch) {
-  state.ui.exp = state.ui.exp || {};
-  var key = ch || expChannel();
-  var box = state.ui.exp[key];
-  if (!box) {
-    box = { cat: 'all', kind: 'all', offset: 0, scroll: 0 };
-    state.ui.exp[key] = box;
-  }
-  return box;
+function radarChannel() {
+  var c = state.ui.radarChannel;
+  return c === 'knowledge' ? 'knowledge' : 'art';
 }
-function expItems() { return ((state.resources && state.resources.items) || []); }
-function expIsEntry(item) { return item.kind === 'creator' || item.kind === 'keyword' || item.kind === 'theme'; }
 
-/* 旧数据（channel = known/adjacent/random）迁移到双频道，不丢任何条目 */
-function migrateResources() {
-  var res = state.resources;
-  if (!res || !Array.isArray(res.items)) return;
-  var changed = false;
-  res.items.forEach(function (it) {
-    if (it.channel !== 'art' && it.channel !== 'knowledge') {
-      if (!it.reach) it.reach = it.channel || 'known';
-      var hay = (it.domains || []).join(' ') + ' ' + (it.category || '');
-      var knowledgeish = /AI|游戏|哲学|科学|行业|技术|人文/.test(hay) && !/角色|插画|构图|色彩|设计/.test(hay);
-      it.channel = knowledgeish ? 'knowledge' : 'art';
-      it.kind = it.kind || (knowledgeish ? 'deep' : 'roam');
-      it.category = it.category || (knowledgeish ? 'AI 与科技' : '绘画与插画');
-      changed = true;
-    }
-    if (!it.kind) { it.kind = it.channel === 'knowledge' ? 'deep' : 'roam'; changed = true; }
-    if (it.favorite === undefined) { it.favorite = false; changed = true; }
-    if (it.read === undefined) { it.read = false; changed = true; }
-    if (it.note === undefined) { it.note = ''; changed = true; }
-    if (it.depth === undefined) { it.depth = ''; changed = true; }
+function radarData() {
+  if (!state.radar) state.radar = { version: 1, migrated: false, weekly: {}, logs: [] };
+  if (!state.radar.weekly) state.radar.weekly = {};
+  if (!Array.isArray(state.radar.logs)) state.radar.logs = [];
+  return state.radar;
+}
+
+function allDims() {
+  var out = [];
+  ['art', 'knowledge'].forEach(function (ch) {
+    RADAR[ch].dims.forEach(function (d) { out.push({ ch: ch, dim: d }); });
   });
-  if (changed) save('resources');
+  return out;
 }
 
-
-function expSwitchChannel(ch) {
-  if (!EXP_CHANNELS[ch] || ch === expChannel()) return;
-  expUi(expChannel()).scroll = window.scrollY;
-  state.ui.expChannel = ch;
-  renderExplore();
-  window.scrollTo({ top: expUi(ch).scroll || 0, behavior: 'auto' });
+function dimById(id) {
+  var found = null;
+  allDims().forEach(function (x) { if (x.dim.id === id) found = x; });
+  return found;
 }
 
-function expFind(id) {
-  var list = expItems();
-  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
-  return null;
+function weekStartISO() {
+  var d = new Date();
+  var wd = d.getDay();
+  var diff = wd === 0 ? -6 : 1 - wd;
+  var m = new Date(d);
+  m.setDate(d.getDate() + diff);
+  var p = function (n) { return String(n).padStart(2, '0'); };
+  return m.getFullYear() + '-' + p(m.getMonth() + 1) + '-' + p(m.getDate());
 }
 
-function expToggle(id, field) {
-  var it = expFind(id);
-  if (!it) return;
-  it[field] = !it[field];
-  save('resources');
-  renderExplore();
-  toast(field === 'favorite' ? (it.favorite ? '已收藏' : '取消收藏') : (it.read ? '标记为已读' : '标记为未读'));
-}
-
-function expSetDepth(id, depth) {
-  var it = expFind(id);
-  if (!it) return;
-  it.depth = it.depth === depth ? '' : depth;
-  if (it.depth) it.read = true;
-  save('resources');
-  renderExplore();
-  if (it.depth === 'deep') toast('标记「深入看看」');
-  else if (it.depth === 'inspired') toast('标记「产生了灵感」');
-}
-
-function expSaveNote(id) {
-  var it = expFind(id);
-  var input = document.getElementById('note-' + id);
-  if (!it || !input) return;
-  it.note = input.value.trim();
-  save('resources');
-  toast(it.note ? '感想已记下' : '已清空');
-}
-
-function expCopy(text) {
-  if (!text) return;
-  var done = function () { toast('已复制：' + text); };
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(done, function () { toast('复制失败，可以手动选中'); });
-  } else {
-    toast('这个浏览器不让自动复制，手动选中即可：' + text);
+/* 本周探索：跨周自动清空方向，不保留成债务 */
+function currentWeekly() {
+  var r = radarData();
+  if (!r.weekly || r.weekly.week_start !== weekStartISO()) {
+    r.weekly = { week_start: weekStartISO(), dimension_id: '', explored: false, note: '' };
+    saveLocal('radar');
   }
+  return r.weekly;
 }
 
-function expFiltered() {
-  var ch = expChannel();
-  var ui = expUi(ch);
-  var cat = ui.cat || 'all';
-  var kind = ui.kind || 'all';
-  var q = (state.ui.expSearch || '').trim().toLowerCase();
-  var unreadOnly = !!state.ui.expUnreadOnly;
+/* 一段通用探索指令：不含任何具体题材，只给方法和边界 */
+function radarPrompt(ch, dim) {
+  var head = ch === 'art'
+    ? '我想探索「' + dim.name + '」这个审美领域。'
+    : '我想探索「' + dim.name + '」这个知识领域。';
+  return [
+    head,
+    '',
+    '先不要给我一份“必看清单”。请按这个顺序来：',
+    '1）用 3–5 句话说明这个领域大致包含什么、它和相邻领域在哪里交界；',
+    '2）问我 2–3 个问题（关于我现在的兴趣、能投入的时间、想解决的问题），再根据我的回答给方向；',
+    '3）推荐的资料必须真实可查，注明来源与时间；优先一手材料（访谈/论文/作品/档案），其次是可靠综述；',
+    '4）同时给两条线：一条是“我熟悉的领域怎么更深”，一条是“我完全陌生的部分在哪”；',
+    '5）不要只给热门内容，也不要把付费墙后面的东西当成唯一入口；',
+    '6）最后给一个 20 分钟内能完成的小入口，和一条能延展两周的路径。',
+    '',
+    '我的背景：美术专业学生，方向是游戏角色设计；平时关注插画、摄影、电影、哲学、吉他。',
+    '请不要预设我会喜欢什么。'
+  ].join('\n');
+}
 
-  var list = expItems().filter(function (it) {
-    if (it.channel !== ch) return false;
-    if (expIsEntry(it)) return false;
-    if (cat !== 'all' && it.category !== cat) return false;
-    if (kind !== 'all' && it.kind !== kind) return false;
-    if (unreadOnly && it.read) return false;
-    if (q) {
-      var hay = [it.title, it.summary, it.reason, it.category, (it.key_points || []).join(' ')].join(' ').toLowerCase();
-      if (hay.indexOf(q) < 0) return false;
-    }
-    return true;
+/* ---- 旧推荐内容迁移：只保留用户标记过"收藏"或写过感想的条目 ---- */
+function migrateRadarOnce() {
+  var r = radarData();
+  if (r.migrated) return;
+  var items = (state.resources && state.resources.items) || [];
+  var moved = 0;
+  items.forEach(function (it) {
+    var keep = it.favorite === true || (it.note && String(it.note).trim());
+    if (!keep) return;
+    var guess = null;
+    allDims().forEach(function (x) {
+      if (guess) return;
+      var cat = it.category || '';
+      if (cat && (x.dim.name.indexOf(cat) >= 0 || cat.indexOf(x.dim.name) >= 0)) guess = x.dim.id;
+    });
+    r.logs.push({
+      id: 'radar_mig_' + (it.id || Date.now()) + '_' + moved,
+      dimension_id: guess || (it.channel === 'knowledge' ? 'k_cross' : 'art_painting'),
+      date: it.fetched_at || it.added_at || todayISO(),
+      name: it.title || '（未命名）',
+      gain: it.note || '',
+      link: (it.source && it.source.url) || '',
+      migrated: true
+    });
+    moved++;
   });
-
-  /* 换一批：按偏移轮转，不触发任何网络请求 */
-  var offset = num(ui.offset) % Math.max(1, list.length);
-  if (offset > 0) list = list.slice(offset).concat(list.slice(0, offset));
-  return list;
+  r.migrated = true;
+  saveLocal('radar');
+  if (moved) toast('已把 ' + moved + ' 条旧收藏转成探索记录');
 }
 
-function expEntries() {
-  var ch = expChannel();
-  return expItems().filter(function (it) { return it.channel === ch && expIsEntry(it); });
-}
+/* ---------------- 渲染 ---------------- */
 
 function renderExplore() {
-  migrateResources();
-  var ch = expChannel();
-  var cfg = EXP_CHANNELS[ch];
-  var items = expItems().filter(function (it) { return it.channel === ch; });
-  var cards = items.filter(function (it) { return !expIsEntry(it); });
-  var entries = items.filter(expIsEntry);
-  var readCount = cards.filter(function (it) { return it.read; }).length;
-  var favCount = cards.filter(function (it) { return it.favorite; }).length;
-  var shown = expFiltered();
+  migrateRadarOnce();
+  var ch = radarChannel();
+  var cfg = RADAR[ch];
+  var weekly = currentWeekly();
 
-  /* 顶部 Tab */
-  var tabs = Object.keys(EXP_CHANNELS).map(function (key) {
-    var c = EXP_CHANNELS[key];
-    var n = expItems().filter(function (it) { return it.channel === key && !expIsEntry(it); }).length;
-    return '<button type="button" class="exp-tab' + (key === ch ? ' is-on' : '') + '" data-act="exp-tab" data-ch="' + key + '">' +
-      '<b>' + esc(c.label) + '</b><i>' + esc(c.desc) + '</i><span>' + n + '</span></button>';
+  var tabs = ['art', 'knowledge'].map(function (key) {
+    var c = RADAR[key];
+    return '<button type="button" class="exp-tab' + (key === ch ? ' is-on' : '') + '" data-act="radar-tab" data-ch="' + key + '">' +
+      '<b>' + esc(c.label) + '</b><i>' + esc(c.desc) + '</i><span>' + c.dims.length + '</span></button>';
   }).join('');
   $('#exploreTabs').innerHTML = tabs;
 
-  var mixText = ch === 'art' ? '漫游 ' + cards.filter(function (i) { return i.kind === 'roam'; }).length +
-      ' / 学习 ' + cards.filter(function (i) { return i.kind === 'study'; }).length : '';
+  /* 本周探索 */
+  var weekDim = weekly.dimension_id ? dimById(weekly.dimension_id) : null;
+  var dimOptions = allDims().map(function (x) {
+    return '<option value="' + esc(x.dim.id) + '"' + (weekly.dimension_id === x.dim.id ? ' selected' : '') + '>' +
+      esc(RADAR[x.ch].label + ' · ' + x.dim.name) + '</option>';
+  }).join('');
 
-  $('#exploreMeta').innerHTML =
-    '<div class="exp-meta-line">' +
-      '<span>本批 <b>' + shown.length + '</b> 条' + (mixText ? '（' + esc(mixText) + '）' : '') + '</span>' +
-      '<span>已读 ' + readCount + '/' + cards.length + '</span>' +
-      '<span>收藏 ' + favCount + '</span>' +
-      (state.resources && state.resources.demo ? '<span class="tag">示例数据</span>' : '') +
+  $('#radarWeekly').innerHTML =
+    '<div class="radar-week-head">' +
+      '<div><span class="eyebrow">本周探索方向</span>' +
+        '<p class="fine">一周只需要一个方向。不要求完成，也不计入任何进度。</p></div>' +
+      (weekly.explored ? '<span class="status-badge main">已达成本周</span>' : '') +
     '</div>' +
-    '<div class="exp-meta-actions">' +
-      '<button type="button" class="ghost-btn" data-act="exp-shuffle">换一批</button>' +
-      '<button type="button" class="' + (state.ui.expUnreadOnly ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-unread">只看未读</button>' +
-    '</div>';
+    '<div class="inline-form">' +
+      '<select id="radarWeekSel"><option value="">— 选一个领域 —</option>' + dimOptions + '</select>' +
+      '<button type="button" class="ghost-btn" data-act="radar-week-save">设为本周</button>' +
+      (weekDim ? '<button type="button" class="solid-btn" data-act="radar-week-done">标记已探索</button>' : '') +
+    '</div>' +
+    (weekDim
+      ? '<p class="radar-week-dim">本周：<b>' + esc(weekDim.dim.name) + '</b> · ' + esc(weekDim.dim.intro) + '</p>' +
+        '<div class="inline-form">' +
+          '<input type="text" id="radarWeekNote" value="' + esc(weekly.note || '') + '" placeholder="一句话收获（可以不写）">' +
+          '<button type="button" class="ghost-btn" data-act="radar-week-note">保存收获</button>' +
+        '</div>'
+      : '');
 
-  /* 分类 + 类型筛选 */
-  var catCounts = {};
-  cards.forEach(function (it) { catCounts[it.category] = (catCounts[it.category] || 0) + 1; });
-  var cats = ['all'].concat(cfg.cats);
-  var curCat = expUi(ch).cat || 'all';
-  $('#channelFilter').innerHTML = cats.map(function (c) {
-    var n = c === 'all' ? cards.length : (catCounts[c] || 0);
-    return '<button type="button" class="chip' + (curCat === c ? ' is-on' : '') + (n ? '' : ' is-empty') +
-      '" data-act="exp-cat" data-cat="' + esc(c) + '">' + (c === 'all' ? '全部' : esc(c)) +
-      '<span>' + n + '</span></button>';
+  /* 随机探索 */
+  var pick = state.ui.radarPick ? dimById(state.ui.radarPick) : null;
+  $('#radarRandom').innerHTML =
+    '<div class="radar-random-head">' +
+      '<div><span class="eyebrow">不知道看什么的时候</span>' +
+        '<p class="fine">从全部 17 个领域里随便挑一个。只挑领域，不挑具体题材。</p></div>' +
+      '<button type="button" class="' + (pick ? 'ghost-btn' : 'solid-btn') + '" data-act="radar-random">' +
+        (pick ? '换一个' : '随机挑一个领域') + '</button>' +
+    '</div>' +
+    (pick
+      ? '<div class="radar-pick">' +
+          '<span class="tag">' + esc(RADAR[pick.ch].label) + '</span>' +
+          '<h3>' + esc(pick.dim.name) + '</h3>' +
+          '<p class="fine">' + esc(pick.dim.intro) + '</p>' +
+          '<div class="btn-row"><button type="button" class="solid-btn" data-act="radar-open" data-id="' + esc(pick.dim.id) + '">开始探索</button></div>' +
+        '</div>'
+      : '');
+
+  /* 维度卡片 */
+  var cards = cfg.dims.map(function (d) {
+    return '<article class="dim-radar-card">' +
+      '<h3>' + esc(d.name) + '</h3>' +
+      '<p class="dim-radar-intro">' + esc(d.intro) + '</p>' +
+      '<button type="button" class="ghost-btn tiny" data-act="radar-open" data-id="' + esc(d.id) + '">开始探索 →</button>' +
+    '</article>';
   }).join('');
+  $('#radarDims').innerHTML = '<div class="dim-radar-grid">' + cards + '</div>';
 
-  var kinds = ['all'].concat(Object.keys(cfg.kinds));
-  $('#kindFilter').innerHTML = kinds.map(function (k) {
-    var name = k === 'all' ? '全部形式' : cfg.kinds[k];
-    return '<button type="button" class="chip chip-line' + ((expUi(ch).kind || 'all') === k ? ' is-on' : '') +
-      '" data-act="exp-kind" data-kind="' + k + '">' + esc(name) + '</button>';
-  }).join('');
-
-  /* 探索入口：创作者 / 关键词 / 主题 */
-  var byKind = { creator: [], keyword: [], theme: [] };
-  entries.forEach(function (e) { (byKind[e.kind] = byKind[e.kind] || []).push(e); });
-  var entryHtml = ['creator', 'keyword', 'theme'].map(function (k) {
-    var list = byKind[k] || [];
-    if (!list.length) return '';
-    return '<div class="entry-block"><span class="eyebrow">' + esc(EXP_ENTRY_LABEL[k]) + '</span><ul>' +
-      list.map(function (e) {
-        return '<li>' +
-          '<span class="entry-title">' + esc(e.title) + '</span>' +
-          '<span class="entry-note">' + esc(e.summary || '') + '</span>' +
-          '<button type="button" class="ghost-btn tiny" data-act="exp-copy" data-text="' + esc(e.title) + '">复制去搜</button>' +
-          '</li>';
-      }).join('') + '</ul></div>';
-  }).join('');
-  $('#expEntries').innerHTML = entryHtml;
-  $('#expEntries').hidden = !entryHtml;
-
-  $('#resList').innerHTML = shown.length
-    ? shown.map(function (it) {
-        return ch === 'art' ? artCard(it) : knowledgeCard(it);
-      }).join('')
-    : '<p class="empty">这个筛选下没有内容。换个分类，或点「换一批」。</p>';
-}
-
-function expActions(item) {
-  var fav = item.favorite === true;
-  var read = item.read === true;
-  var deep = item.depth === 'deep';
-  var inspired = item.depth === 'inspired';
-  var url = (item.source || {}).url || '';
-  return '<div class="res-foot">' +
-    '<button type="button" class="' + (fav ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-fav" data-id="' + esc(item.id) + '">' +
-      (fav ? '已收藏' : '喜欢 / 收藏') + '</button>' +
-    '<button type="button" class="' + (deep ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-depth" data-id="' + esc(item.id) + '" data-depth="deep">深入看看</button>' +
-    '<button type="button" class="' + (inspired ? 'solid-btn' : 'ghost-btn') + '" data-act="exp-depth" data-id="' + esc(item.id) + '" data-depth="inspired">产生了灵感</button>' +
-    '<button type="button" class="ghost-btn" data-act="exp-read" data-id="' + esc(item.id) + '">' + (read ? '已读' : '标记已读') + '</button>' +
-    (url ? '<a class="ghost-btn link-btn" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">打开来源</a>' : '') +
-  '</div>' +
-  '<div class="note-row">' +
-    '<input type="text" id="note-' + esc(item.id) + '" value="' + esc(item.note || '') + '" placeholder="一句感想（可选，不写也没关系）">' +
-    '<button type="button" class="ghost-btn tiny" data-act="exp-note-save" data-id="' + esc(item.id) + '">记下</button>' +
-  '</div>';
-}
-
-function expSourceLine(item) {
-  var src = item.source || {};
-  return [src.name || '未标注来源', src.author || '', src.published_at || ''].filter(Boolean).join(' · ');
-}
-
-function artCard(item) {
-  var cover = item.cover
-    ? '<img src="' + esc(item.cover) + '" alt="" loading="lazy">'
-    : '<div class="cover-ph"><span>' + esc(item.category || '自由探索') + '</span><i>no cover</i></div>';
-  var points = (item.key_points || []).length
-    ? '<div class="res-points"><span class="eyebrow">看点</span><ul>' +
-      item.key_points.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>'
-    : '';
-  var qs = (item.questions || []).length
-    ? '<div class="res-points"><span class="eyebrow">可以问自己</span><ul>' +
-      item.questions.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul></div>'
-    : '';
-
-  return '<article class="res res-art' + (item.read ? ' is-read' : '') + '">' +
-    '<div class="res-cover">' + cover + '</div>' +
-    '<div class="res-art-body">' +
-      '<div class="res-top">' +
-        '<div style="min-width:0"><h3>' + esc(item.title) + '</h3>' +
-        '<div class="res-src">' + esc(expSourceLine(item)) + '</div></div>' +
-        '<span class="tag">' + esc((EXP_CHANNELS.art.kinds[item.kind] || '')) + '</span>' +
+  /* 探索指令面板 */
+  var open = state.ui.radarDim ? dimById(state.ui.radarDim) : null;
+  if (open) {
+    $('#radarPrompt').hidden = false;
+    $('#radarPrompt').innerHTML =
+      '<div class="radar-prompt-head">' +
+        '<div><span class="eyebrow">探索指令 · 复制后交给 ChatGPT</span>' +
+          '<h3>' + esc(open.dim.name) + '</h3></div>' +
+        '<button type="button" class="ghost-btn" data-act="radar-close">收起</button>' +
       '</div>' +
-      '<p class="res-summary">' + esc(item.summary || '') + '</p>' +
-      '<p class="res-why"><b>为什么看</b> ' + esc(item.reason || '') + '</p>' +
-      points + qs +
-      '<div class="tags"><span class="tag">' + esc(item.category || '') + '</span>' +
-        (item.entry_only ? '<span class="tag">探索入口 · 非具体作品</span>' : '') +
-        (item.demo ? '<span class="tag">示例</span>' : '') + '</div>' +
-      expActions(item) +
+      '<pre id="radarPromptText" class="radar-prompt-body">' + esc(radarPrompt(open.ch, open.dim)) + '</pre>' +
+      '<div class="btn-row">' +
+        '<button type="button" class="solid-btn" data-act="radar-copy">复制指令</button>' +
+        '<span class="fine">粘到 ChatGPT / 任意对话式 AI 里，它会先问你几个问题再给方向。</span>' +
+      '</div>';
+  } else {
+    $('#radarPrompt').hidden = true;
+    $('#radarPrompt').innerHTML = '';
+  }
+
+  /* 探索记录 */
+  var filter = state.ui.radarLogDim || 'all';
+  var logs = radarData().logs.filter(function (l) {
+    return filter === 'all' || l.dimension_id === filter;
+  }).sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
+
+  var filterOpts = ['<option value="all">全部领域</option>'].concat(allDims().map(function (x) {
+    return '<option value="' + esc(x.dim.id) + '"' + (filter === x.dim.id ? ' selected' : '') + '>' + esc(x.dim.name) + '</option>';
+  })).join('');
+
+  $('#radarLogs').innerHTML =
+    '<div class="radar-log-form">' +
+      '<div class="form-head"><h3>记一条探索</h3><span class="eyebrow">只记值得留下的</span></div>' +
+      '<div class="grid-2">' +
+        '<label class="q">领域<select id="radarLogDimSel">' + filterOpts.replace('value="all"', 'value="art_painting"') + '</select></label>' +
+        '<label class="q">日期<input type="date" id="radarLogDate" value="' + esc(todayISO()) + '"></label>' +
+        '<label class="q">探索名称<input type="text" id="radarLogName" placeholder="你自己给它起的名字"></label>' +
+        '<label class="q">原始链接<span class="opt">选填</span><input type="text" id="radarLogLink" placeholder="https://…"></label>' +
+      '</div>' +
+      '<label class="q">一句话收获<input type="text" id="radarLogGain" placeholder="看完之后你多知道了什么"></label>' +
+      '<div class="btn-row"><button type="button" class="solid-btn" data-act="radar-log-add">存进记录</button></div>' +
     '</div>' +
-  '</article>';
+    '<div class="radar-log-list-head"><span class="eyebrow">探索记录</span>' +
+      '<select id="radarLogFilter" class="mini-select">' + filterOpts + '</select></div>' +
+    '<ul class="radar-log-list">' + (logs.length ? logs.map(function (l) {
+      var x = dimById(l.dimension_id);
+      return '<li>' +
+        '<span class="log-date">' + esc(l.date) + '</span>' +
+        '<span class="radar-log-name">' + esc(l.name) + '</span>' +
+        '<span class="tag">' + esc(x ? x.dim.name : '未分类') + '</span>' +
+        (l.gain ? '<span class="radar-log-gain">' + esc(l.gain) + '</span>' : '') +
+        (l.link ? '<a class="ghost-btn tiny link-btn" href="' + esc(l.link) + '" target="_blank" rel="noopener noreferrer">来源</a>' : '') +
+        '<button type="button" class="note-del" data-act="radar-log-del" data-id="' + esc(l.id) + '">×</button>' +
+      '</li>';
+    }).join('') : '<li class="fine">还没有记录。想留下的时候再写，不写也没关系。</li>') + '</ul>';
 }
 
-function knowledgeCard(item) {
-  var points = (item.key_points || []).length
-    ? '<div class="res-line"><b>关键点</b><span>' + item.key_points.map(esc).join('；') + '</span></div>' : '';
-  var qs = (item.questions || []).length
-    ? '<div class="res-line"><b>继续想</b><span>' + item.questions.map(esc).join('；') + '</span></div>' : '';
-  var fo = item.fact_opinion
-    ? '<div class="res-line"><b>事实/观点</b><span>' + esc(item.fact_opinion) + '</span></div>' : '';
+/* ---------------- 探索雷达交互 ---------------- */
 
-  return '<article class="res res-know' + (item.read ? ' is-read' : '') + '">' +
-    '<div class="res-top">' +
-      '<div style="min-width:0"><h3>' + esc(item.title) + '</h3>' +
-      '<div class="res-src">' + esc(expSourceLine(item)) + '</div></div>' +
-      '<span class="tag">' + esc(EXP_CHANNELS.knowledge.kinds[item.kind] || '') + '</span>' +
-    '</div>' +
-    '<p class="res-summary">' + esc(item.summary || '') + '</p>' +
-    '<div class="res-body">' +
-      '<div class="res-line"><b>为什么</b><span>' + esc(item.reason || '') + '</span></div>' +
-      points + qs + fo +
-    '</div>' +
-    '<div class="tags"><span class="tag">' + esc(item.category || '') + '</span>' +
-      (item.entry_only ? '<span class="tag">探索入口</span>' : '') +
-      (item.demo ? '<span class="tag">示例</span>' : '') + '</div>' +
-    expActions(item) +
-  '</article>';
+function radarOpen(id) {
+  state.ui.radarDim = id;
+  renderExplore();
+  var el = $('#radarPrompt');
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function radarCopy() {
+  var el = $('#radarPromptText');
+  if (!el) return;
+  var text = el.textContent;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () { toast('已复制探索指令'); },
+      function () { toast('复制失败，手动选中即可'); });
+  } else {
+    toast('这个浏览器不让自动复制，手动选中即可');
+  }
+}
+
+function radarRandom() {
+  var all = allDims();
+  var cur = state.ui.radarPick;
+  var pool = all.filter(function (x) { return x.dim.id !== cur; });
+  var pick = pool[Math.floor(Math.random() * pool.length)];
+  state.ui.radarPick = pick.dim.id;
+  state.ui.radarDim = null;
+  renderExplore();
+}
+
+function radarSaveWeek() {
+  var sel = $('#radarWeekSel');
+  var w = currentWeekly();
+  w.dimension_id = sel ? sel.value : '';
+  radarData().weekly = w;
+  save('radar');
+  renderExplore();
+  toast(w.dimension_id ? '本周方向已设置' : '已清空本周方向');
+}
+
+function radarWeekDone() {
+  var w = currentWeekly();
+  if (!w.dimension_id) { toast('先选一个本周方向'); return; }
+  w.explored = true;
+  save('radar');
+  renderExplore();
+  toast('本周探索达成');
+}
+
+function radarWeekNote() {
+  var el = $('#radarWeekNote');
+  if (!el) return;
+  var w = currentWeekly();
+  w.note = el.value.trim();
+  save('radar');
+  toast(w.note ? '收获已保存' : '已清空');
+}
+
+function radarAddLog() {
+  var dimSel = $('#radarLogDimSel');
+  var nameEl = $('#radarLogName');
+  if (!nameEl || !nameEl.value.trim()) { toast('给这次探索起个名字'); return; }
+  var rec = {
+    id: 'radar_' + Date.now().toString(36),
+    dimension_id: dimSel ? dimSel.value : 'art_painting',
+    date: (($('#radarLogDate') || {}).value) || todayISO(),
+    name: nameEl.value.trim(),
+    gain: (($('#radarLogGain') || {}).value || '').trim(),
+    link: (($('#radarLogLink') || {}).value || '').trim()
+  };
+  radarData().logs.push(rec);
+  save('radar');
+  renderExplore();
+  toast('已存进探索记录');
+}
+
+function radarDelLog(id) {
+  if (!confirm('删除这条探索记录？')) return;
+  var r = radarData();
+  r.logs = r.logs.filter(function (l) { return l.id !== id; });
+  save('radar');
+  renderExplore();
+  toast('已删除');
 }
 
 /* ============ 7. 知识库 ============ */
@@ -3887,6 +4012,7 @@ function exportJSON() {
     oc: state.oc,
     works: state.works,
     prompts: state.prompts,
+    radar: state.radar,
     history: state.history
   };
   var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -3973,7 +4099,16 @@ function bindEvents() {
     else if (act === 'rollover-day') { rolloverDay(); }
     else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
     else if (act === 'quote-next') { nextQuote(); }
-    else if (act === 'exp-tab') { expSwitchChannel(el.dataset.ch); }
+    else if (act === 'radar-tab') { state.ui.radarChannel = el.dataset.ch; state.ui.radarDim = null; renderExplore(); }
+    else if (act === 'radar-open') { radarOpen(el.dataset.id); }
+    else if (act === 'radar-close') { state.ui.radarDim = null; renderExplore(); }
+    else if (act === 'radar-copy') { radarCopy(); }
+    else if (act === 'radar-random') { radarRandom(); }
+    else if (act === 'radar-week-save') { radarSaveWeek(); }
+    else if (act === 'radar-week-done') { radarWeekDone(); }
+    else if (act === 'radar-week-note') { radarWeekNote(); }
+    else if (act === 'radar-log-add') { radarAddLog(); }
+    else if (act === 'radar-log-del') { radarDelLog(el.dataset.id); }
     else if (act === 'lib-tab') { state.ui.libTab = el.dataset.tab; try { localStorage.setItem('pgd.v1.libTab', el.dataset.tab); } catch (e) {} state.ui.promptEdit = null; renderLibrary(); }
     else if (act === 'prompt-save') { savePrompt(); }
     else if (act === 'prompt-edit') { state.ui.promptEdit = el.dataset.id; renderLibrary(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
@@ -3982,15 +4117,6 @@ function bindEvents() {
     else if (act === 'prompt-copy') { copyPrompt(el.dataset.id); }
     else if (act === 'invest-confirm') { confirmInvest(); }
     else if (act === 'invest-clear') { clearInvest(); }
-    else if (act === 'exp-cat') { var ec = expUi(); ec.cat = el.dataset.cat; ec.offset = 0; renderExplore(); }
-    else if (act === 'exp-kind') { var ek = expUi(); ek.kind = el.dataset.kind; ek.offset = 0; renderExplore(); }
-    else if (act === 'exp-shuffle') { var es = expUi(); es.offset = num(es.offset) + 1; renderExplore(); toast('换了一批'); }
-    else if (act === 'exp-unread') { state.ui.expUnreadOnly = !state.ui.expUnreadOnly; renderExplore(); }
-    else if (act === 'exp-fav') { expToggle(el.dataset.id, 'favorite'); }
-    else if (act === 'exp-read') { expToggle(el.dataset.id, 'read'); }
-    else if (act === 'exp-depth') { expSetDepth(el.dataset.id, el.dataset.depth); }
-    else if (act === 'exp-note-save') { expSaveNote(el.dataset.id); }
-    else if (act === 'exp-copy') { expCopy(el.dataset.text); }
     else if (act === 'cloud-login') { doCloudAuth('login'); }
     else if (act === 'cloud-signup') { doCloudAuth('signup'); }
     else if (act === 'cloud-sync') { cloudSyncNow(); }
@@ -4019,14 +4145,6 @@ function bindEvents() {
     $('#threeQState').textContent = '已保存 ' + nowStamp();
   });
 
-  var expSearchEl = $('#expSearch');
-  if (expSearchEl) {
-    expSearchEl.addEventListener('input', function (e) {
-      state.ui.expSearch = e.target.value;
-      expUi().offset = 0;
-      renderExplore();
-    });
-  }
 
   $('#libSearch').addEventListener('input', function (e) {
     state.ui.search = e.target.value;
@@ -4040,6 +4158,13 @@ function bindEvents() {
       renderPromptsView();
     });
   }
+
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.id === 'radarLogFilter') {
+      state.ui.radarLogDim = e.target.value;
+      renderExplore();
+    }
+  });
 
   $('#libCat').addEventListener('change', function (e) {
     state.ui.cat = e.target.value;
@@ -4174,12 +4299,14 @@ function cloudApplyPayload(payload) {
     if (payload.oc) state.oc = payload.oc;
     if (payload.works) state.works = payload.works;
     if (payload.prompts) state.prompts = payload.prompts;
+    if (payload.radar) state.radar = payload.radar;
     if (Array.isArray(payload.history)) state.history = payload.history;
     saveLocal('today'); saveLocal('weekly'); saveLocal('resources'); saveLocal('notes');
     if (payload.skills) saveLocal('skills');
     if (payload.oc) saveLocal('oc');
     if (payload.works) saveLocal('works');
     if (payload.prompts) saveLocal('prompts');
+    if (payload.radar) saveLocal('radar');
     try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
   } finally {
     CLOUD.suspend = false;
@@ -4228,6 +4355,7 @@ async function cloudPush() {
         oc: state.oc,
         works: state.works,
         prompts: state.prompts,
+        radar: state.radar,
         history: state.history
       },
       updated_at: now
