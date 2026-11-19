@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-18 22:54
+  生成时间：2026-11-19 13:22
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -790,6 +790,63 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
 @media (max-width: 620px) {
   .invest-actions .solid-btn { width: 100%; padding: 11px; font-size: 14px; }
   .invest-hint { flex: 1 1 100%; }
+}
+
+
+/* ---------- 成长页：三页签 ---------- */
+
+.growth-tabs {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px; margin-bottom: 16px;
+}
+.growth-tab {
+  position: relative; text-align: left;
+  background: var(--paper-2); border: 1px solid var(--line);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 2px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.growth-tab b { font-family: var(--serif); font-size: 16px; }
+.growth-tab i { font-style: normal; font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--muted-2); text-transform: uppercase; }
+.growth-tab span {
+  position: absolute; right: 12px; top: 10px;
+  font-family: var(--mono); font-size: 10px; color: var(--muted-2);
+}
+.growth-tab:hover { border-color: var(--line-2); }
+.growth-tab.is-on { background: var(--paper-3); border-color: var(--ink); box-shadow: var(--shadow); }
+.growth-tab.is-on i { color: var(--accent); }
+.growth-tab.is-on span { color: var(--accent); }
+
+/* ---------- 作品企划 ---------- */
+
+.works-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+.works-head .fine { max-width: 58ch; margin-top: 4px; }
+
+.work-card {
+  border: 1px solid var(--line-2); background: var(--paper-3);
+  padding: 16px 18px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 10px;
+}
+.work-card.is-paused { opacity: 0.72; border-style: dashed; }
+.work-head { display: flex; align-items: center; gap: 12px; }
+.work-title {
+  flex: 1; min-width: 0;
+  font-family: var(--serif); font-size: 18px; font-weight: 600;
+  background: transparent; border: 1px solid transparent; padding: 4px 6px;
+}
+.work-title:hover { border-color: var(--line); }
+.work-title:focus { border-color: var(--ink-2); background: #fff; }
+.work-q { margin-bottom: 0; }
+.work-week { border: 1px dashed var(--line-2); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.work-week-head { display: flex; align-items: center; gap: 10px; }
+.work-ms, .work-log { display: flex; flex-direction: column; gap: 6px; }
+.work-ms .inline-form, .work-log .inline-form { margin-top: 2px; }
+.work-new .grid-2 { margin-bottom: 6px; }
+
+@media (max-width: 620px) {
+  .growth-tabs { grid-template-columns: 1fr; gap: 8px; }
+  .growth-tab { flex-direction: row; align-items: baseline; gap: 8px; padding: 10px 12px; }
+  .growth-tab span { position: static; margin-left: auto; }
+  .work-head { flex-wrap: wrap; }
+  .work-title { font-size: 16px; }
 }
 
 /* ---------- 其他 ---------- */
@@ -1890,6 +1947,11 @@ window.__SEED__ = {
     "results": [],
     "legacy_projects": []
   },
+  "works": {
+    "version": 1,
+    "updated_at": "",
+    "projects": []
+  },
   "history": [],
   "schedule": {
     "version": 2,
@@ -2014,7 +2076,8 @@ const KEY = {
   notes: 'pgd.v1.notes',
   history: 'pgd.v1.history',
   skills: 'pgd.v1.skills',
-  oc: 'pgd.v1.oc'
+  oc: 'pgd.v1.oc',
+  works: 'pgd.v1.works'
 };
 
 const DATA_URL = {
@@ -2024,7 +2087,8 @@ const DATA_URL = {
   notes: '../data/notes.json',
   schedule: '../config/schedule.json',
   skills: '../data/skills.json',
-  oc: '../data/oc.json'
+  oc: '../data/oc.json',
+  works: '../data/works.json'
 };
 
 const WEEK_CN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -2120,6 +2184,7 @@ const state = {
   notes: null,
   skills: null,
   oc: null,
+  works: null,
   schedule: null,
   history: [],
   source: '',
@@ -2253,8 +2318,10 @@ function readLocal() {
     try {
       var sk = localStorage.getItem(KEY.skills);
       var oc = localStorage.getItem(KEY.oc);
+      var wk = localStorage.getItem(KEY.works);
       if (sk) data.skills = JSON.parse(sk);
       if (oc) data.oc = JSON.parse(oc);
+      if (wk) data.works = JSON.parse(wk);
     } catch (err) { /* ignore */ }
     return data;
   } catch (err) {
@@ -2281,11 +2348,11 @@ function save(key) {
 /* 只落本地、不打时间、不推送：用于首次加载种子数据，
    否则一台新设备会把"种子"当成"我的最新修改"，反过来覆盖云端。 */
 function saveLocalAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc'].forEach(saveLocal);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works'].forEach(saveLocal);
 }
 
 function saveAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc'].forEach(save);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works'].forEach(save);
 }
 
 function readHistory() {
@@ -2332,11 +2399,12 @@ function loadFromJSON() {
     fetchJSON(DATA_URL.notes),
     fetchJSON(DATA_URL.schedule).catch(function () { return null; }),
     fetchJSON(DATA_URL.skills).catch(function () { return null; }),
-    fetchJSON(DATA_URL.oc).catch(function () { return null; })
+    fetchJSON(DATA_URL.oc).catch(function () { return null; }),
+    fetchJSON(DATA_URL.works).catch(function () { return null; })
   ]).then(function (arr) {
     return {
       today: arr[0], weekly: arr[1], resources: arr[2], notes: arr[3],
-      schedule: arr[4], skills: arr[5], oc: arr[6]
+      schedule: arr[4], skills: arr[5], oc: arr[6], works: arr[7]
     };
   });
 }
@@ -2345,11 +2413,13 @@ function loadFromJSON() {
 function hydrateGrowth() {
   return Promise.all([
     state.skills ? Promise.resolve(null) : fetchJSON(DATA_URL.skills).catch(function () { return null; }),
-    state.oc ? Promise.resolve(null) : fetchJSON(DATA_URL.oc).catch(function () { return null; })
+    state.oc ? Promise.resolve(null) : fetchJSON(DATA_URL.oc).catch(function () { return null; }),
+    state.works ? Promise.resolve(null) : fetchJSON(DATA_URL.works).catch(function () { return null; })
   ]).then(function (arr) {
     if (arr[0]) { state.skills = arr[0]; saveLocal('skills'); }
     if (arr[1]) { state.oc = arr[1]; saveLocal('oc'); }
-    if (arr[0] || arr[1]) renderAll();
+    if (arr[2]) { state.works = arr[2]; saveLocal('works'); }
+    if (arr[0] || arr[1] || arr[2]) renderAll();
   });
 }
 
@@ -2373,6 +2443,7 @@ function applyData(data, source) {
   state.notes = data.notes;
   if (data.skills !== undefined && data.skills) state.skills = data.skills;
   if (data.oc !== undefined && data.oc) state.oc = data.oc;
+  if (data.works !== undefined && data.works) state.works = data.works;
   if (data.schedule !== undefined) state.schedule = data.schedule;
   state.source = source;
   migrateToday();
@@ -2385,7 +2456,8 @@ var api = {
   saveResources: function () { save('resources'); },
   saveNotes: function () { save('notes'); },
   saveSkills: function () { save('skills'); },
-  saveOc: function () { save('oc'); }
+  saveOc: function () { save('oc'); },
+  saveWorks: function () { save('works'); }
 };
 
 /* ============ 3. 启动 ============ */
@@ -2416,6 +2488,7 @@ function boot() {
       notes: seed.notes || JSON.parse(JSON.stringify(FALLBACK.notes)),
       skills: seed.skills || null,
       oc: seed.oc || null,
+      works: seed.works || null,
       schedule: seed.schedule || null
     }, 'seed');
     if (Array.isArray(seed.history) && seed.history.length) {
@@ -3580,6 +3653,7 @@ function exportJSON() {
     notes: state.notes,
     skills: state.skills,
     oc: state.oc,
+    works: state.works,
     history: state.history
   };
   var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -3851,10 +3925,12 @@ function cloudApplyPayload(payload) {
     if (payload.notes) state.notes = payload.notes;
     if (payload.skills) state.skills = payload.skills;
     if (payload.oc) state.oc = payload.oc;
+    if (payload.works) state.works = payload.works;
     if (Array.isArray(payload.history)) state.history = payload.history;
     saveLocal('today'); saveLocal('weekly'); saveLocal('resources'); saveLocal('notes');
     if (payload.skills) saveLocal('skills');
     if (payload.oc) saveLocal('oc');
+    if (payload.works) saveLocal('works');
     try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
   } finally {
     CLOUD.suspend = false;
@@ -3901,6 +3977,7 @@ async function cloudPush() {
         notes: state.notes,
         skills: state.skills,
         oc: state.oc,
+        works: state.works,
         history: state.history
       },
       updated_at: now
@@ -4432,6 +4509,150 @@ document.addEventListener('DOMContentLoaded', function () {
       '</div>';
   }
 
+  /* ---------------- 作品企划（长期目标） ---------------- */
+
+  var WORK_STATUS = { active: '进行中', paused: '暂停', archived: '已归档' };
+
+  function worksData() { return state.works || { projects: [] }; }
+  function worksList() { return (worksData().projects || []).slice(); }
+  function activeWorks() { return worksList().filter(function (w) { return w.status !== 'archived'; }); }
+  function archivedWorks() { return worksList().filter(function (w) { return w.status === 'archived'; }); }
+  function findWork(id) {
+    return worksList().filter(function (w) { return w.id === id; })[0] || null;
+  }
+  function workWeek(w) {
+    if (!w.weekly) return null;
+    for (var i = 0; i < w.weekly.length; i++) if (w.weekly[i].week_start === weekStartISO()) return w.weekly[i];
+    return null;
+  }
+
+  function workCard(w) {
+    var wk = workWeek(w);
+    var milestones = (w.milestones || []);
+    var logs = (w.logs || []).slice(-3).reverse();
+
+    var msHtml = milestones.length
+      ? '<ul class="proj-list">' + milestones.map(function (m, i) {
+          return '<li class="proj' + (m.done ? ' is-done' : '') + '">' +
+            '<button type="button" class="check" data-act="work-ms" data-id="' + esc(w.id) + '" data-idx="' + i + '">✓</button>' +
+            '<span>' + esc(m.name) + '</span></li>';
+        }).join('') + '</ul>' : '<p class="fine">还没有拆阶段。把「完成一张角色插画」拆成 3–5 个里程碑更好推进。</p>';
+
+    var logHtml = logs.length
+      ? '<ul class="log-list">' + logs.map(function (l) {
+          return '<li><span class="log-date">' + esc(l.date) + '</span>' + esc(l.text) + '</li>';
+        }).join('') + '</ul>' : '';
+
+    return '<article class="work-card' + (w.status === 'paused' ? ' is-paused' : '') + '">' +
+      '<header class="work-head">' +
+        '<input type="text" class="work-title" id="wf-title-' + esc(w.id) + '" value="' + esc(w.title) + '" placeholder="企划名称">' +
+        '<span class="status-badge ' + (w.status === 'paused' ? 'paused' : 'main') + '">' + esc(WORK_STATUS[w.status] || '进行中') + '</span>' +
+      '</header>' +
+
+      '<label class="q work-q">想做成什么<span class="opt">一句话就够</span>' +
+        '<input type="text" id="wf-goal-' + esc(w.id) + '" value="' + esc(w.goal || '') + '" placeholder="例如：一套 6 张的港口守灯人系列插画"></label>' +
+
+      '<div class="grid-2">' +
+        '<label class="q work-q">当前阶段' +
+          '<input type="text" id="wf-stage-' + esc(w.id) + '" value="' + esc(w.stage || '') + '" placeholder="构思 / 草图 / 上色 / 收尾"></label>' +
+        '<label class="q work-q">最近推进' +
+          '<input type="text" value="' + esc(w.last_touch ? shortDate(w.last_touch) : '还没开始') + '" disabled></label>' +
+      '</div>' +
+
+      '<label class="q work-q">下一步<span class="opt">能直接动手的一件事</span>' +
+        '<input type="text" id="wf-next-' + esc(w.id) + '" value="' + esc(w.next || '') + '" placeholder="例如：画 3 个剪影方案"></label>' +
+
+      '<div class="work-week">' +
+        '<div class="work-week-head"><span class="eyebrow">本周小目标</span>' +
+          (wk && wk.done ? '<span class="status-badge main">已完成</span>' : '') + '</div>' +
+        '<div class="inline-form">' +
+          '<input type="text" id="wf-week-' + esc(w.id) + '" value="' + esc(wk ? wk.goal : '') + '" placeholder="这周只做一件小事">' +
+          (wk && !wk.done ? '<button type="button" class="ghost-btn tiny" data-act="work-week-done" data-id="' + esc(w.id) + '">完成</button>' : '') +
+        '</div>' +
+      '</div>' +
+
+      '<div class="work-ms"><span class="eyebrow">里程碑</span>' + msHtml +
+        '<div class="inline-form"><input type="text" id="wf-ms-' + esc(w.id) + '" placeholder="加一条里程碑">' +
+        '<button type="button" class="ghost-btn tiny" data-act="work-ms-add" data-id="' + esc(w.id) + '">添加</button></div></div>' +
+
+      '<div class="work-log"><span class="eyebrow">推进记录</span>' + logHtml +
+        '<div class="inline-form"><input type="text" id="wf-log-' + esc(w.id) + '" placeholder="今天推进了什么">' +
+        '<button type="button" class="ghost-btn tiny" data-act="work-log-add" data-id="' + esc(w.id) + '">记下</button></div></div>' +
+
+      '<div class="btn-row">' +
+        '<button type="button" class="solid-btn" data-act="work-save" data-id="' + esc(w.id) + '">保存修改</button>' +
+        '<button type="button" class="ghost-btn" data-act="work-push" data-id="' + esc(w.id) + '">排进今天</button>' +
+        '<button type="button" class="ghost-btn" data-act="work-pause" data-id="' + esc(w.id) + '">' + (w.status === 'paused' ? '恢复' : '暂停') + '</button>' +
+        '<button type="button" class="ghost-btn" data-act="work-archive" data-id="' + esc(w.id) + '">归档</button>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function worksTab() {
+    var list = activeWorks();
+    var arch = archivedWorks();
+
+    var head = '<div class="works-head">' +
+      '<div><span class="eyebrow">长期目标</span>' +
+      '<p class="fine">放「想做但还没做出来」的作品企划。创作训练那边登记的是已完成成果，这里放的是方向。</p></div>' +
+      '<button type="button" class="solid-btn" data-act="work-new-open">+ 新建企划</button>' +
+      '</div>';
+
+    var newForm = state.ui.workNew
+      ? '<div class="result-form work-new">' +
+          '<div class="form-head"><h3>新企划</h3><span class="eyebrow">先写两行，细节以后再补</span></div>' +
+          '<div class="grid-2">' +
+            '<label class="q">名称<input type="text" id="workNewTitle" placeholder="例如：港口守灯人系列"></label>' +
+            '<label class="q">想做成什么<input type="text" id="workNewGoal" placeholder="例如：6 张一组，讲一个人的日常"></label>' +
+          '</div>' +
+          '<div class="btn-row"><button type="button" class="solid-btn" data-act="work-new">建立企划</button>' +
+          '<button type="button" class="ghost-btn" data-act="work-new-cancel">取消</button></div>' +
+        '</div>'
+      : '';
+
+    var body = list.length
+      ? list.map(workCard).join('')
+      : '<p class="empty">还没有作品企划。点右上角「+ 新建企划」，写一个你一直想做的。</p>';
+
+    var archHtml = arch.length
+      ? '<div class="oc-archive"><span class="eyebrow">已归档</span><ul>' + arch.map(function (w) {
+          return '<li><span>' + esc(w.title) + '</span>' +
+            '<button type="button" class="ghost-btn tiny" data-act="work-restore" data-id="' + esc(w.id) + '">恢复</button></li>';
+        }).join('') + '</ul></div>'
+      : '';
+
+    return '<article class="card">' +
+      '<header class="card-head"><h2>作品企划</h2><span class="eyebrow">' + list.length + ' 个进行中</span></header>' +
+      head + newForm + body + archHtml +
+    '</article>';
+  }
+
+  /* ---------------- 三个页签 ---------------- */
+
+  var GROWTH_TABS = [
+    { id: 'skills', name: '技能路线', en: 'Skills' },
+    { id: 'oc', name: '创作训练', en: 'Practice' },
+    { id: 'works', name: '作品企划', en: 'Works' }
+  ];
+
+  function currentTab() {
+    var t = state.ui.growthTab;
+    return (t === 'skills' || t === 'oc' || t === 'works') ? t : 'skills';
+  }
+
+  function tabCount(id) {
+    if (id === 'skills') return routes().length;
+    if (id === 'oc') return DIMENSIONS.length;
+    return activeWorks().length;
+  }
+
+  function tabsBar() {
+    return '<div class="growth-tabs">' + GROWTH_TABS.map(function (t) {
+      return '<button type="button" class="growth-tab' + (currentTab() === t.id ? ' is-on' : '') + '" data-act="growth-tab" data-tab="' + t.id + '">' +
+        '<b>' + esc(t.name) + '</b><i>' + esc(t.en) + '</i><span>' + tabCount(t.id) + '</span></button>';
+    }).join('') + '</div>';
+  }
+
   function renderGrowth() {
     var host = document.getElementById('growthBody');
     if (!host) return;
@@ -4439,32 +4660,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var mainRoute = routes().filter(function (r) { return r.status === 'main'; })[0];
     var wk = weekVerified();
-    var sel = state.ui.ocDim ? dimById(state.ui.ocDim) : null;
+    var tab = currentTab();
 
     var summary =
       '<div class="week-top">' +
         '<div class="stat"><span class="eyebrow">主攻技能</span><b>' + esc(mainRoute ? mainRoute.name : '未设置') + '</b></div>' +
-        '<div class="stat"><span class="eyebrow">技能路线</span><b>' + routes().length + ' 条</b></div>' +
         '<div class="stat"><span class="eyebrow">本周成果</span><b>' + wk.length + ' 项</b></div>' +
-        '<div class="stat"><span class="eyebrow">累计训练</span><b>' + results().filter(isVerified).length + ' 项</b></div>' +
+        '<div class="stat"><span class="eyebrow">作品企划</span><b>' + activeWorks().length + ' 个</b></div>' +
       '</div>';
 
-    host.innerHTML = summary +
-      '<article class="card">' +
-        '<header class="card-head"><h2>技能成长路线</h2><span class="eyebrow">一次只主攻一条</span></header>' +
-        '<div class="skill-grid">' + routes().map(skillCard).join('') + '</div>' +
-      '</article>' +
+    var body;
+    if (tab === 'skills') {
+      body = '<article class="card">' +
+          '<header class="card-head"><h2>技能成长路线</h2><span class="eyebrow">一次只主攻一条</span></header>' +
+          '<div class="skill-grid">' + routes().map(skillCard).join('') + '</div>' +
+        '</article>';
+    } else if (tab === 'oc') {
+      var sel = state.ui.ocDim ? dimById(state.ui.ocDim) : null;
+      body = '<article class="card">' +
+          '<header class="card-head"><h2>创作训练</h2><span class="eyebrow">七个维度，每周至少一项成果</span></header>' +
+          weekBanner() +
+          '<div class="dim-grid">' + DIMENSIONS.map(dimCard).join('') + '</div>' +
+          (sel ? dimDetail(sel) : '<p class="fine">点任意一张卡片看它的训练内容、历史成果和进度。</p>') +
+          (legacyProjects().length
+            ? '<p class="fine">旧的 OC 企划档案已保留 ' + legacyProjects().length + ' 个，不再参与这里计数。</p>' : '') +
+          newResultForm() +
+          historyBlock() +
+        '</article>';
+    } else {
+      body = worksTab();
+    }
 
-      '<article class="card">' +
-        '<header class="card-head"><h2>创作训练</h2><span class="eyebrow">七个维度，每周至少一项成果</span></header>' +
-        weekBanner() +
-        '<div class="dim-grid">' + DIMENSIONS.map(dimCard).join('') + '</div>' +
-        (sel ? dimDetail(sel) : '<p class="fine">点任意一张卡片看它的训练内容、历史成果和进度。</p>') +
-        (legacyProjects().length
-          ? '<p class="fine">旧的 OC 企划档案已保留 ' + legacyProjects().length + ' 个，不再参与这里计数。</p>' : '') +
-        newResultForm() +
-        historyBlock() +
-      '</article>';
+    host.innerHTML = summary + tabsBar() + body;
+    bindWorkInputs();
+  }
+
+  function bindWorkInputs() {
+    /* 输入框不需要额外绑定：保存时统一读取 */
   }
 
   /* 本周 / 复盘 里的小结 */
@@ -4656,6 +4888,152 @@ document.addEventListener('DOMContentLoaded', function () {
         save('oc'); renderGrowth(); renderWeekGrowth(); renderReviewGrowth();
         toast('已删除'); return;
       }
+
+      /* ---- 页签 ---- */
+      if (act === 'growth-tab') {
+        state.ui.growthTab = el.dataset.tab;
+        try { localStorage.setItem('pgd.v1.growthTab', el.dataset.tab); } catch (e) { /* ignore */ }
+        state.ui.ocDim = null;
+        renderGrowth();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      /* ---- 作品企划 ---- */
+      if (act === 'work-new-open') { state.ui.workNew = true; renderGrowth(); return; }
+      if (act === 'work-new-cancel') { state.ui.workNew = false; renderGrowth(); return; }
+
+      if (act === 'work-new') {
+        var nt = (document.getElementById('workNewTitle') || {}).value || '';
+        var ng = (document.getElementById('workNewGoal') || {}).value || '';
+        if (!nt.trim()) { toast('先写企划名称'); return; }
+        if (!state.works) state.works = { projects: [] };
+        state.works.projects = state.works.projects || [];
+        state.works.projects.push({
+          id: 'work_' + Date.now().toString(36),
+          title: nt.trim(),
+          goal: ng.trim(),
+          stage: '',
+          status: 'active',
+          next: '',
+          milestones: [],
+          logs: [],
+          weekly: [],
+          created_at: todayISO(),
+          last_touch: ''
+        });
+        state.ui.workNew = false;
+        save('works');
+        renderGrowth();
+        toast('企划已建立');
+        return;
+      }
+
+      if (act === 'work-save') {
+        var w = findWork(id);
+        if (!w) return;
+        var tEl = document.getElementById('wf-title-' + id);
+        var gEl = document.getElementById('wf-goal-' + id);
+        var sEl = document.getElementById('wf-stage-' + id);
+        var nEl = document.getElementById('wf-next-' + id);
+        var wkEl = document.getElementById('wf-week-' + id);
+        if (tEl) w.title = tEl.value.trim() || w.title;
+        if (gEl) w.goal = gEl.value.trim();
+        if (sEl) w.stage = sEl.value.trim();
+        if (nEl) w.next = nEl.value.trim();
+        if (wkEl) {
+          var wg = workWeek(w);
+          if (!wg) { wg = { week_start: weekStartISO(), goal: '', done: false }; w.weekly = w.weekly || []; w.weekly.push(wg); }
+          wg.goal = wkEl.value.trim();
+        }
+        w.last_touch = todayISO();
+        save('works');
+        renderGrowth();
+        toast('已保存');
+        return;
+      }
+
+      if (act === 'work-push') {
+        var w2 = findWork(id);
+        if (!w2) return;
+        if (!w2.next) { toast('先写一条「下一步」'); return; }
+        pushToToday(w2.next, 'work', id);
+        return;
+      }
+
+      if (act === 'work-pause') {
+        var w3 = findWork(id);
+        if (!w3) return;
+        w3.status = w3.status === 'paused' ? 'active' : 'paused';
+        save('works'); renderGrowth();
+        toast(w3.status === 'paused' ? '已暂停' : '已恢复');
+        return;
+      }
+
+      if (act === 'work-archive') {
+        var w4 = findWork(id);
+        if (!w4) return;
+        w4.status = 'archived';
+        save('works'); renderGrowth();
+        toast('已归档');
+        return;
+      }
+
+      if (act === 'work-restore') {
+        var w5 = findWork(id);
+        if (!w5) return;
+        w5.status = 'active';
+        save('works'); renderGrowth();
+        toast('已恢复');
+        return;
+      }
+
+      if (act === 'work-ms') {
+        var w6 = findWork(id);
+        if (!w6) return;
+        var mi = num(el.dataset.idx);
+        if (w6.milestones && w6.milestones[mi]) {
+          w6.milestones[mi].done = !w6.milestones[mi].done;
+          if (w6.milestones[mi].done) w6.last_touch = todayISO();
+        }
+        save('works'); renderGrowth();
+        return;
+      }
+
+      if (act === 'work-ms-add') {
+        var w7 = findWork(id);
+        var msEl = document.getElementById('wf-ms-' + id);
+        if (!w7 || !msEl) return;
+        if (!msEl.value.trim()) { toast('写一条里程碑'); return; }
+        w7.milestones = w7.milestones || [];
+        w7.milestones.push({ name: msEl.value.trim(), done: false });
+        save('works'); renderGrowth();
+        return;
+      }
+
+      if (act === 'work-log-add') {
+        var w8 = findWork(id);
+        var lgEl = document.getElementById('wf-log-' + id);
+        if (!w8 || !lgEl) return;
+        if (!lgEl.value.trim()) { toast('写一句推进了什么'); return; }
+        w8.logs = w8.logs || [];
+        w8.logs.push({ date: todayISO(), text: lgEl.value.trim() });
+        w8.last_touch = todayISO();
+        save('works'); renderGrowth();
+        toast('已记录');
+        return;
+      }
+
+      if (act === 'work-week-done') {
+        var w9 = findWork(id);
+        var wg9 = w9 ? workWeek(w9) : null;
+        if (!wg9) return;
+        wg9.done = true;
+        w9.last_touch = todayISO();
+        save('works'); renderGrowth();
+        toast('本周目标完成');
+        return;
+      }
     });
 
     document.addEventListener('change', function (e) {
@@ -4670,6 +5048,11 @@ document.addEventListener('DOMContentLoaded', function () {
     render: function () { renderGrowth(); renderWeekGrowth(); renderReviewGrowth(); },
     bind: bind
   };
+
+  try {
+    var savedTab = localStorage.getItem('pgd.v1.growthTab');
+    if (savedTab === 'skills' || savedTab === 'oc' || savedTab === 'works') state.ui.growthTab = savedTab;
+  } catch (e) { /* ignore */ }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', bind);
