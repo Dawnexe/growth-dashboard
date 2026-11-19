@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-19 13:22
+  生成时间：2026-11-19 15:52
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -849,6 +849,52 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
   .work-title { font-size: 16px; }
 }
 
+
+/* ---------- 知识库：记录 / Prompt ---------- */
+
+.lib-switch { flex: none; }
+.lib-switch-btn {
+  display: inline-flex; align-items: baseline; gap: 8px;
+  background: var(--paper-3); border: 1px solid var(--ink);
+  padding: 9px 14px; transition: background 0.15s, color 0.15s;
+}
+.lib-switch-btn b { font-family: var(--serif); font-size: 14px; font-weight: 600; }
+.lib-switch-btn span {
+  font-family: var(--mono); font-size: 10px; color: var(--muted);
+  border-left: 1px solid var(--line); padding-left: 8px;
+}
+.lib-switch-btn:hover { background: var(--ink); color: var(--paper-2); }
+.lib-switch-btn:hover span { color: var(--paper-2); opacity: 0.7; border-color: rgba(255,255,255,.3); }
+
+.prompt-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+
+.prompt-card {
+  background: var(--paper-2); border: 1px solid var(--line);
+  padding: 16px 18px; display: flex; flex-direction: column; gap: 8px;
+  box-shadow: var(--shadow);
+}
+.prompt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.prompt-head h3 { font-size: 16px; line-height: 1.35; }
+.prompt-scene { font-size: 12px; color: var(--muted); }
+.prompt-body {
+  font-family: var(--mono); font-size: 11.5px; line-height: 1.7;
+  color: var(--ink-2); background: var(--paper-3);
+  border: 1px solid var(--line); padding: 10px 12px; margin: 0;
+  max-height: 168px; overflow: auto; white-space: pre-wrap; word-break: break-word;
+}
+
+.prompt-form {
+  border: 1px solid var(--line-2); background: var(--paper-3);
+  padding: 16px 18px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px;
+}
+.prompt-form textarea { font-family: var(--mono); font-size: 12.5px; min-height: 110px; }
+.prompt-form .grid-2 { margin-bottom: 0; }
+
+@media (max-width: 620px) {
+  .prompt-list { grid-template-columns: 1fr; }
+  .lib-switch-btn { width: 100%; justify-content: space-between; }
+}
+
 /* ---------- 其他 ---------- */
 
 .fine { font-size: 12px; color: var(--muted); line-height: 1.7; }
@@ -1165,20 +1211,33 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
       </p>
     </section>
 
-    <!-- 知识库 -->
+    <!-- 知识库：记录 / Prompt 两个板块 -->
     <section class="view" id="view-library">
       <header class="view-head">
         <div>
-          <h2>知识收纳</h2>
-          <p class="sub">低成本记录 + 定期回收，不做几千条卡片的数据库。</p>
+          <h2 id="libTitle">知识收纳</h2>
+          <p class="sub" id="libSub">低成本记录 + 定期回收，不做几千条卡片的数据库。</p>
         </div>
+        <div class="lib-switch" id="libSwitch"></div>
       </header>
-      <div class="toolbar">
-        <input type="search" id="libSearch" placeholder="搜关键词，比如 剪影、剪、港口">
-        <select id="libCat"></select>
-        <span class="eyebrow" id="libCount"></span>
+
+      <div id="libNotesView">
+        <div class="toolbar">
+          <input type="search" id="libSearch" placeholder="搜关键词，比如 剪影、剪、港口">
+          <select id="libCat"></select>
+          <span class="eyebrow" id="libCount"></span>
+        </div>
+        <div id="libList" class="note-list"></div>
       </div>
-      <div id="libList" class="note-list"></div>
+
+      <div id="libPromptsView" hidden>
+        <div class="toolbar">
+          <input type="search" id="promptSearch" placeholder="搜标题、正文、用途、标签">
+          <span class="eyebrow" id="promptCount"></span>
+        </div>
+        <div id="promptFormHost"></div>
+        <div id="promptList" class="prompt-list"></div>
+      </div>
     </section>
 
     <!-- 复盘 -->
@@ -1952,6 +2011,11 @@ window.__SEED__ = {
     "updated_at": "",
     "projects": []
   },
+  "prompts": {
+    "version": 1,
+    "updated_at": "",
+    "items": []
+  },
   "history": [],
   "schedule": {
     "version": 2,
@@ -2077,7 +2141,8 @@ const KEY = {
   history: 'pgd.v1.history',
   skills: 'pgd.v1.skills',
   oc: 'pgd.v1.oc',
-  works: 'pgd.v1.works'
+  works: 'pgd.v1.works',
+  prompts: 'pgd.v1.prompts'
 };
 
 const DATA_URL = {
@@ -2088,7 +2153,8 @@ const DATA_URL = {
   schedule: '../config/schedule.json',
   skills: '../data/skills.json',
   oc: '../data/oc.json',
-  works: '../data/works.json'
+  works: '../data/works.json',
+  prompts: '../data/prompts.json'
 };
 
 const WEEK_CN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -2185,11 +2251,12 @@ const state = {
   skills: null,
   oc: null,
   works: null,
+  prompts: null,
   schedule: null,
   history: [],
   source: '',
   view: 'today',
-  ui: { channel: 'all', search: '', cat: 'all', noticeDismissed: false }
+  ui: { channel: 'all', search: '', cat: 'all', noticeDismissed: false, libTab: 'notes', promptSearch: '', promptEdit: null }
 };
 
 /* ============ 1. 工具 ============ */
@@ -2319,9 +2386,11 @@ function readLocal() {
       var sk = localStorage.getItem(KEY.skills);
       var oc = localStorage.getItem(KEY.oc);
       var wk = localStorage.getItem(KEY.works);
+      var pr = localStorage.getItem(KEY.prompts);
       if (sk) data.skills = JSON.parse(sk);
       if (oc) data.oc = JSON.parse(oc);
       if (wk) data.works = JSON.parse(wk);
+      if (pr) data.prompts = JSON.parse(pr);
     } catch (err) { /* ignore */ }
     return data;
   } catch (err) {
@@ -2348,11 +2417,11 @@ function save(key) {
 /* 只落本地、不打时间、不推送：用于首次加载种子数据，
    否则一台新设备会把"种子"当成"我的最新修改"，反过来覆盖云端。 */
 function saveLocalAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works'].forEach(saveLocal);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts'].forEach(saveLocal);
 }
 
 function saveAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works'].forEach(save);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts'].forEach(save);
 }
 
 function readHistory() {
@@ -2400,11 +2469,12 @@ function loadFromJSON() {
     fetchJSON(DATA_URL.schedule).catch(function () { return null; }),
     fetchJSON(DATA_URL.skills).catch(function () { return null; }),
     fetchJSON(DATA_URL.oc).catch(function () { return null; }),
-    fetchJSON(DATA_URL.works).catch(function () { return null; })
+    fetchJSON(DATA_URL.works).catch(function () { return null; }),
+    fetchJSON(DATA_URL.prompts).catch(function () { return null; })
   ]).then(function (arr) {
     return {
       today: arr[0], weekly: arr[1], resources: arr[2], notes: arr[3],
-      schedule: arr[4], skills: arr[5], oc: arr[6], works: arr[7]
+      schedule: arr[4], skills: arr[5], oc: arr[6], works: arr[7], prompts: arr[8]
     };
   });
 }
@@ -2414,12 +2484,14 @@ function hydrateGrowth() {
   return Promise.all([
     state.skills ? Promise.resolve(null) : fetchJSON(DATA_URL.skills).catch(function () { return null; }),
     state.oc ? Promise.resolve(null) : fetchJSON(DATA_URL.oc).catch(function () { return null; }),
-    state.works ? Promise.resolve(null) : fetchJSON(DATA_URL.works).catch(function () { return null; })
+    state.works ? Promise.resolve(null) : fetchJSON(DATA_URL.works).catch(function () { return null; }),
+    state.prompts ? Promise.resolve(null) : fetchJSON(DATA_URL.prompts).catch(function () { return null; })
   ]).then(function (arr) {
     if (arr[0]) { state.skills = arr[0]; saveLocal('skills'); }
     if (arr[1]) { state.oc = arr[1]; saveLocal('oc'); }
     if (arr[2]) { state.works = arr[2]; saveLocal('works'); }
-    if (arr[0] || arr[1] || arr[2]) renderAll();
+    if (arr[3]) { state.prompts = arr[3]; saveLocal('prompts'); }
+    if (arr[0] || arr[1] || arr[2] || arr[3]) renderAll();
   });
 }
 
@@ -2444,6 +2516,7 @@ function applyData(data, source) {
   if (data.skills !== undefined && data.skills) state.skills = data.skills;
   if (data.oc !== undefined && data.oc) state.oc = data.oc;
   if (data.works !== undefined && data.works) state.works = data.works;
+  if (data.prompts !== undefined && data.prompts) state.prompts = data.prompts;
   if (data.schedule !== undefined) state.schedule = data.schedule;
   state.source = source;
   migrateToday();
@@ -2457,7 +2530,8 @@ var api = {
   saveNotes: function () { save('notes'); },
   saveSkills: function () { save('skills'); },
   saveOc: function () { save('oc'); },
-  saveWorks: function () { save('works'); }
+  saveWorks: function () { save('works'); },
+  savePrompts: function () { save('prompts'); }
 };
 
 /* ============ 3. 启动 ============ */
@@ -2489,6 +2563,7 @@ function boot() {
       skills: seed.skills || null,
       oc: seed.oc || null,
       works: seed.works || null,
+      prompts: seed.prompts || null,
       schedule: seed.schedule || null
     }, 'seed');
     if (Array.isArray(seed.history) && seed.history.length) {
@@ -3442,7 +3517,35 @@ function noteItems() {
   return (state.notes && state.notes.items) || [];
 }
 
+/* 知识库有两个板块：记录（六个分类）与 Prompt（独立数据，不混进分类） */
+
+function promptItems() { return (state.prompts && state.prompts.items) || []; }
+function libTab() { return state.ui.libTab === 'prompts' ? 'prompts' : 'notes'; }
+
 function renderLibrary() {
+  var tab = libTab();
+
+  /* 顶部切换按钮：显示「另一个板块」和它的条数 */
+  var notesN = noteItems().length;
+  var promptsN = promptItems().length;
+  $('#libSwitch').innerHTML = tab === 'notes'
+    ? '<button type="button" class="lib-switch-btn" data-act="lib-tab" data-tab="prompts">' +
+        '<b>Prompt 库</b><span>' + promptsN + '</span></button>'
+    : '<button type="button" class="lib-switch-btn" data-act="lib-tab" data-tab="notes">' +
+        '<b>← 返回记录</b><span>' + notesN + '</span></button>';
+
+  $('#libTitle').textContent = tab === 'notes' ? '知识收纳' : 'Prompt 库';
+  $('#libSub').textContent = tab === 'notes'
+    ? '低成本记录 + 定期回收，不做几千条卡片的数据库。'
+    : '写过的提示词单独放这里，不进那六个记录分类。';
+
+  $('#libNotesView').hidden = tab !== 'notes';
+  $('#libPromptsView').hidden = tab !== 'prompts';
+
+  if (tab === 'notes') { renderNotesView(); } else { renderPromptsView(); }
+}
+
+function renderNotesView() {
   var items = noteItems();
 
   var cats = ['all'].concat(NOTE_CATS);
@@ -3467,6 +3570,68 @@ function renderLibrary() {
     : '<p class="empty">' + (items.length ? '没有匹配的记录。' : '还没有任何记录。今天的一句话就可以是第一条。') + '</p>';
 }
 
+function renderPromptsView() {
+  var items = promptItems();
+  var editing = state.ui.promptEdit ? findPrompt(state.ui.promptEdit) : null;
+
+  var form =
+    '<div class="prompt-form">' +
+      '<div class="form-head"><h3>' + (editing ? '编辑 Prompt' : '新建 Prompt') + '</h3>' +
+        '<span class="eyebrow">' + (editing ? '改完点保存' : '标题 + 正文就够') + '</span></div>' +
+      '<div class="grid-2">' +
+        '<label class="q">标题<input type="text" id="promptTitle" value="' + esc(editing ? editing.title : '') + '" placeholder="例如：角色剪影发散"></label>' +
+        '<label class="q">用途<span class="opt">选填</span><input type="text" id="promptScene" value="' + esc(editing ? (editing.scene || '') : '') + '" placeholder="例如：卡住时帮我出 10 个方向"></label>' +
+      '</div>' +
+      '<label class="q">正文<textarea id="promptBody" rows="5" placeholder="把提示词原文粘进来；变量用 {{角色}} 这种写法">' + esc(editing ? editing.body : '') + '</textarea></label>' +
+      '<label class="q">标签<span class="opt">逗号分隔</span><input type="text" id="promptTags" value="' + esc(editing ? (editing.tags || []).join('、') : '') + '" placeholder="角色设计、发散"></label>' +
+      '<div class="btn-row">' +
+        '<button type="button" class="solid-btn" data-act="prompt-save">' + (editing ? '保存修改' : '加入 Prompt 库') + '</button>' +
+        (editing ? '<button type="button" class="ghost-btn" data-act="prompt-cancel">取消编辑</button>' : '') +
+      '</div>' +
+    '</div>';
+
+  var q = (state.ui.promptSearch || '').trim().toLowerCase();
+  var list = items.filter(function (it) {
+    if (!q) return true;
+    var hay = [it.title, it.body, it.scene, (it.tags || []).join(' ')].join(' ').toLowerCase();
+    return hay.indexOf(q) >= 0;
+  }).sort(function (a, b) {
+    return String(b.updated_at || b.created_at || '').localeCompare(String(a.updated_at || a.created_at || ''));
+  });
+
+  $('#promptCount').textContent = list.length + ' / ' + items.length + ' 条';
+
+  $('#promptList').innerHTML = list.length
+    ? list.map(promptCard).join('')
+    : '<p class="empty">' + (items.length ? '没有匹配的 Prompt。' : '还没有 Prompt。把常用的一段粘进来，以后一键复制。') + '</p>';
+
+  $('#promptFormHost').innerHTML = form;
+}
+
+function findPrompt(id) {
+  var list = promptItems();
+  for (var i = 0; i < list.length; i++) if (list[i].id === id) return list[i];
+  return null;
+}
+
+function promptCard(it) {
+  var tags = (it.tags || []).map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('');
+  return '<article class="prompt-card">' +
+    '<header class="prompt-head">' +
+      '<h3>' + esc(it.title) + '</h3>' +
+      '<span class="eyebrow">' + esc(it.updated_at ? shortDate(it.updated_at) : '') + '</span>' +
+    '</header>' +
+    (it.scene ? '<p class="prompt-scene">' + esc(it.scene) + '</p>' : '') +
+    '<pre class="prompt-body">' + esc(it.body) + '</pre>' +
+    (tags ? '<div class="tags">' + tags + '</div>' : '') +
+    '<div class="res-foot">' +
+      '<button type="button" class="solid-btn" data-act="prompt-copy" data-id="' + esc(it.id) + '">复制全文</button>' +
+      '<button type="button" class="ghost-btn" data-act="prompt-edit" data-id="' + esc(it.id) + '">编辑</button>' +
+      '<button type="button" class="ghost-btn danger" data-act="prompt-del" data-id="' + esc(it.id) + '">删除</button>' +
+    '</div>' +
+  '</article>';
+}
+
 function noteItem(n) {
   return '<article class="note-item">' +
     '<div class="note-meta">' +
@@ -3476,6 +3641,73 @@ function noteItem(n) {
     '<div class="note-text">' + esc(n.text) + '</div>' +
     '<button type="button" class="note-del" data-act="del-note" data-id="' + esc(n.id) + '" aria-label="删除">×</button>' +
   '</article>';
+}
+
+/* ---- Prompt 交互 ---- */
+
+function savePrompt() {
+  var titleEl = $('#promptTitle');
+  var bodyEl = $('#promptBody');
+  if (!titleEl || !bodyEl) return;
+  var title = titleEl.value.trim();
+  var body = bodyEl.value.trim();
+  if (!title) { toast('先写标题'); return; }
+  if (!body) { toast('正文不能为空'); return; }
+
+  var scene = ($('#promptScene') || {}).value || '';
+  var tagsRaw = ($('#promptTags') || {}).value || '';
+  var tags = tagsRaw.split(/[，,、\s]+/).map(function (t) { return t.trim(); }).filter(Boolean);
+  var now = todayISO();
+
+  if (!state.prompts) state.prompts = { version: 1, items: [] };
+  state.prompts.items = state.prompts.items || [];
+
+  var editing = state.ui.promptEdit ? findPrompt(state.ui.promptEdit) : null;
+  if (editing) {
+    editing.title = title;
+    editing.body = body;
+    editing.scene = scene.trim();
+    editing.tags = tags;
+    editing.updated_at = now;
+    state.ui.promptEdit = null;
+    toast('已保存修改');
+  } else {
+    state.prompts.items.push({
+      id: 'pmt_' + Date.now().toString(36),
+      title: title,
+      body: body,
+      scene: scene.trim(),
+      tags: tags,
+      created_at: now,
+      updated_at: now
+    });
+    toast('已加入 Prompt 库');
+  }
+  save('prompts');
+  renderLibrary();
+}
+
+function deletePrompt(id) {
+  var it = findPrompt(id);
+  if (!it) return;
+  if (!confirm('删除这条 Prompt？\n\n' + it.title)) return;
+  if (state.ui.promptEdit === id) state.ui.promptEdit = null;
+  state.prompts.items = promptItems().filter(function (p) { return p.id !== id; });
+  save('prompts');
+  renderLibrary();
+  toast('已删除');
+}
+
+function copyPrompt(id) {
+  var it = findPrompt(id);
+  if (!it) return;
+  var text = it.body;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function () { toast('已复制：' + it.title); },
+      function () { toast('复制失败，可以手动选中'); });
+  } else {
+    toast('这个浏览器不让自动复制，手动选中即可');
+  }
 }
 
 /* ============ 8. 复盘 ============ */
@@ -3654,6 +3886,7 @@ function exportJSON() {
     skills: state.skills,
     oc: state.oc,
     works: state.works,
+    prompts: state.prompts,
     history: state.history
   };
   var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -3741,6 +3974,12 @@ function bindEvents() {
     else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
     else if (act === 'quote-next') { nextQuote(); }
     else if (act === 'exp-tab') { expSwitchChannel(el.dataset.ch); }
+    else if (act === 'lib-tab') { state.ui.libTab = el.dataset.tab; try { localStorage.setItem('pgd.v1.libTab', el.dataset.tab); } catch (e) {} state.ui.promptEdit = null; renderLibrary(); }
+    else if (act === 'prompt-save') { savePrompt(); }
+    else if (act === 'prompt-edit') { state.ui.promptEdit = el.dataset.id; renderLibrary(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    else if (act === 'prompt-cancel') { state.ui.promptEdit = null; renderLibrary(); }
+    else if (act === 'prompt-del') { deletePrompt(el.dataset.id); }
+    else if (act === 'prompt-copy') { copyPrompt(el.dataset.id); }
     else if (act === 'invest-confirm') { confirmInvest(); }
     else if (act === 'invest-clear') { clearInvest(); }
     else if (act === 'exp-cat') { var ec = expUi(); ec.cat = el.dataset.cat; ec.offset = 0; renderExplore(); }
@@ -3793,6 +4032,14 @@ function bindEvents() {
     state.ui.search = e.target.value;
     renderLibrary();
   });
+
+  var promptSearchEl = $('#promptSearch');
+  if (promptSearchEl) {
+    promptSearchEl.addEventListener('input', function (e) {
+      state.ui.promptSearch = e.target.value;
+      renderPromptsView();
+    });
+  }
 
   $('#libCat').addEventListener('change', function (e) {
     state.ui.cat = e.target.value;
@@ -3926,11 +4173,13 @@ function cloudApplyPayload(payload) {
     if (payload.skills) state.skills = payload.skills;
     if (payload.oc) state.oc = payload.oc;
     if (payload.works) state.works = payload.works;
+    if (payload.prompts) state.prompts = payload.prompts;
     if (Array.isArray(payload.history)) state.history = payload.history;
     saveLocal('today'); saveLocal('weekly'); saveLocal('resources'); saveLocal('notes');
     if (payload.skills) saveLocal('skills');
     if (payload.oc) saveLocal('oc');
     if (payload.works) saveLocal('works');
+    if (payload.prompts) saveLocal('prompts');
     try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
   } finally {
     CLOUD.suspend = false;
@@ -3978,6 +4227,7 @@ async function cloudPush() {
         skills: state.skills,
         oc: state.oc,
         works: state.works,
+        prompts: state.prompts,
         history: state.history
       },
       updated_at: now
@@ -4167,6 +4417,10 @@ async function cloudInit() {
 /* ============ 12. 启动 ============ */
 
 document.addEventListener('DOMContentLoaded', function () {
+  try {
+    var lt = localStorage.getItem('pgd.v1.libTab');
+    if (lt === 'notes' || lt === 'prompts') state.ui.libTab = lt;
+  } catch (e) { /* ignore */ }
   bindEvents();
   boot();
   cloudInit();
