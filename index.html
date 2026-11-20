@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-20 18:07
+  生成时间：2026-11-20 18:30
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -484,6 +484,10 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
   font-family: var(--mono); font-size: 11px;
   background: var(--accent-soft); padding: 1px 4px; color: var(--accent);
 }
+
+.push-ddl { font-family: var(--mono); font-size: 10px; color: var(--muted-2); margin-top: 3px; }
+.push-ddl.is-over { color: #a4553c; }
+.ms-date.is-late { border-color: #a4553c; color: #a4553c; }
 
 /* ---------- 其他 ---------- */
 
@@ -2850,16 +2854,15 @@ function findWorkById(id) {
   return null;
 }
 
-/* 一个企划在某天是否"应该推进"，返回当前该做的里程碑 */
+/* 一个企划在某天该推进哪个里程碑：
+   系统不排期，只按你写下的顺序，取第一个没做完的。
+   做完勾掉，下一个就自然顶上来。 */
 function dueMilestone(w, day) {
   if (!w || w.status !== 'active' || !w.schedule_enabled) return null;
   if (!w.plan_start || !w.plan_end) return null;
   if (day < w.plan_start || day > w.plan_end) return null;
   var open = (w.milestones || []).filter(function (m) { return !m.done; });
-  if (!open.length) return null;
-  /* 已经到期的（planned_date <= day）取最后一个；都还没到就取第一个 */
-  var due = open.filter(function (m) { return m.planned_date && m.planned_date <= day; });
-  return due.length ? due[due.length - 1] : open[0];
+  return open.length ? open[0] : null;
 }
 
 /* 今日推进：从企划推导，不落库，所以刷新不会重复生成 */
@@ -2917,6 +2920,8 @@ function renderPush() {
           '<span class="push-dot">·</span>' + esc(t.milestone_name) + '</div>' +
         '<div class="push-hint">今天继续推进这一阶段即可，不要求今天完成整个里程碑。' +
           (msAll > 1 ? '（还有 ' + msAll + ' 个里程碑未完成）' : '') + '</div>' +
+        (t.planned ? '<div class="push-ddl' + (t.planned < day ? ' is-over' : '') + '">' +
+          (t.planned < day ? '自己定的 DDL 已过：' : '你定的 DDL：') + esc(shortDate(t.planned)) + '</div>' : '') +
         (done
           ? '<div class="push-done-line">今天已推进' + (rec.note ? '：' + esc(rec.note) : '') + '</div>'
           : '<div class="push-note-row"><input type="text" id="pushNote-' + esc(t.work_id) + '" placeholder="今天具体推了什么（可选）">' +
@@ -5232,6 +5237,15 @@ document.addEventListener('DOMContentLoaded', function () {
       if (w.plan_start === undefined) { w.plan_start = ''; changed = true; }
       if (w.plan_end === undefined) { w.plan_end = ''; changed = true; }
       if (!Array.isArray(w.progress_days)) { w.progress_days = []; changed = true; }
+      /* 以前系统会自动给里程碑排日期；现在不排了，把那些自动填的清掉，只留你自己填的 */
+      if (w.auto_sched_cleared !== true) {
+        (w.milestones || []).forEach(function (m) {
+          if (!m.locked) m.planned_date = '';
+        });
+        w.auto_sched_cleared = true;
+        w.schedule_updated_at = '';
+        changed = true;
+      }
       (w.milestones || []).forEach(function (m, mi) {
         if (!m.id) {
           m.id = 'ms_' + (w.id || ('w' + wi)) + '_' + mi + '_' + Math.random().toString(36).slice(2, 6);
@@ -5273,76 +5287,6 @@ document.addEventListener('DOMContentLoaded', function () {
     return Math.round((db - da) / 86400000);
   }
 
-  /* 均匀排期：
-     - 已完成的里程碑一律不动（保留 planned_date / done_date）
-     - locked=true（用户手动改过日期）的默认不动
-     - 其余按"在全部里程碑里的序号"分槽，窗口 = [max(今天, 开始), 完成]
-     - 结果保证不早于今天，且顺序单调不减 */
-  function rescheduleWork(w, force) {
-    if (!w.plan_start || !w.plan_end) return 0;
-    var ms = w.milestones || [];
-    if (!ms.length) return 0;
-
-    var today = todayISO();
-    var start = w.plan_start;
-    var end = w.plan_end;
-    var from = start > today ? start : today;
-    if (from > end) from = end;
-
-    var days = isoSpan(from, end);
-    if (days < 1) days = 1;
-    var n = ms.length;
-
-    /* 固定点：已完成的、以及用户手动定过日期的（force 时不算） */
-    var fixedIdx = [];
-    ms.forEach(function (m, i) {
-      if (m.done) { fixedIdx.push(i); return; }
-      if (m.locked && !force) fixedIdx.push(i);
-    });
-
-    function nearestFixed(i) {
-      var prev = null, next = null;
-      fixedIdx.forEach(function (fi) {
-        if (fi < i && ms[fi].planned_date) prev = ms[fi].planned_date;
-        if (fi > i && !next && ms[fi].planned_date) next = ms[fi].planned_date;
-      });
-      return { prev: prev, next: next };
-    }
-
-    /* 1) 未固定的按序号分槽，并夹在前后固定点之间 */
-    var touched = 0;
-    ms.forEach(function (m, i) {
-      if (m.done) return;
-      if (m.locked && !force) return;
-      var slot = n === 1 ? 1 : (i + 1) / n;
-      var d = isoAdd(from, Math.round(days * slot));
-      if (d > end) d = end;
-      if (d < from) d = from;
-      var bound = nearestFixed(i);
-      if (bound.prev && d < bound.prev) d = bound.prev;
-      if (bound.next && d > bound.next) d = bound.next;
-      m.planned_date = d;
-      if (force) m.locked = false;
-      touched++;
-    });
-
-    /* 2) 单调修正只作用于未固定的那几段，绝不改写手动/已完成日期 */
-    var last = '';
-    ms.forEach(function (m) {
-      if (!m.planned_date) return;
-      if (m.done || m.locked) { last = m.planned_date; return; }
-      if (last && m.planned_date < last) m.planned_date = last;
-      last = m.planned_date;
-    });
-
-    w.schedule_updated_at = today;
-    return touched;
-  }
-
-  function lockedCount(w) {
-    return (w.milestones || []).filter(function (m) { return m.locked && !m.done; }).length;
-  }
-
   function openMilestones(w) {
     return (w.milestones || []).filter(function (m) { return !m.done; });
   }
@@ -5354,34 +5298,35 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var msHtml = milestones.length
       ? '<ul class="proj-list">' + milestones.map(function (m, i) {
+          var late = !m.done && m.planned_date && m.planned_date < todayISO();
           var dateCell = w.schedule_enabled
-            ? '<input type="date" class="ms-date" id="wf-msdate-' + esc(w.id) + '-' + i + '" value="' + esc(m.planned_date || '') + '" data-act="work-ms-date" data-id="' + esc(w.id) + '" data-idx="' + i + '">'
-            : (m.planned_date ? '<span class="ms-planned">' + esc(shortDate(m.planned_date)) + '</span>' : '');
+            ? '<input type="date" class="ms-date' + (late ? ' is-late' : '') + '" id="wf-msdate-' + esc(w.id) + '-' + i + '" value="' + esc(m.planned_date || '') + '" data-act="work-ms-date" data-id="' + esc(w.id) + '" data-idx="' + i + '" title="自己定的 DDL（可留空）">'
+            : (m.planned_date ? '<span class="ms-planned">' + esc(shortDate(m.planned_date)) + (late ? ' · 已过' : '') + '</span>' : '');
           return '<li class="proj' + (m.done ? ' is-done' : '') + '">' +
             '<button type="button" class="check" data-act="work-ms" data-id="' + esc(w.id) + '" data-idx="' + i + '">✓</button>' +
             '<span class="ms-name">' + esc(m.name) + '</span>' +
-            (m.locked && !m.done ? '<span class="tag tiny-tag">手动</span>' : '') +
+
             (m.done && m.done_date ? '<span class="ms-done-date">' + esc(shortDate(m.done_date)) + ' 完成</span>' : '') +
             dateCell +
             '<button type="button" class="note-del ms-del" data-act="work-ms-del" data-id="' + esc(w.id) + '" data-idx="' + i + '" title="删除里程碑">×</button>' +
             '</li>';
         }).join('') + '</ul>' : '<p class="fine">还没有拆阶段。把「完成一张角色插画」拆成 3–5 个里程碑更好推进。</p>';
 
-    /* 日程区块 */
+    /* 日程区块：只定时间界限，里程碑的 DDL 由你自己写 */
     var schedBody;
     if (!w.schedule_enabled) {
       schedBody = '<div class="sched-off">' +
         '<button type="button" class="ghost-btn" data-act="work-sched-toggle" data-id="' + esc(w.id) + '">启用计划日程</button>' +
-        '<span class="fine">开启后设定起止日期，系统会把里程碑摊到这段时间里，并在到期日自动出现在「今日推进」。</span>' +
+        '<span class="fine">只设一个时间界限（开始 / 完成），到这个区间里，第一个没做完的里程碑会自动出现在「今日推进」。' +
+        '怎么拆、每一步的 DDL 都你自己定。</span>' +
         '</div>';
     } else {
       var openN = openMilestones(w).length;
-      var lk = lockedCount(w);
       var overdue = w.plan_end && w.plan_end < todayISO() && openN > 0;
       schedBody =
         '<div class="sched-on">' +
           '<div class="sched-head">' +
-            '<span class="eyebrow">计划日程</span>' +
+            '<span class="eyebrow">时间界限</span>' +
             (overdue ? '<span class="status-badge overdue">需要调整计划</span>' : '') +
             '<button type="button" class="ghost-btn tiny" data-act="work-sched-toggle" data-id="' + esc(w.id) + '">关闭</button>' +
           '</div>' +
@@ -5390,11 +5335,10 @@ document.addEventListener('DOMContentLoaded', function () {
             '<label class="q">预期完成<input type="date" id="wf-end-' + esc(w.id) + '" value="' + esc(w.plan_end || '') + '"></label>' +
           '</div>' +
           '<div class="btn-row">' +
-            '<button type="button" class="solid-btn" data-act="work-plan-save" data-id="' + esc(w.id) + '">保存日期并重排</button>' +
-            '<button type="button" class="ghost-btn" data-act="work-plan-force" data-id="' + esc(w.id) + '">全部重新均匀排期</button>' +
+            '<button type="button" class="solid-btn" data-act="work-plan-save" data-id="' + esc(w.id) + '">保存时间界限</button>' +
           '</div>' +
-          '<p class="fine">' + (openN ? ('还有 ' + openN + ' 个里程碑未完成' + (lk ? '，其中 ' + lk + ' 个是你手动定的日期（不会被覆盖）' : '') + '。')
-            : '所有里程碑都完成了。') + '</p>' +
+          '<p class="fine">系统不排期。' + (openN ? ('还有 ' + openN + ' 个里程碑，' +
+            '「今日推进」只认第一个没做完的，做完勾掉，下一个自动顶上。') : '所有里程碑都完成了。') + '</p>' +
         '</div>';
     }
 
@@ -5937,10 +5881,10 @@ document.addEventListener('DOMContentLoaded', function () {
           sw.schedule_enabled = true;
           if (!sw.plan_start) sw.plan_start = todayISO();
           if (!sw.plan_end) sw.plan_end = isoAdd(sw.plan_start, 14 * Math.max(1, openMilestones(sw).length));
-          var n1 = rescheduleWork(sw, false);
+          sw.auto_sched_cleared = true;
           save('works');
           renderGrowth();
-          toast('日程已启用，' + n1 + ' 个里程碑排好了');
+          toast('日程已启用。里程碑的 DDL 你自己填，系统不排');
         } else {
           sw.schedule_enabled = false;
           save('works');
@@ -5961,39 +5905,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (ne < ns) { toast('完成日期不能早于开始日期'); return; }
         pw.plan_start = ns;
         pw.plan_end = ne;
-        var n2 = rescheduleWork(pw, false);
         save('works');
         renderGrowth();
-        var kept = lockedCount(pw);
-        toast('已重排 ' + n2 + ' 个里程碑' + (kept ? '，保留 ' + kept + ' 个手动日期' : ''));
-        return;
-      }
-
-      if (act === 'work-plan-force') {
-        var fw = findWork(id);
-        if (!fw) return;
-        if (lockedCount(fw) && !confirm('会覆盖你手动调整过的日期，确定全部重新均匀排期？')) return;
-        var n3 = rescheduleWork(fw, true);
-        save('works');
-        renderGrowth();
-        toast('全部重排：' + n3 + ' 个里程碑');
-        return;
-      }
-
-      if (act === 'work-ms-date') {
-        var dw = findWork(id);
-        if (!dw) return;
-        var idx = num(el.dataset.idx);
-        var ms = (dw.milestones || [])[idx];
-        if (!ms) return;
-        var v = el.value;
-        if (v && dw.plan_start && v < dw.plan_start) { toast('不能早于计划开始日期'); el.value = ms.planned_date || ''; return; }
-        if (v && dw.plan_end && v > dw.plan_end) { toast('不能晚于预期完成日期'); el.value = ms.planned_date || ''; return; }
-        ms.planned_date = v;
-        ms.locked = !!v;
-        save('works');
-        renderGrowth();
-        toast(v ? '这个里程碑定在 ' + v : '已交回自动排期');
+        toast('时间界限已保存（' + ns + ' ~ ' + ne + '）');
         return;
       }
 
@@ -6155,7 +6069,6 @@ document.addEventListener('DOMContentLoaded', function () {
           locked: false,
           done_date: ''
         });
-        if (w7.schedule_enabled) rescheduleWork(w7, false);
         save('works'); renderGrowth();
         return;
       }
@@ -6200,8 +6113,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var ms = (w.milestones || [])[idx];
         if (!ms) return;
         var v = e.target.value;
-        if (v && w.plan_start && v < w.plan_start) { toast('不能早于计划开始日期'); e.target.value = ms.planned_date || ''; return; }
-        if (v && w.plan_end && v > w.plan_end) { toast('不能晚于预期完成日期'); e.target.value = ms.planned_date || ''; return; }
+        /* DDL 是你自己定的参考线，系统只负责记录，不检查它是否落在计划窗口内 */
         ms.planned_date = v;
         ms.locked = !!v;
         save('works');
