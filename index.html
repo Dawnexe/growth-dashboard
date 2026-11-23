@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-20 18:30
+  生成时间：2026-11-23 22:59
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -1498,7 +1498,7 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
 
     <footer class="foot">
       <span id="footSrc">数据源：data/*.json</span>
-      <span>V0.1 · 只验证「今天做什么 / 忽略了什么 / 有什么新东西」</span>
+      <span id="footBuild">V0.6 · 2026-11-23 22:59</span>
     </footer>
   </main>
 </div>
@@ -3310,6 +3310,14 @@ function renderToday() {
   $('#storeBadge').textContent = state.source === 'json' ? '已从项目 JSON 载入'
     : state.source === 'localStorage' ? '本地存储（含你的修改）'
     : state.source === 'seed' ? '数据在本机浏览器' : '内置示例';
+
+  var fb = $('#footBuild');
+  if (fb) {
+    var lm = document.lastModified ? new Date(document.lastModified) : new Date();
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    fb.textContent = 'V0.6 · ' + lm.getFullYear() + '-' + pad(lm.getMonth() + 1) + '-' + pad(lm.getDate()) +
+      ' ' + pad(lm.getHours()) + ':' + pad(lm.getMinutes());
+  }
 
   renderModePick();
   renderQuote();
