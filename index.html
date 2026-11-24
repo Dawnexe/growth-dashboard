@@ -1,6 +1,6 @@
 <!--
   个人成长驾驶舱 · 单文件版
-  生成时间：2026-11-23 22:59
+  生成时间：2026-11-23 23:12
   数据来源：发布版（已脱敏：无记录、无作息时间、无个人文案）
   由 dev/build_offline.py 生成，请勿手工编辑；数据改了要重新运行脚本。
   用法：拷到手机/Pad 用浏览器打开，或上传到静态托管；勾选和记录存在浏览器里。
@@ -1094,6 +1094,57 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
   .cal-chip { font-size: 10.5px; padding: 2px 7px; }
 }
 
+
+/* ---------- 今日推进：统一卡片 ---------- */
+
+.push-src {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.08em;
+  color: var(--muted-2); border: 1px solid var(--line);
+  padding: 0 4px; margin-left: 6px; vertical-align: 1px;
+}
+.push-min { font-family: var(--mono); font-size: 10px; color: var(--muted-2); }
+
+/* ---------- 每日 Debug ---------- */
+
+#debugCard { border-left: 2px solid var(--line-2); }
+.debug-note { margin-top: 8px; }
+.debug-ok { color: var(--muted-2); font-family: var(--mono); font-size: 10px; }
+.debug-skip { color: #a4553c; font-family: var(--mono); font-size: 10px; }
+.debug-history { margin-top: 10px; }
+.debug-history summary {
+  font-size: 11.5px; color: var(--muted); cursor: pointer; padding: 3px 0;
+}
+.debug-history summary:hover { color: var(--ink-2); }
+.debug-history .log-list { margin-top: 6px; }
+
+/* ---------- 想做的事 ---------- */
+
+#wishCard { margin-top: 16px; }
+.wish-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; }
+.wish-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 0; border-top: 1px dashed var(--line);
+}
+.wish-item:first-child { border-top: 0; }
+.wish-item .check { flex: none; }
+.wish-text {
+  flex: 1; min-width: 0; font-size: 13px; color: var(--ink);
+  background: transparent; border: 1px solid transparent; padding: 4px 6px;
+}
+.wish-text:hover { border-color: var(--line); }
+.wish-text:focus { border-color: var(--ink-2); background: #fff; }
+.wish-item.is-done .wish-text {
+  text-decoration: line-through; text-decoration-color: var(--line-2); color: var(--muted);
+}
+.wish-done { margin-top: 10px; }
+.wish-done summary { font-size: 11.5px; color: var(--muted); cursor: pointer; }
+.wish-done summary:hover { color: var(--ink-2); }
+
+@media (max-width: 620px) {
+  .push-goto { margin-left: 0; }
+  .wish-text { font-size: 13.5px; }
+}
+
 /* ---------- 其他 ---------- */
 
 .fine { font-size: 12px; color: var(--muted); line-height: 1.7; }
@@ -1292,8 +1343,8 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
             <article class="card" id="rotationCard"></article>
           </div>
 
-          <article class="card" id="focusCard" hidden></article>
           <article class="card" id="optionalCard"></article>
+          <article class="card" id="debugCard"></article>
         </div>
 
         <div class="col">
@@ -1330,7 +1381,8 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
           <article class="card" id="lowEnergyCard"></article>
         </div>
       </div>
-    </section>
+         <article class="card" id="wishCard"></article>
+     </section>
 
     <!-- 本周 -->
     <section class="view" id="view-week">
@@ -1498,7 +1550,7 @@ textarea:focus, input:focus, select:focus { border-color: var(--ink-2); }
 
     <footer class="foot">
       <span id="footSrc">数据源：data/*.json</span>
-      <span id="footBuild">V0.6 · 2026-11-23 22:59</span>
+      <span id="footBuild">V0.6 · 2026-11-23 23:12</span>
     </footer>
   </main>
 </div>
@@ -2229,6 +2281,16 @@ window.__SEED__ = {
     "weekly": {},
     "logs": []
   },
+  "debug": {
+    "version": 1,
+    "updated_at": "",
+    "logs": []
+  },
+  "wishlist": {
+    "version": 1,
+    "updated_at": "",
+    "items": []
+  },
   "history": [],
   "schedule": {
     "version": 2,
@@ -2356,7 +2418,9 @@ const KEY = {
   oc: 'pgd.v1.oc',
   works: 'pgd.v1.works',
   prompts: 'pgd.v1.prompts',
-  radar: 'pgd.v1.radar'
+  radar: 'pgd.v1.radar',
+  debug: 'pgd.v1.debug',
+  wishlist: 'pgd.v1.wishlist'
 };
 
 const DATA_URL = {
@@ -2369,7 +2433,9 @@ const DATA_URL = {
   oc: '../data/oc.json',
   works: '../data/works.json',
   prompts: '../data/prompts.json',
-  radar: '../data/radar.json'
+  radar: '../data/radar.json',
+  debug: '../data/debug.json',
+  wishlist: '../data/wishlist.json'
 };
 
 const WEEK_CN = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
@@ -2468,6 +2534,8 @@ const state = {
   works: null,
   prompts: null,
   radar: null,
+  debug: null,
+  wishlist: null,
   schedule: null,
   history: [],
   source: '',
@@ -2604,11 +2672,15 @@ function readLocal() {
       var wk = localStorage.getItem(KEY.works);
       var pr = localStorage.getItem(KEY.prompts);
       var rd = localStorage.getItem(KEY.radar);
+      var dg = localStorage.getItem(KEY.debug);
+      var wl = localStorage.getItem(KEY.wishlist);
       if (sk) data.skills = JSON.parse(sk);
       if (oc) data.oc = JSON.parse(oc);
       if (wk) data.works = JSON.parse(wk);
       if (pr) data.prompts = JSON.parse(pr);
       if (rd) data.radar = JSON.parse(rd);
+      if (dg) data.debug = JSON.parse(dg);
+      if (wl) data.wishlist = JSON.parse(wl);
     } catch (err) { /* ignore */ }
     return data;
   } catch (err) {
@@ -2635,11 +2707,11 @@ function save(key) {
 /* 只落本地、不打时间、不推送：用于首次加载种子数据，
    否则一台新设备会把"种子"当成"我的最新修改"，反过来覆盖云端。 */
 function saveLocalAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts', 'radar'].forEach(saveLocal);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts', 'radar', 'debug', 'wishlist'].forEach(saveLocal);
 }
 
 function saveAll() {
-  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts', 'radar'].forEach(save);
+  ['today', 'weekly', 'resources', 'notes', 'skills', 'oc', 'works', 'prompts', 'radar', 'debug', 'wishlist'].forEach(save);
 }
 
 function readHistory() {
@@ -2689,11 +2761,14 @@ function loadFromJSON() {
     fetchJSON(DATA_URL.oc).catch(function () { return null; }),
     fetchJSON(DATA_URL.works).catch(function () { return null; }),
     fetchJSON(DATA_URL.prompts).catch(function () { return null; }),
-    fetchJSON(DATA_URL.radar).catch(function () { return null; })
+    fetchJSON(DATA_URL.radar).catch(function () { return null; }),
+    fetchJSON(DATA_URL.debug).catch(function () { return null; }),
+    fetchJSON(DATA_URL.wishlist).catch(function () { return null; })
   ]).then(function (arr) {
     return {
       today: arr[0], weekly: arr[1], resources: arr[2], notes: arr[3],
-      schedule: arr[4], skills: arr[5], oc: arr[6], works: arr[7], prompts: arr[8], radar: arr[9]
+      schedule: arr[4], skills: arr[5], oc: arr[6], works: arr[7], prompts: arr[8],
+      radar: arr[9], debug: arr[10], wishlist: arr[11]
     };
   });
 }
@@ -2705,14 +2780,18 @@ function hydrateGrowth() {
     state.oc ? Promise.resolve(null) : fetchJSON(DATA_URL.oc).catch(function () { return null; }),
     state.works ? Promise.resolve(null) : fetchJSON(DATA_URL.works).catch(function () { return null; }),
     state.prompts ? Promise.resolve(null) : fetchJSON(DATA_URL.prompts).catch(function () { return null; }),
-    state.radar ? Promise.resolve(null) : fetchJSON(DATA_URL.radar).catch(function () { return null; })
+    state.radar ? Promise.resolve(null) : fetchJSON(DATA_URL.radar).catch(function () { return null; }),
+    state.debug ? Promise.resolve(null) : fetchJSON(DATA_URL.debug).catch(function () { return null; }),
+    state.wishlist ? Promise.resolve(null) : fetchJSON(DATA_URL.wishlist).catch(function () { return null; })
   ]).then(function (arr) {
     if (arr[0]) { state.skills = arr[0]; saveLocal('skills'); }
     if (arr[1]) { state.oc = arr[1]; saveLocal('oc'); }
     if (arr[2]) { state.works = arr[2]; saveLocal('works'); }
     if (arr[3]) { state.prompts = arr[3]; saveLocal('prompts'); }
     if (arr[4]) { state.radar = arr[4]; saveLocal('radar'); }
-    if (arr[0] || arr[1] || arr[2] || arr[3] || arr[4]) renderAll();
+    if (arr[5]) { state.debug = arr[5]; saveLocal('debug'); }
+    if (arr[6]) { state.wishlist = arr[6]; saveLocal('wishlist'); }
+    if (arr[0] || arr[1] || arr[2] || arr[3] || arr[4] || arr[5] || arr[6]) renderAll();
   });
 }
 
@@ -2739,6 +2818,8 @@ function applyData(data, source) {
   if (data.works !== undefined && data.works) state.works = data.works;
   if (data.prompts !== undefined && data.prompts) state.prompts = data.prompts;
   if (data.radar !== undefined && data.radar) state.radar = data.radar;
+  if (data.debug !== undefined && data.debug) state.debug = data.debug;
+  if (data.wishlist !== undefined && data.wishlist) state.wishlist = data.wishlist;
   if (data.schedule !== undefined) state.schedule = data.schedule;
   state.source = source;
   migrateToday();
@@ -2754,7 +2835,9 @@ var api = {
   saveOc: function () { save('oc'); },
   saveWorks: function () { save('works'); },
   savePrompts: function () { save('prompts'); },
-  saveRadar: function () { save('radar'); }
+  saveRadar: function () { save('radar'); },
+  saveDebug: function () { save('debug'); },
+  saveWishlist: function () { save('wishlist'); }
 };
 
 /* ============ 3. 启动 ============ */
@@ -2788,6 +2871,8 @@ function boot() {
       works: seed.works || null,
       prompts: seed.prompts || null,
       radar: seed.radar || null,
+      debug: seed.debug || null,
+      wishlist: seed.wishlist || null,
       schedule: seed.schedule || null
     }, 'seed');
     if (Array.isArray(seed.history) && seed.history.length) {
@@ -2895,46 +2980,116 @@ function progressDay(w, day) {
   return null;
 }
 
+/* 今日推进：一个卡片，两个来源
+   ① 企划日程（从 works 推导，不需要落库）
+   ② 手动「排进今天」（today.focus_tasks，来自技能 / 企划 / OC）
+   同一个企划如果已经有日程推进，就不再显示它的手动条目，避免重复。 */
+function todayPushList(day) {
+  var out = [];
+
+  /* ① 企划日程 */
+  pushTasks(day).forEach(function (t) {
+    out.push({
+      key: 'work:' + t.work_id,
+      kind: 'work',
+      work_id: t.work_id,
+      milestone_id: t.milestone_id,
+      title: t.milestone_name,
+      project: t.work_title,
+      planned: t.planned,
+      color: t.color,
+      done: !!(progressDay(findWorkById(t.work_id) || {}, day) || {}).done
+    });
+  });
+
+  /* ② 手动排进今天 */
+  var derived = {};
+  out.forEach(function (x) { if (x.work_id) derived[x.work_id] = true; });
+
+  (state.today && state.today.focus_tasks || []).forEach(function (task) {
+    var link = task.link || {};
+    if (link.type === 'work' && derived[link.id]) return;   /* 已有日程推进，跳过重复 */
+    out.push({
+      key: 'task:' + task.id,
+      kind: 'task',
+      task_id: task.id,
+      title: task.title,
+      project: '',
+      source: link.type === 'skill' ? '技能' : link.type === 'work' ? '企划' : (link.type === 'oc' ? 'OC' : '手动'),
+      link: link,
+      minutes: num(task.estimated_minutes),
+      done: task.status === 'done'
+    });
+  });
+
+  return out;
+}
+
 function renderPush() {
   var card = $('#pushCard');
   if (!card) return;
   var day = todayISO();
-  var tasks = pushTasks(day);
+  var list = todayPushList(day);
 
-  if (!tasks.length) {
+  if (!list.length) {
     card.hidden = true;
     card.innerHTML = '';
     return;
   }
   card.hidden = false;
 
-  var rows = tasks.map(function (t) {
-    var w = findWorkById(t.work_id);
-    var rec = w ? progressDay(w, day) : null;
-    var done = !!(rec && rec.done);
-    var msAll = ((w && w.milestones) || []).filter(function (m) { return !m.done; }).length;
-    return '<li class="push-item' + (done ? ' is-done' : '') + '">' +
-      '<button type="button" class="check" data-act="push" data-work="' + esc(t.work_id) + '">✓</button>' +
+  var rows = list.map(function (it) {
+    if (it.kind === 'work') {
+      var w = findWorkById(it.work_id);
+      var rec = w ? progressDay(w, day) : null;
+      var msAll = ((w && w.milestones) || []).filter(function (m) { return !m.done; }).length;
+      return '<li class="push-item' + (it.done ? ' is-done' : '') + '">' +
+        '<button type="button" class="check" data-act="push" data-work="' + esc(it.work_id) + '">✓</button>' +
+        '<div class="push-body">' +
+          '<div class="push-title"><span class="push-proj ' + it.color + '">' + esc(it.project) + '</span>' +
+            '<span class="push-dot">·</span>' + esc(it.title) +
+            '<span class="push-src">企划</span></div>' +
+          '<div class="push-hint">今天继续推进这一阶段即可，不要求今天完成整个里程碑。' +
+            (msAll > 1 ? '（还有 ' + msAll + ' 个里程碑未完成）' : '') + '</div>' +
+          (it.planned ? '<div class="push-ddl' + (it.planned < day ? ' is-over' : '') + '">' +
+            (it.planned < day ? '自己定的 DDL 已过：' : '你定的 DDL：') + esc(shortDate(it.planned)) + '</div>' : '') +
+          (it.done
+            ? '<div class="push-done-line">今天已推进' + (rec && rec.note ? '：' + esc(rec.note) : '') + '</div>'
+            : '<div class="push-note-row"><input type="text" id="pushNote-' + esc(it.work_id) + '" placeholder="今天具体推了什么（可选）">' +
+              '<button type="button" class="ghost-btn tiny" data-act="push-note" data-work="' + esc(it.work_id) + '">记一句</button></div>') +
+        '</div>' +
+        '<button type="button" class="ghost-btn tiny push-goto" data-act="push-goto" data-work="' + esc(it.work_id) + '">去企划</button>' +
+      '</li>';
+    }
+
+    var badge = it.source ? '<span class="push-src">' + esc(it.source) + '</span>' : '';
+    var jump = '';
+    if (it.link && it.link.type === 'work') {
+      jump = '<button type="button" class="ghost-btn tiny push-goto" data-act="push-goto" data-work="' + esc(it.link.id) + '">去企划</button>';
+    } else if (it.link && it.link.type === 'skill') {
+      jump = '<button type="button" class="ghost-btn tiny push-goto" data-act="push-goto-skill">去技能</button>';
+    }
+    return '<li class="push-item' + (it.done ? ' is-done' : '') + '">' +
+      '<button type="button" class="check" data-act="toggle" data-id="' + esc(it.task_id) + '">✓</button>' +
       '<div class="push-body">' +
-        '<div class="push-title"><span class="push-proj ' + t.color + '">' + esc(t.work_title) + '</span>' +
-          '<span class="push-dot">·</span>' + esc(t.milestone_name) + '</div>' +
-        '<div class="push-hint">今天继续推进这一阶段即可，不要求今天完成整个里程碑。' +
-          (msAll > 1 ? '（还有 ' + msAll + ' 个里程碑未完成）' : '') + '</div>' +
-        (t.planned ? '<div class="push-ddl' + (t.planned < day ? ' is-over' : '') + '">' +
-          (t.planned < day ? '自己定的 DDL 已过：' : '你定的 DDL：') + esc(shortDate(t.planned)) + '</div>' : '') +
-        (done
-          ? '<div class="push-done-line">今天已推进' + (rec.note ? '：' + esc(rec.note) : '') + '</div>'
-          : '<div class="push-note-row"><input type="text" id="pushNote-' + esc(t.work_id) + '" placeholder="今天具体推了什么（可选）">' +
-            '<button type="button" class="ghost-btn tiny" data-act="push-note" data-work="' + esc(t.work_id) + '">记一句</button></div>') +
+        '<div class="push-title">' + esc(it.title) + badge + '</div>' +
+        '<div class="push-hint">从成长页手动排进来的，做完勾掉即可。</div>' +
       '</div>' +
-      '<button type="button" class="ghost-btn tiny push-goto" data-act="push-goto" data-work="' + esc(t.work_id) + '">去企划</button>' +
+      (it.minutes ? '<span class="push-min">' + it.minutes + ' min</span>' : '') +
+      jump +
     '</li>';
   }).join('');
+
+  var workN = list.filter(function (x) { return x.kind === 'work'; }).length;
+  var taskN = list.length - workN;
+  var meta = [];
+  if (workN) meta.push('企划 ' + workN);
+  if (taskN) meta.push('手动 ' + taskN);
 
   card.innerHTML =
     '<header class="card-head">' +
       '<h2>今日推进</h2>' +
-      '<span class="eyebrow">长期企划往前走一步 · 不要求今天做完</span>' +
+      '<span class="eyebrow">' + (meta.join(' · ') || '') + ' · 不要求今天做完</span>' +
     '</header>' +
     '<ul class="push-list">' + rows + '</ul>';
 }
@@ -3190,13 +3345,15 @@ function findTask(id) {
   return null;
 }
 
-function taskRow(task) {
+function taskRow(task, titleOverride) {
   var done = task.status === 'done';
+  /* 防坑：Array.map 会把下标当第二个参数传进来，这里只认字符串 */
+  var title = (typeof titleOverride === 'string' && titleOverride) ? titleOverride : task.title;
   return '<li class="task' + (done ? ' is-done' : '') + '">' +
     '<button type="button" class="check" data-act="toggle" data-id="' + esc(task.id) + '" aria-label="切换完成状态">✓</button>' +
     '<div class="task-body">' +
-    '<div class="task-title">' + esc(task.title) + (task.skippable ? '<span class="skippable">可跳过</span>' : '') + '</div>' +
-    (task.hint ? '<div class="task-hint">' + esc(task.hint) + '</div>' : '') +
+    '<div class="task-title">' + esc(title) + (task.skippable ? '<span class="skippable">可跳过</span>' : '') + '</div>' +
+    (task.hint && !titleOverride ? '<div class="task-hint">' + esc(task.hint) + '</div>' : '') +
     '</div>' +
     '<span class="task-side">' + (task.estimated_minutes ? num(task.estimated_minutes) + ' min' : '') + '</span>' +
     '</li>';
@@ -3326,7 +3483,8 @@ function renderToday() {
   renderAnchors();
   renderRotation();
   renderOptional();
-  renderFocus();
+  renderDebug();
+  renderWishlist();
   renderProgress();
   renderLowEnergy();
   renderTodayNotes();
@@ -3404,7 +3562,7 @@ function renderAnchors() {
   var minutes = anchors.reduce(function (a, b) { return a + num(b.estimated_minutes); }, 0);
   $('#anchorMeta').textContent = anchors.length + ' 项 · 约 ' + minutes + ' 分钟';
   $('#anchorList').innerHTML = anchors.length
-    ? anchors.map(taskRow).join('')
+    ? anchors.map(function (a) { return taskRow(a); }).join('')
     : '<li class="empty">没有设置锚点。</li>';
 
   var note;
@@ -3441,32 +3599,171 @@ function renderOptional() {
   if (!o) { card.hidden = true; return; }
   card.hidden = false;
   var paused = t.mode && t.mode !== 'green';
+  /* 不预设具体题材：只提醒"今天可以探索一次"，看什么由你去探索页自己挑 */
+  var generic = '尝试在对应领域进行一次定向或不定向探索';
   card.innerHTML =
     '<header class="card-head"><h2>可选探索</h2><span class="eyebrow">今日不做也不算欠</span></header>' +
     (paused
       ? '<p class="empty">' + MODE_LABEL[t.mode] + '模式：已收起。</p>'
-      : '<ul class="tasks">' + taskRow(o) + '</ul>');
+      : '<ul class="tasks">' + taskRow(o, generic) + '</ul>' +
+        '<p class="fine">具体看什么，去「探索」页按当时的心情挑一个领域就行。</p>');
 }
 
-function renderFocus() {
-  var t = state.today || {};
-  var list = t.focus_tasks || [];
-  var card = $('#focusCard');
+/* ---------------- 每日 Debug ---------------- */
+
+function debugData() {
+  if (!state.debug || typeof state.debug !== 'object') state.debug = { version: 1, logs: [] };
+  if (!Array.isArray(state.debug.logs)) state.debug.logs = [];
+  return state.debug;
+}
+
+function debugRecord(day, create) {
+  var d = debugData();
+  for (var i = 0; i < d.logs.length; i++) if (d.logs[i].date === day) return d.logs[i];
+  if (!create) return null;
+  var rec = { date: day, done: false, note: '' };
+  d.logs.push(rec);
+  return rec;
+}
+
+function renderDebug() {
+  var card = $('#debugCard');
   if (!card) return;
-  if (!list.length) { card.hidden = true; return; }
-  card.hidden = false;
+  var day = todayISO();
+  var rec = debugRecord(day, false) || { date: day, done: false, note: '' };
+  var history = debugData().logs
+    .filter(function (x) { return x.date !== day; })
+    .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); })
+    .slice(0, 14);
+
+  var histHtml = history.length
+    ? '<details class="debug-history"><summary>过去 ' + history.length + ' 天的记录</summary>' +
+        '<ul class="log-list">' + history.map(function (h) {
+          return '<li><span class="log-date">' + esc(h.date) + '</span>' +
+            (h.done ? '<span class="debug-ok">已检查</span> ' : '<span class="debug-skip">未检查</span> ') +
+            esc(h.note || '—') + '</li>';
+        }).join('') + '</ul></details>'
+    : '';
+
   card.innerHTML =
-    '<header class="card-head"><h2>今日推进</h2><span class="eyebrow">来自技能 / OC</span></header>' +
-    '<ul class="tasks">' + list.map(function (task) {
-      var src = task.link
-        ? '<span class="skippable">' + (task.link.type === 'skill' ? '技能' : 'OC') + '</span>'
-        : '';
-      return '<li class="task' + (task.status === 'done' ? ' is-done' : '') + '">' +
-        '<button type="button" class="check" data-act="toggle" data-id="' + esc(task.id) + '">✓</button>' +
-        '<div class="task-body"><div class="task-title">' + esc(task.title) + src + '</div></div>' +
-        '<span class="task-side">' + num(task.estimated_minutes) + ' min</span>' +
-        '</li>';
-    }).join('') + '</ul>';
+    '<header class="card-head"><h2>每日 Debug</h2><span class="eyebrow">约 10 分钟 · 保养这个系统</span></header>' +
+    '<p class="fine">看看今天有没有哪里不对：任务显示、日期、计划符不符合实际。没问题也算完成。</p>' +
+    '<ul class="tasks">' +
+      '<li class="task' + (rec.done ? ' is-done' : '') + '">' +
+        '<button type="button" class="check" data-act="debug-toggle">✓</button>' +
+        '<div class="task-body"><div class="task-title">今日检查完成</div></div>' +
+        '<span class="task-side">10 min</span>' +
+      '</li>' +
+    '</ul>' +
+    '<div class="inline-form debug-note">' +
+      '<input type="text" id="debugNote" value="' + esc(rec.note || '') + '" placeholder="今天发现的问题 / 做的调整（可以留空）">' +
+      '<button type="button" class="ghost-btn tiny" data-act="debug-note">记下</button>' +
+      '<button type="button" class="ghost-btn tiny" data-act="debug-normal">今天系统正常</button>' +
+    '</div>' +
+    histHtml;
+}
+
+/* ---------------- 想做的事（长期愿望清单，和今日任务完全隔离） ---------------- */
+
+function wishData() {
+  if (!state.wishlist || typeof state.wishlist !== 'object') state.wishlist = { version: 1, items: [] };
+  if (!Array.isArray(state.wishlist.items)) state.wishlist.items = [];
+  return state.wishlist;
+}
+
+function renderWishlist() {
+  var card = $('#wishCard');
+  if (!card) return;
+  var items = wishData().items;
+  var open = items.filter(function (x) { return !x.done; });
+  var done = items.filter(function (x) { return x.done; }).slice(-20).reverse();
+
+  var row = function (it) {
+    return '<li class="wish-item' + (it.done ? ' is-done' : '') + '">' +
+      '<button type="button" class="check" data-act="wish-toggle" data-id="' + esc(it.id) + '">✓</button>' +
+      '<input type="text" class="wish-text" id="wishText-' + esc(it.id) + '" value="' + esc(it.text) + '" data-act="wish-edit" data-id="' + esc(it.id) + '">' +
+      '<button type="button" class="note-del" data-act="wish-del" data-id="' + esc(it.id) + '" title="删除">×</button>' +
+    '</li>';
+  };
+
+  card.innerHTML =
+    '<header class="card-head"><h2>想做的事</h2><span class="eyebrow">空下来时的储备 · 不是今日任务</span></header>' +
+    '<p class="fine">想看 / 想玩 / 想试试的东西先扔这里。它们不会进今天的任务，也不会欠账。</p>' +
+    '<form class="inline-form" id="wishForm" autocomplete="off">' +
+      '<input type="text" id="wishInput" placeholder="想看的电影、想玩的游戏、想读的书、想试的事…">' +
+      '<button type="submit" class="solid-btn">加入</button>' +
+    '</form>' +
+    '<ul class="wish-list">' + (open.length
+      ? open.map(row).join('')
+      : '<li class="fine">还没有。想到什么随时加。</li>') + '</ul>' +
+    (done.length
+      ? '<details class="wish-done"><summary>已完成 ' + done.length + ' 件</summary><ul class="wish-list">' +
+        done.map(row).join('') + '</ul></details>'
+      : '');
+}
+
+/* ---------------- 每日 Debug / 想做的事 交互 ---------------- */
+
+function toggleDebug() {
+  var day = todayISO();
+  var rec = debugRecord(day, true);
+  rec.done = !rec.done;
+  if (rec.done) rec.checked_at = day;
+  save('debug');
+  renderDebug();
+  toast(rec.done ? '今天的检查记下了' : '已取消');
+}
+
+function saveDebugNote(text) {
+  var rec = debugRecord(todayISO(), true);
+  rec.note = text;
+  save('debug');
+  renderDebug();
+}
+
+function addWish() {
+  var el = $('#wishInput');
+  if (!el || !el.value.trim()) { toast('写一句想做的事'); return; }
+  wishData().items.push({
+    id: 'wish_' + Date.now().toString(36),
+    text: el.value.trim(),
+    done: false,
+    created_at: todayISO(),
+    done_at: ''
+  });
+  save('wishlist');
+  renderWishlist();
+  toast('加进清单了');
+}
+
+function toggleWish(id) {
+  var it = wishData().items.filter(function (x) { return x.id === id; })[0];
+  if (!it) return;
+  it.done = !it.done;
+  it.done_at = it.done ? todayISO() : '';
+  save('wishlist');
+  renderWishlist();
+  toast(it.done ? '完成一件 ✓' : '已放回清单');
+}
+
+function editWish(id, text) {
+  var it = wishData().items.filter(function (x) { return x.id === id; })[0];
+  if (!it) return;
+  var v = String(text || '').trim();
+  if (!v) { renderWishlist(); return; }
+  it.text = v;
+  save('wishlist');
+  renderWishlist();
+}
+
+function delWish(id) {
+  var it = wishData().items.filter(function (x) { return x.id === id; })[0];
+  if (!it) return;
+  if (!confirm('删掉这条？\n\n' + it.text)) return;
+  state.wishlist.items = wishData().items.filter(function (x) { return x.id !== id; });
+  save('wishlist');
+  renderWishlist();
+  toast('已删除');
 }
 
 function renderProgress() {
@@ -4344,6 +4641,8 @@ function exportJSON() {
     works: state.works,
     prompts: state.prompts,
     radar: state.radar,
+    debug: state.debug,
+    wishlist: state.wishlist,
     history: state.history
   };
   var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -4430,6 +4729,19 @@ function bindEvents() {
     else if (act === 'rollover-day') { rolloverDay(); }
     else if (act === 'dismiss-notice') { state.ui.noticeDismissed = true; renderNotice(); }
     else if (act === 'quote-next') { nextQuote(); }
+    else if (act === 'debug-toggle') { toggleDebug(); }
+    else if (act === 'debug-note') { saveDebugNote((($('#debugNote') || {}).value || '').trim()); toast('记下了'); }
+    else if (act === 'debug-normal') {
+      var dn = debugRecord(todayISO(), true);
+      dn.done = true;
+      dn.note = '今天系统正常';
+      save('debug'); renderDebug(); toast('今天系统正常 ✓');
+    }
+    else if (act === 'wish-toggle') { toggleWish(el.dataset.id); }
+    else if (act === 'wish-del') { delWish(el.dataset.id); }
+    else if (act === 'push-goto-skill') {
+      if (window.GrowthModule && window.GrowthModule.openTab) window.GrowthModule.openTab('skills');
+    }
     else if (act === 'push') { togglePush(el.dataset.work); }
     else if (act === 'push-note') { savePushNote(el.dataset.work); }
     else if (act === 'push-goto') { gotoWork(el.dataset.work); }
@@ -4497,6 +4809,20 @@ function bindEvents() {
     if (e.target && e.target.id === 'radarLogFilter') {
       state.ui.radarLogDim = e.target.value;
       renderExplore();
+    }
+  });
+
+  /* 想做的事：表单提交 + 文字编辑 */
+  document.addEventListener('submit', function (e) {
+    if (e.target && e.target.id === 'wishForm') {
+      e.preventDefault();
+      addWish();
+    }
+  });
+
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.dataset && e.target.dataset.act === 'wish-edit') {
+      editWish(e.target.dataset.id, e.target.value);
     }
   });
 
@@ -4634,6 +4960,8 @@ function cloudApplyPayload(payload) {
     if (payload.works) state.works = payload.works;
     if (payload.prompts) state.prompts = payload.prompts;
     if (payload.radar) state.radar = payload.radar;
+    if (payload.debug) state.debug = payload.debug;
+    if (payload.wishlist) state.wishlist = payload.wishlist;
     if (Array.isArray(payload.history)) state.history = payload.history;
     saveLocal('today'); saveLocal('weekly'); saveLocal('resources'); saveLocal('notes');
     if (payload.skills) saveLocal('skills');
@@ -4641,6 +4969,8 @@ function cloudApplyPayload(payload) {
     if (payload.works) saveLocal('works');
     if (payload.prompts) saveLocal('prompts');
     if (payload.radar) saveLocal('radar');
+    if (payload.debug) saveLocal('debug');
+    if (payload.wishlist) saveLocal('wishlist');
     try { localStorage.setItem(KEY.history, JSON.stringify(state.history)); } catch (err) { /* ignore */ }
   } finally {
     CLOUD.suspend = false;
@@ -4690,6 +5020,8 @@ async function cloudPush() {
         works: state.works,
         prompts: state.prompts,
         radar: state.radar,
+        debug: state.debug,
+        wishlist: state.wishlist,
         history: state.history
       },
       updated_at: now
@@ -6145,6 +6477,13 @@ document.addEventListener('DOMContentLoaded', function () {
   window.GrowthModule = {
     render: function () { renderGrowth(); renderWeekGrowth(); renderReviewGrowth(); },
     openWork: openWork,
+    openTab: function (tab) {
+      state.ui.growthTab = tab;
+      try { localStorage.setItem('pgd.v1.growthTab', tab); } catch (e) { /* ignore */ }
+      renderGrowth();
+      var nav = document.querySelector('[data-view="growth"]');
+      if (nav) nav.click();
+    },
     bind: bind
   };
 
